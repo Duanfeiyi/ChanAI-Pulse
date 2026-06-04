@@ -1,105 +1,84 @@
 # ChanAI Pulse v1.0.0 公开发布安全审计
 
-生成时间：2026-06-04
+生成日期：2026-06-04
 
-## 1. 将要公开的文件
+## 1. 当前将要 push 的分支
 
-公开仓库应只包含以下内容：
+- 当前公开发布分支：`main`
+- 本地仍存在内部历史分支：`internal/history-before-public-release`
+- 本地仍存在旧分支：`master`
+- 发布要求：只 push `main`，不要 push `internal/history-before-public-release` 或 `master`
+- 当前 remote：未配置
 
-- `app/`
-- `core/`
-- `configs/`（如存在公开配置）
-- `demo_data/`
-- `docs/`
-- `tests/`
-- `release/` 中的脚本和发布说明
-- `README.md`
-- `LICENSE`
-- `CITATION.cff`
-- `CHANGELOG.md`
-- `ROADMAP.md`
-- `.gitignore`
-- `.github/ISSUE_TEMPLATE/`
+## 2. 当前 Git tracked 文件数量
 
-## 2. 不会公开的文件
+- 当前 `git ls-files` 跟踪文件数量：45
+- 跟踪文件范围包括：源码、公开 demo 数据、文档、测试、Release 说明、License、Citation、Roadmap、Issue templates
 
-以下内容不得公开：
+## 3. 是否包含 datasets/
 
-- `datasets/measured/raw_archives/`
-- `datasets/measured/extracted_preview/`
-- `datasets/measured/DATASET_AUDIT.md`
-- `datasets/measured/REAL_DATA_VALIDATION.md`
-- `datasets/measured/BEGINNER_GUIDE.md`
-- `legacy/`
-- 真实测量数据
-- zip / rar / 7z
-- 旧安装包 exe
-- 大型实验输出
+- 当前公开 `main` 分支未跟踪 `datasets/`
+- `datasets/` 已由 `.gitignore` 忽略
+- 真实测量数据只允许保留在本地，不进入公开仓库
 
-说明：`DATASET_AUDIT.md` 包含真实数据文件名和变量结构信息，存在元信息泄露风险，因此不应进入公开仓库。
+## 4. 是否包含真实测量压缩包
 
-## 3. 真实数据泄露风险
+- 当前 `git ls-files` 未发现 `.zip`、`.rar`、`.7z`
+- 当前 `git ls-files` 未发现 `datasets/measured/raw_archives/`
+- 当前 `git ls-files` 未发现 `datasets/measured/extracted_preview/`
+- 结论：未发现真实测量压缩包被 Git 跟踪
 
-当前公开分支必须使用干净历史，不能包含曾经提交过的真实数据审计文档或 legacy 备份文件。
+## 5. 是否包含 legacy/
 
-建议做法：
+- 当前公开 `main` 分支未跟踪 `legacy/`
+- `legacy/` 已由 `.gitignore` 忽略
+- 结论：原始大文件备份不会随公开源码发布
 
-- 保留本地内部历史分支；
-- 创建 orphan `main` 分支作为公开发布分支；
-- 只添加公开文件；
-- 不 push 内部分支。
+## 6. 是否包含大型压缩包、旧 installer 或 exe
 
-## 4. 大型压缩包与旧安装包检查
+- 当前 `git ls-files` 未发现 `.zip`、`.rar`、`.7z`
+- 当前 `git ls-files` 未发现 `.exe`
+- 当前 `git ls-files` 未发现旧 installer
+- 结论：未发现大型压缩包或旧安装包进入 Git
 
-公开仓库不得包含：
+## 7. MATLAB App Package 状态
 
-```text
-*.zip
-*.rar
-*.7z
-*.exe
-*.mlappinstall
-```
+- 人工打包文件位置：`release/matlab_app_package/ChanAI Pulse.mlappinstall`
+- Release 附件文件位置：`release/github_release_assets/ChanAI_Pulse_v1.0.0.mlappinstall`
+- Release 附件大小：213,155 bytes
+- `.mlappinstall` 已由 `.gitignore` 忽略
+- 发布策略：不提交到源码仓库，只作为 GitHub Release asset 上传
 
-`.mlappinstall` 应作为 GitHub Release 附件上传，不直接提交到源码仓库。
+## 8. Release assets
 
-## 5. MATLAB App Package 状态
+准备上传到 GitHub Release 的附件：
 
-目标文件：
+- `release/github_release_assets/ChanAI_Pulse_v1.0.0.mlappinstall`
+- `release/github_release_assets/安装说明.md`
+- `release/github_release_assets/README_RELEASE.md`
 
-```text
-release/matlab_app_package/ChanAI_Pulse_v1.0.0.mlappinstall
-```
+Release notes 文件：
 
-当前自动生成未成功。原因：`matlab.apputil.package` 需要有效的 App Packaging `.prj` 文件，而该 `.prj` 需要通过 MATLAB 图形化 App Packaging 工具创建。
+- `release/github_release_assets/RELEASE_DESCRIPTION.md`
 
-需要人工操作：
+Release 说明已明确：
 
-1. MATLAB 中运行 `addpath(genpath(pwd))`；
-2. 打开 Apps > Package App；
-3. Main file 选择 `app/ChannelSimulatorApp.m`；
-4. App name: `ChanAI Pulse`；
-5. Version: `1.0.0`；
-6. Include: `core/`, `configs/`, `demo_data/`, `docs/`, `README.md`, `LICENSE`；
-7. Exclude: `datasets/`, `legacy/`, build outputs；
-8. 输出 `ChanAI_Pulse_v1.0.0.mlappinstall`；
-9. 放入 `release/github_release_assets/` 用于 Release 附件。
+- This release requires MATLAB and required toolboxes. It is not a standalone executable.
+- No private measured datasets are included in this release.
 
-## 6. GitHub CLI 状态
+## 9. 是否适合公开发布
 
-`gh` 未安装或不可用，因此本机当前无法自动创建 GitHub 仓库或 GitHub Release。
+当前 `main` 分支适合公开发布源码版，前提是：
 
-需要人工操作：
+1. 只 push `main` 分支；
+2. 不 push `master`；
+3. 不 push `internal/history-before-public-release`；
+4. 不提交 `.mlappinstall` 到源码仓库；
+5. `.mlappinstall` 只通过 GitHub Release 附件上传；
+6. push 前再次确认 `git status` 干净；
+7. 如果 GitHub CLI 不可用，需要人工创建 GitHub 仓库或安装并登录 GitHub CLI。
 
-- 安装 GitHub CLI 并登录；或
-- 在 GitHub 网页手动创建 `ChanAI-Pulse` 公共仓库和 `v1.0.0` Release。
+## 10. 当前结论
 
-## 7. 是否适合发布
-
-源码内容在清理为公开 orphan `main` 分支后适合发布。
-
-当前阻塞：
-
-- `.mlappinstall` 尚未生成；
-- `gh` 不可用，无法自动创建仓库和 Release。
+安全审计通过。当前未发现真实测量数据、legacy 备份、旧安装包、大型压缩包或 `.mlappinstall` 被 Git 跟踪。
 
