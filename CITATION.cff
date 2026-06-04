@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use ChanAI Pulse in your research, please cite this repository and related publications."
+title: "ChanAI Pulse: AI-based Predictive Channel Modeling Platform for 6G Multi-Band and Multi-Scenario Communications"
+authors:
+  - name: "ChanAI Pulse Development Team"
+version: "1.0.0"
+date-released: "2026-06-04"
+repository-code: "https://github.com/your-org/ChanAI-Pulse"
+license: "Apache-2.0"
+

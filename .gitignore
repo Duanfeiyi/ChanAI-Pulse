@@ -1,0 +1,60 @@
+# MATLAB generated files
+*.asv
+*.m~
+*.autosave
+*.slxc
+*.mex*
+*.pcode
+*.mlappinstall
+*.prj
+*.log
+
+# MATLAB build and packaging output
+application/
+for_redistribution/
+for_testing/
+release/build/
+release/for_testing/
+release/for_redistribution/
+release/matlab_app_package/*.prj
+release/github_release_assets/*.mlappinstall
+PackagingLog.html
+mccExcludedFiles.log
+readme.txt
+requiredMCRProducts.txt
+
+# Large/private data and model outputs
+data/
+datasets/
+private_data/
+raw_data/
+*.zip
+*.rar
+*.7z
+*.onnx
+*.h5
+*.hdf5
+
+# Real measured datasets stay local by default.
+datasets/measured/
+legacy/
+
+# Keep synthetic demo data trackable
+!demo_data/
+!demo_data/*.mat
+!demo_data/*.m
+!demo_data/README.md
+
+# Experiment and runtime outputs
+experiments/exp_*/
+results/*
+!results/README.md
+models/*
+!models/README.md
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
