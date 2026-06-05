@@ -41,9 +41,12 @@ legacy/
 
 # Keep synthetic demo data trackable
 !demo_data/
+!demo_data/**
 !demo_data/*.mat
 !demo_data/*.m
 !demo_data/README.md
+!demo_data/chanais_demo/data/
+!demo_data/chanais_demo/data/**
 
 # Experiment and runtime outputs
 experiments/exp_*/

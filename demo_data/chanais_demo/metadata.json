@@ -1,0 +1,29 @@
+{
+  "schema_version": "ChanAIs-Dataset-v1.0-draft",
+  "dataset_version": "1.0.0-demo",
+  "dataset_id": "chanais_synthetic_sage_demo",
+  "scenario": "synthetic_demo_scenario",
+  "environment": "synthetic_indoor_like",
+  "frequency_band": "synthetic_mmwave_like",
+  "carrier_frequency": 28000000000,
+  "bandwidth": 100000000,
+  "antenna_configuration": "synthetic_16_element_virtual_array",
+  "polarization": "Pol_0",
+  "mobility": "synthetic_moving_receiver",
+  "trajectory": "MovingR1",
+  "los_condition": "synthetic_mixed",
+  "sampling_interval": 0.001,
+  "time_window": "0-1s",
+  "data_source": "synthetic_demo",
+  "data_type": "SAGE",
+  "license": "Apache-2.0 for code; synthetic demo data for public testing",
+  "visibility": "public_demo",
+  "units": {
+    "delay": "s",
+    "frequency": "Hz",
+    "angle": "degree",
+    "power": "linear"
+  },
+  "notes": "Synthetic SAGE-like demo data. Not measured data and not valid benchmark evidence."
+}
+

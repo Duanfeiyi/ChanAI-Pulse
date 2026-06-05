@@ -5,6 +5,7 @@
 ChanAI Pulse is currently released as a MATLAB desktop research prototype and MATLAB App Package. It is designed to support channel research across Sub-6 GHz, mmWave, THz, optical wireless, satellite, UAV, maritime, RIS, industrial IoT, ISAC-oriented, and other emerging wireless scenarios.
 
 > Current release: v1.0.0  
+> Current development direction: v1.1.0 ChanAIs Dataset  
 > Source code: [https://github.com/Duanfeiyi/ChanAI-Pulse](https://github.com/Duanfeiyi/ChanAI-Pulse)  
 > Release page: [ChanAI Pulse v1.0.0](https://github.com/Duanfeiyi/ChanAI-Pulse/releases/tag/v1.0.0)
 
@@ -109,6 +110,7 @@ The repository includes small synthetic demo files:
 
 - `demo_data/demo_sub6_scenario1.mat`
 - `demo_data/demo_mmwave_scenario2.mat`
+- `demo_data/chanais_demo/` synthetic SAGE-like ChanAIs demo structure
 
 These files are synthetic demo data for GUI loading and visualization checks only. They are not measured datasets and must not be used as formal scientific benchmark evidence.
 
@@ -128,6 +130,7 @@ See:
 
 - `docs/DATASET_POLICY.md`
 - `docs/CHANAIS_DATASET_PLAN.md`
+- `docs/DATASET_SPECIFICATION.md`
 
 ## Project Showcase
 
@@ -144,6 +147,8 @@ ChanAI Pulse will be extended with a future ChanAIs Dataset and benchmark ecosys
 Planning documents:
 
 - `docs/CHANAIS_DATASET_PLAN.md`
+- `docs/DATASET_SPECIFICATION.md`
+- `docs/templates/DATASET_CARD_TEMPLATE.md`
 - `docs/BENCHMARK_PLAN.md`
 - `ROADMAP.md`
 
@@ -152,11 +157,13 @@ Planning documents:
 ```text
 app/                  MATLAB App entry point
 core/                 Low-risk extracted helper functions
+core/dataset/         Lightweight ChanAIs Dataset manager interfaces
 configs/              Public configuration notes
 demo_data/            Public synthetic demo data
 docs/                 User, collaboration, dataset, and planning docs
 release/              Release notes and packaging workflow docs
 tests/                Smoke tests and validation probes
+tools/                Dataset converter framework and utilities
 ```
 
 Local-only directories such as `datasets/`, `legacy/`, `experiments/`, `models/`, and `results/` are ignored for public release unless explicitly reviewed and approved.
@@ -183,4 +190,3 @@ ChanAI Pulse is released under the Apache License 2.0. See `LICENSE`.
 ## Acknowledgements
 
 ChanAI Pulse is developed as a research-oriented platform for full-frequency and full-scenario wireless channel modeling, generation, and AI-based prediction, with 6G-oriented applications.
-

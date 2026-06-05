@@ -2,42 +2,69 @@
 
 This roadmap is directional and does not commit to specific release dates.
 
-## v1.0.0
+## v1.0.0 - Platform Prototype
 
-MATLAB desktop Release Candidate.
+Status: completed.
 
-- Preserve the current three-module App workflow.
-- Provide synthetic demo data.
-- Document measured dataset policy.
-- Provide basic smoke tests and collaboration documentation.
-- Keep installer packaging deferred until MATLAB Compiler is available.
+- MATLAB desktop research prototype.
+- Three-module workflow: Channel Characterization, Channel Generation, Channel Prediction & Training.
+- Public source code release.
+- MATLAB App Package release.
+- Synthetic demo data.
+- Dataset policy and collaboration documentation.
 
-## v1.1.0
+## v1.1.0 - ChanAIs Dataset
 
-Benchmark and experiment management improvements.
+Status: active planning and initial framework.
 
-- Enhanced benchmark report generation.
-- Experiment manager for configs, metrics, figures, models, and logs.
-- More synthetic demo scenarios.
-- More validation around measured SAGE/CIR inputs.
-- Better dataset schema documentation.
+Goals:
 
-## v1.2.0
+- Define ChanAIs Dataset v1.0.
+- Establish unified wireless channel data format.
+- Establish unified metadata specification.
+- Provide SAGE / CIR / CTF / PDP compatibility plan.
+- Add SAGE-compatible converter framework.
+- Add synthetic SAGE-like public demo dataset.
+- Add lightweight Dataset Manager interfaces.
 
-MATLAB installer release.
+Out of scope for v1.1.0:
 
-- Resolve MATLAB Compiler installation/path issue.
-- Add `release/build_installer.m`.
-- Validate standalone installer behavior.
-- Document runtime requirements and packaging steps.
+- Benchmark leaderboard.
+- New prediction algorithms.
+- Physics-informed loss.
+- Web platform.
+- Public release of private measured datasets.
 
-## v2.0.0
+## v1.2.0 - ChanAI Benchmark
 
-Broader platform and dataset evolution.
+Planned.
 
-- ChanAIs Dataset as a separate governed dataset release.
-- Optional Web interface exploration.
+- Define benchmark tasks and fixed dataset splits.
+- Add reproducible evaluation reports.
+- Add baseline result templates.
+- Prepare future leaderboard rules.
+
+## v2.0.0 - Physics-Informed Prediction
+
+Planned.
+
+- Explore physics-informed constraints for channel prediction.
+- Connect channel statistics, propagation priors, and AI models.
+- Preserve compatibility with ChanAIs Dataset and Benchmark formats.
+
+## v2.1.0 - Cross-Scenario Generalization
+
+Planned.
+
+- Study transfer across frequency bands, environments, mobility patterns, and antenna configurations.
+- Define cross-scenario validation protocols.
+- Extend dataset metadata and split strategy.
+
+## v3.0.0 - Web Platform & Cloud Deployment
+
+Planned.
+
+- Explore Web platform and cloud deployment after MATLAB workflow and dataset standards are stable.
 - Possible Python/FastAPI/React migration path.
-- Cross-language config and metrics schema.
-- Expanded multi-band, multi-scenario benchmark workflows.
+- Cloud-side experiment tracking and collaborative dataset browsing.
 
