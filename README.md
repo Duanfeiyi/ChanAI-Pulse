@@ -1,87 +1,97 @@
 # ChanAI Pulse
 
-**ChanAI Pulse** is an AI-based Predictive Channel Modeling Platform for 6G multi-band and multi-scenario communications.
+**ChanAI Pulse** is an AI-driven universal channel characterization, generation and prediction platform for full-frequency and full-scenario wireless channel research, with 6G-oriented applications.
 
-This v1.0.0 Release Candidate is a MATLAB desktop research prototype. It focuses on keeping the existing MATLAB App runnable, preserving the original three-module workflow, and preparing the project for a clean public GitHub release.
+ChanAI Pulse is currently released as a MATLAB desktop research prototype and MATLAB App Package. It is designed to support channel research across Sub-6 GHz, mmWave, THz, optical wireless, satellite, UAV, maritime, RIS, industrial IoT, ISAC-oriented, and other emerging wireless scenarios.
 
-## Overview
+> Current release: v1.0.0  
+> Source code: [https://github.com/Duanfeiyi/ChanAI-Pulse](https://github.com/Duanfeiyi/ChanAI-Pulse)  
+> Release page: [ChanAI Pulse v1.0.0](https://github.com/Duanfeiyi/ChanAI-Pulse/releases/tag/v1.0.0)
 
-ChanAI Pulse is designed for integrated 6G channel research across bands and scenarios such as Sub-6 GHz, mmWave, THz, optical wireless, satellite, UAV, maritime, RIS, industrial IoT, and ISAC-oriented environments.
+## Release Download
 
-The current release centers on three workflows:
+The v1.0.0 release provides a MATLAB App Package:
 
-- Channel Characterization
-- Channel Generation
-- Channel Prediction & Training
+```text
+ChanAI_Pulse_v1.0.0.mlappinstall
+```
 
-The repository includes source code, documentation, tests, and small synthetic demo data. It does **not** include private measured datasets, thesis PDFs, defense slides, or installer binaries.
+This package requires MATLAB and the required toolboxes. It is **not** a standalone executable and does not include MATLAB Runtime packaging.
+
+Installation notes:
+
+- Chinese installation guide: `release/github_release_assets/INSTALL_CN.md`
+- Release README: `release/github_release_assets/README_RELEASE.md`
+- Release description: `release/github_release_assets/RELEASE_DESCRIPTION.md`
 
 ## Key Features
 
-- MATLAB desktop App with a three-tab GUI.
-- Bilingual UI support for English and Chinese.
-- Multi-band and multi-scenario entry points.
-- Channel characteristic visualization.
-- Native stochastic channel generation workflow.
-- AI prediction and training workflow.
+- MATLAB desktop App with the original three-module GUI workflow.
+- Bilingual English / Chinese interface support.
+- Full-frequency and full-scenario research positioning with 6G-oriented applications.
+- Channel characterization and visualization workflow.
+- Stochastic channel generation and synthetic data workflow.
+- Channel prediction and training workflow.
 - TCN, LSTM, and GRU model selection support.
-- Low-risk extracted helper functions under `core/`.
-- Small synthetic demo data for public loading and visualization checks.
-- Local measured dataset audit and policy documentation.
-- GitHub collaboration guides for student teams.
+- Small public synthetic demo data for loading and visualization checks.
+- Clear local measured dataset policy.
+- Collaboration, release, and benchmark planning documents for student research teams.
 
-## System Architecture
-
-```text
-MATLAB App GUI
-  |
-  +-- Channel Characterization
-  |     +-- raw data extraction
-  |     +-- angular spectrum estimation
-  |     +-- delay / Doppler / spread visualization
-  |
-  +-- Channel Generation
-  |     +-- stochastic channel generation
-  |     +-- synthetic channel tensor workflow
-  |     +-- send-to-AI data path
-  |
-  +-- Channel Prediction & Training
-        +-- TCN / LSTM / GRU selection
-        +-- recursive prediction workflow
-        +-- RMSE / NRMSE / capacity-oriented metrics
-```
-
-## Modules
+## Core Modules
 
 ### Channel Characterization
 
-Loads channel-like MATLAB data and visualizes key channel characteristics such as angular power, delay power, Doppler behavior, and spread CDF.
+Loads MATLAB channel-like data and supports characteristic analysis such as angular spectrum, delay-domain behavior, Doppler-related behavior, and spread distribution visualization.
 
 ### Channel Generation
 
-Provides a MATLAB-native stochastic generation workflow for synthetic channel data and data augmentation experiments.
+Provides MATLAB-native stochastic channel generation and data augmentation workflows for controlled synthetic channel experiments.
 
 ### Channel Prediction & Training
 
-Supports TCN, LSTM, and GRU model selection in the existing MATLAB App workflow. The v1.0.0 RC preserves the current training and prediction behavior.
+Supports the existing MATLAB App prediction and training workflow with TCN, LSTM, and GRU model options. The v1.0.0 public release preserves the current training and prediction behavior.
 
-## Screenshots
+## System Workflow
 
-Screenshots will be added after final manual GUI validation.
+```text
+Measured or synthetic channel-like data
+  |
+  v
+Channel characterization
+  |
+  v
+Channel generation and augmentation
+  |
+  v
+AI training and prediction
+  |
+  v
+Metric evaluation and validation
+```
 
-Recommended screenshots:
+## MATLAB Requirements
 
-- Characterization page
-- Channel Generation page
-- Prediction & Training page
-- English/Chinese UI switch
+Recommended MATLAB version:
 
-## Installation
+- MATLAB R2022b or later
 
-Clone the repository and open MATLAB from the project root.
+Required toolboxes:
+
+- Deep Learning Toolbox
+- Signal Processing Toolbox
+- Statistics and Machine Learning Toolbox
+
+Recommended toolboxes:
+
+- Communications Toolbox
+- 5G Toolbox
+
+## Quick Start From Source
+
+Clone the repository:
 
 ```bash
-git clone https://github.com/your-org/ChanAI-Pulse.git
+git clone https://github.com/Duanfeiyi/ChanAI-Pulse.git
 cd ChanAI-Pulse
 ```
 
@@ -93,31 +103,6 @@ run("tests/smoke_test.m")
 ChannelSimulatorApp
 ```
 
-## MATLAB Requirements
-
-Validated local environment:
-
-- MATLAB R2022b
-- Deep Learning Toolbox
-- Signal Processing Toolbox
-- Statistics and Machine Learning Toolbox
-
-MATLAB Compiler is not currently available in the validated local installation, so an installer is not provided in this RC.
-
-## Quick Start
-
-1. Open MATLAB.
-2. Change directory to the repository root.
-3. Run:
-
-```matlab
-addpath(genpath(pwd))
-run("tests/smoke_test.m")
-ChannelSimulatorApp
-```
-
-4. Use `demo_data/` for public synthetic loading and visualization checks.
-
 ## Demo Data
 
 The repository includes small synthetic demo files:
@@ -125,38 +110,58 @@ The repository includes small synthetic demo files:
 - `demo_data/demo_sub6_scenario1.mat`
 - `demo_data/demo_mmwave_scenario2.mat`
 
-These files are generated data for GUI loading and visualization tests only. They are not measured datasets and must not be used as scientific benchmark evidence.
+These files are synthetic demo data for GUI loading and visualization checks only. They are not measured datasets and must not be used as formal scientific benchmark evidence.
 
-To regenerate:
+To regenerate the demo data:
 
 ```matlab
 run("demo_data/generate_demo_data.m")
 ```
 
-## Measured Dataset Policy
+## Dataset Policy
 
-Private measured datasets are not included in this public repository.
+No private measured datasets are included in this public repository or v1.0.0 Release.
 
-Measured data under local paths such as `datasets/measured/raw_archives/` and `datasets/measured/extracted_preview/` are for internal validation only. They must not be committed, uploaded, copied into `demo_data/`, or published through GitHub.
+The GitHub repository only contains synthetic demo data. Private measured data, local raw archives, extracted previews, large experiment outputs, and legacy backups must not be uploaded.
 
-Only synthetic demo data is included in this repository. A future ChanAIs Dataset release, if any, should be handled as a separate dataset project with independent authorization, metadata, versioning, and licensing.
+See:
 
-See `docs/DATASET_POLICY.md`.
+- `docs/DATASET_POLICY.md`
+- `docs/CHANAIS_DATASET_PLAN.md`
+
+## Project Showcase
+
+A text-based project overview for supervisors, collaborators, and industry visitors is available in:
+
+- `docs/PROJECT_SHOWCASE.md`
+
+The current repository does not include GUI screenshots. Screenshots may be added later after a separate manual review and privacy check.
+
+## Benchmark And Dataset Roadmap
+
+ChanAI Pulse will be extended with a future ChanAIs Dataset and benchmark ecosystem after authorization, anonymization, schema unification, and task definition work is complete.
+
+Planning documents:
+
+- `docs/CHANAIS_DATASET_PLAN.md`
+- `docs/BENCHMARK_PLAN.md`
+- `ROADMAP.md`
 
 ## Project Structure
 
 ```text
 app/                  MATLAB App entry point
 core/                 Low-risk extracted helper functions
-datasets/measured/    Local-only measured dataset documentation
+configs/              Public configuration notes
 demo_data/            Public synthetic demo data
-docs/                 User, release, dataset, and collaboration docs
-legacy/               Original App backup
-release/              Packaging and MATLAB Compiler diagnosis
+docs/                 User, collaboration, dataset, and planning docs
+release/              Release notes and packaging workflow docs
 tests/                Smoke tests and validation probes
 ```
 
-## GitHub Collaboration
+Local-only directories such as `datasets/`, `legacy/`, `experiments/`, `models/`, and `results/` are ignored for public release unless explicitly reviewed and approved.
+
+## Collaboration
 
 Team workflow documentation is available in:
 
@@ -164,29 +169,6 @@ Team workflow documentation is available in:
 - `docs/CONTRIBUTING.md`
 - `docs/GUI_MANUAL_TEST_CHECKLIST.md`
 - `docs/RELEASE_CHECKLIST.md`
-
-Recommended future branch structure:
-
-```text
-main
-dev
-feature/ui
-feature/data
-feature/benchmark
-feature/docs
-feature/prediction
-```
-
-## Roadmap
-
-See `ROADMAP.md`.
-
-Short version:
-
-- v1.0.0: MATLAB desktop Release Candidate
-- v1.1.0: benchmark and experiment-management improvements
-- v1.2.0: MATLAB installer after MATLAB Compiler issue is resolved
-- v2.0.0: ChanAIs Dataset and possible Web/Python migration exploration
 
 ## Citation
 
@@ -200,5 +182,5 @@ ChanAI Pulse is released under the Apache License 2.0. See `LICENSE`.
 
 ## Acknowledgements
 
-ChanAI Pulse is developed as a research-oriented 6G channel modeling and AI prediction platform. The v1.0.0 RC prioritizes reproducibility, maintainability, and safe open-source project structure.
+ChanAI Pulse is developed as a research-oriented platform for full-frequency and full-scenario wireless channel modeling, generation, and AI-based prediction, with 6G-oriented applications.
 
