@@ -15,7 +15,8 @@ end
 
 records = normalizeSageContainer(loaded.sage);
 fieldSummary = repmat(struct("record_index", [], "fields", strings(0, 1), ...
-    "has_cir", false, "cir_size", [], "cir_is_complex", false), 1, numel(records));
+    "has_cir", false, "cir_size", [], "cir_canonical_size", [], ...
+    "cir_is_complex", false), 1, numel(records));
 
 for idx = 1:numel(records)
     item = records{idx};
@@ -26,6 +27,8 @@ for idx = 1:numel(records)
             fieldSummary(idx).has_cir = true;
             fieldSummary(idx).cir_size = size(item.cir);
             fieldSummary(idx).cir_is_complex = ~isreal(item.cir);
+            [~, cirInfo] = canonicalize_cir(item.cir);
+            fieldSummary(idx).cir_canonical_size = cirInfo.canonical_size;
         end
     end
 end
@@ -46,4 +49,3 @@ else
     error("read_sage_mat:UnsupportedSage", "Unsupported sage variable class: %s", class(sage));
 end
 end
-
