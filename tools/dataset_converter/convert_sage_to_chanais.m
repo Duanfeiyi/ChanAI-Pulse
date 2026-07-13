@@ -46,6 +46,10 @@ for fileIdx = 1:numel(files)
         record.data_type = "SAGE";
         record.path_parameters = struct();
         record.quality = struct();
+        % Keep top-level fields stable when SAGE records have different fields.
+        record.cir = [];
+        record.cir_estimated = [];
+        record.warning = "";
 
         record = copyIfPresent(record, source, "alpha", "path_parameters", "alpha");
         record = copyIfPresent(record, source, "doa", "path_parameters", "doa");
@@ -66,7 +70,7 @@ for fileIdx = 1:numel(files)
         else
             record.validation_status = "PASS";
         end
-        if isfield(record, "warning")
+        if record.warning ~= ""
             recordWarnings(end + 1, 1) = record.record_id + ": " + record.warning; %#ok<AGROW>
         end
 
