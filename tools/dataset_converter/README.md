@@ -14,7 +14,7 @@ The current scope is a framework only. It does not convert or publish private me
 ## Files
 
 - `inspect_mat_dataset.m`: read-only inspection of variables, classes, dimensions, and likely channel-related fields.
-- `build_metadata_template.m`: creates a ChanAIs metadata struct with required fields.
+- `build_metadata_template.m`: creates a ChanAIs metadata struct with core, recommended, and optional fields.
 - `convert_sage_to_chanais.m`: maps SAGE-compatible `.mat` files to a normalized `chanais` MATLAB structure.
 
 ## Safety Rules
@@ -39,3 +39,15 @@ chanais = convert_sage_to_chanais(inputFile, outputDir, metadata);
 
 Generated outputs from private datasets should stay local.
 
+## Validation Status
+
+The dataset validator returns `PASS`, `WARNING`, or `FAIL`.
+
+- `PASS`: core and recommended metadata are available and channel files are present.
+- `WARNING`: the dataset can be loaded safely, but recommended context is incomplete.
+- `FAIL`: core identity metadata or usable channel data is missing.
+
+For SAGE conversion, `sage.cir`, `sage.cir_e`, or `sage.alpha` is sufficient
+for a record to remain usable. Missing `doa`, `delay`, or likelihood becomes a
+warning so historical data can still be inspected without being silently
+misrepresented as complete.

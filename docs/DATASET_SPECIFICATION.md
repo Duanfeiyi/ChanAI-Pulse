@@ -34,13 +34,36 @@ Directory meanings:
 - `splits/`: train, validation, and test split files.
 - `README.md`: human-readable dataset card summary and usage notes.
 
-## 3. Required Metadata
+## 3. Metadata Levels
 
-Each dataset should define the following metadata fields:
+ChanAIs deliberately uses three metadata levels. Existing measurement
+datasets are often incomplete, so the schema must make their limitations
+visible without unnecessarily blocking safe read-only use.
+
+### Core required metadata
+
+These fields identify a dataset and are required for a valid ChanAIs
+dataset:
 
 ```text
 dataset_id
 scenario
+data_source
+data_type
+visibility
+```
+
+`data_source` should state whether the data is measured, simulated, or
+synthetic. `visibility` must make the publication boundary explicit.
+Placeholder values such as `unspecified` do not satisfy a core field.
+
+### Recommended metadata
+
+The following fields make physical interpretation, comparison, and future
+benchmark use more reliable. Missing values produce a warning, not a hard
+failure:
+
+```text
 environment
 frequency_band
 carrier_frequency
@@ -52,13 +75,13 @@ trajectory
 los_condition
 sampling_interval
 time_window
-data_source
-data_type
 license
-visibility
+units
 ```
 
-Recommended optional fields:
+### Optional metadata
+
+These fields are useful when available but are not needed for basic loading:
 
 ```text
 schema_version
@@ -210,16 +233,31 @@ private_measured
 
 The public ChanAI Pulse repository must only include `public_demo` synthetic data unless a separate review approves a public measured dataset.
 
-## 9. Validation Rules
+## 9. Validation Rules And Graceful Degradation
 
-A dataset should be considered valid if:
+The validator returns one of three statuses:
 
-1. `metadata.json` exists.
-2. Required metadata fields are present.
-3. At least one supported data type is declared.
-4. Data files are present under `data/raw`, `data/processed`, or `data/features`.
-5. Private measured data is not included in public demo releases.
-6. Units and visibility are documented.
+| Status | Meaning | Platform behavior |
+| --- | --- | --- |
+| `PASS` | Core and recommended metadata are present, and data files are found. | Load and expose all capabilities supported by the file contents. |
+| `WARNING` | Core metadata and data files are present, but recommended context or optional fields are absent. | Allow safe loading; show what analysis is unavailable or less interpretable. |
+| `FAIL` | The dataset root, `metadata.json`, a core metadata value, a supported `data_type`, or a channel data file is missing. | Do not enter the normal dataset loading flow; report the concrete missing item. |
+
+At record level, a SAGE record containing `sage.cir` can support CIR-based
+loading and characterization even when path parameters are incomplete. A
+record without `sage.cir`, `cir`, `ctf`, `pdp`, or usable path parameters is
+not a usable channel record and should be reported as `FAIL`.
+
+Examples:
+
+- A SAGE file with `sage.cir` but no `sage.doa` is `WARNING`: time-domain
+  analysis remains possible, while angle-spectrum analysis is unavailable.
+- A CIR dataset without a documented carrier frequency is `WARNING`: it can
+  be loaded, but cross-band interpretation is limited.
+- A file with no CIR, CTF, PDP, or SAGE channel representation is `FAIL`.
+
+The validator never changes source data. A warning is information for the
+user, not a request to rewrite historical measured files.
 
 ## 10. v1.1.0 Scope
 
@@ -231,4 +269,3 @@ The v1.1.0 scope is:
 - Provide lightweight dataset loading and validation interfaces.
 
 The v1.1.0 scope does not include benchmark leaderboard, new prediction algorithms, physics-informed modeling, Web deployment, or public release of private measured datasets.
-
