@@ -968,12 +968,6 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                         trainingPolicy = "synthetic_only_chronological";
                     end
                 end
-                XTrain = experiment.train.input_cells;
-                YTrain = experiment.train.targets;
-                XValidation = experiment.validation.input_cells;
-                YValidation = experiment.validation.targets;
-                nL = size(YTrain, 2);
-                layers = build_prediction_layers(app.selectedAlgo, nL);
             catch ME
                 if strcmp(app.CurrentLang, 'CN')
                     uialert(app.UIFigure, ['无法建立训练、验证与测试切分: ' ME.message], '错误');
@@ -1010,29 +1004,20 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 drawnow limitrate; pause(0.1); 
             end
             
-            validationFrequency = max(1, floor(numel(XTrain) / 16));
-            opts = trainingOptions('adam', 'MaxEpochs', 500, 'MiniBatchSize', 16, ...
-                'InitialLearnRate', 0.005, 'LearnRateSchedule', 'piecewise', ...
-                'LearnRateDropPeriod', 200, 'LearnRateDropFactor', 0.5, ...
-                'GradientThreshold', 1, 'ValidationData', {XValidation, YValidation}, ...
-                'ValidationFrequency', validationFrequency, 'Plots', plot_mode, 'Verbose', 0);
-            
             t_train = tic;
             try
-                trainedNet = trainNetwork(XTrain, YTrain, layers, opts);
-                [validationPrediction, ~] = predict_holdout_partition( ...
-                    trainedNet, experiment.validation, experiment.norm_params);
-                validationRMSE = compute_rmse(validationPrediction, experiment.validation.raw_targets);
-                validationNRMSE = compute_nrmse(validationRMSE, experiment.validation.raw_targets);
-                app.TrainedNet = trainedNet;
+                trainingResult = train_prediction_model(experiment, app.selectedAlgo, ...
+                    "PlotMode", plot_mode);
+                app.TrainedNet = trainingResult.net;
                 app.ExperimentContext = struct( ...
                     'experiment', experiment, ...
                     'evaluation_dataset_index', evaluationIndex, ...
                     'evaluation_dataset_label', string(app.DatasetPaths{evaluationIndex}), ...
                     'training_dataset_index', idx, ...
                     'training_policy', trainingPolicy, ...
-                    'validation_rmse', validationRMSE, ...
-                    'validation_nrmse', validationNRMSE);
+                    'validation_rmse', trainingResult.validation_rmse, ...
+                    'validation_nrmse', trainingResult.validation_nrmse);
+                app.LastTrainTime = trainingResult.train_time;
                 success = true;
             catch ME
                 if ~isvalid(app) || ~isvalid(app.UIFigure), return; end
@@ -1050,7 +1035,9 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                     uialert(app.UIFigure, ['Training failed: ' ME.message], 'Error'); 
                 end
             end
-            app.LastTrainTime = toc(t_train);
+            if ~success
+                app.LastTrainTime = toc(t_train);
+            end
             
             if ~isvalid(app) || ~isvalid(app.UIFigure), return; end
             if ~isempty(d) && isvalid(d), delete(d); end
@@ -1084,8 +1071,6 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             end
             experiment = app.ExperimentContext.experiment;
             evaluationIndex = app.ExperimentContext.evaluation_dataset_index;
-            gt_dbm = experiment.test.raw_targets;
-            [nS, curr_dim] = size(gt_dbm);
             metric_data = app.ChannelMetrics{evaluationIndex};
             
             prevState = app.UIFigure.WindowState;
@@ -1096,60 +1081,18 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             end
             drawnow;
             
-            mu_v = app.NormParams.Mu;
-            sig_v = app.NormParams.Sigma;
-            mu_v_t = mu_v';
-            sig_v_t = sig_v';
-            win = app.PredictionWindow;
-            
-            t_infer = tic;
-            [preds_dbm, ~] = predict_holdout_partition( ...
-                app.TrainedNet, experiment.test, app.NormParams);
-            
             future_len = round(app.PredLengthEdit.Value);
             batch_size = round(app.BatchSizeEdit.Value);
             if batch_size < 1, batch_size = 1; end
-            
-            future_preds_cell = cell(batch_size, 1);
-            if future_len > 0 && ~isempty(app.TrainedNet)
-                base_window_norm = experiment.test.input_cells{end};
-                for b = 1:batch_size
-                    current_window_norm = base_window_norm;
-                    if batch_size > 1, current_window_norm = current_window_norm + randn(size(current_window_norm)) * 0.02; end
-                    curr_future = zeros(future_len, curr_dim);
-                    for step = 1:future_len
-                        p_norm = predict(app.TrainedNet, {current_window_norm}); 
-                        p_val = p_norm .* sig_v_t + mu_v_t;
-                        curr_future(step, :) = p_val;
-                        c_cols = size(current_window_norm, 2); current_window_norm = [current_window_norm(:, 2:c_cols), p_norm'];
-                    end
-                    future_preds_cell{b} = curr_future;
-                end
-            end
-            t_infer_end = toc(t_infer);
-            
-            B_hz = app.BandwidthEdit.Value * 1e6; res = struct();
+            B_hz = app.BandwidthEdit.Value * 1e6;
             noise_dBm = [noise_test, noise_test-5, noise_test-10, noise_test-15, noise_test-20];
-            [res.CapAcc, res.SNR, res.C_pre, res.C_ori] = compute_capacity_accuracy(preds_dbm, gt_dbm, B_hz, noise_dBm);
-            
-            group_size = max(1, floor(nS / 10)); num_groups = floor(nS / group_size);
-            if num_groups >= 1
-                rmse_values = zeros(num_groups, 1);
-                for g = 1:num_groups
-                    gt_g = gt_dbm((g-1)*group_size+1 : g*group_size, :); 
-                    pr_g = preds_dbm((g-1)*group_size+1 : g*group_size, :);
-                    rmse_values(g) = compute_rmse(pr_g, gt_g);
-                end
-                res.GroupRMSE = rmse_values;
-            else, res.GroupRMSE = compute_rmse(preds_dbm, gt_dbm); end
-            
-            res.RMSE = compute_rmse(preds_dbm, gt_dbm);
-            res.NRMSE = compute_nrmse(res.RMSE, gt_dbm);
-            res.ValidationRMSE = app.ExperimentContext.validation_rmse;
-            res.ValidationNRMSE = app.ExperimentContext.validation_nrmse;
-            
-            [res.xp, res.fp, res.xo, res.fo] = compute_ds_cdf(preds_dbm, gt_dbm, B_hz);
-            res.Raw_Pre = preds_dbm; res.Raw_Ori = gt_dbm; res.Future_Pre = future_preds_cell; res.Metrics = metric_data; 
+            res = run_prediction_model(app.TrainedNet, experiment, app.NormParams, ...
+                "FutureSteps", future_len, "BatchSize", batch_size, ...
+                "BandwidthHz", B_hz, "NoiseDbm", noise_dBm, ...
+                "ValidationRMSE", app.ExperimentContext.validation_rmse, ...
+                "ValidationNRMSE", app.ExperimentContext.validation_nrmse);
+            [nS, curr_dim] = size(res.Raw_Ori);
+            res.Metrics = metric_data;
             
             if contains(curr_ds, '[增强]') || contains(curr_ds, '[Augmented]')
                 res_key = sprintf('%s_Aug', app.selectedAlgo); tag_label = 'Real + Synthetic Train';
@@ -1164,7 +1107,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             else
                 res.DataScale = sprintf('%d Bins × %d Test Targets', curr_dim, nS);
             end
-            res.TrainTime = app.LastTrainTime; res.InferTime = t_infer_end; res.TagLabel = tag_label;
+            res.TrainTime = app.LastTrainTime; res.TagLabel = tag_label;
             res.TrainingPolicy = app.ExperimentContext.training_policy;
             res.EvaluationDataset = app.ExperimentContext.evaluation_dataset_label;
             app.PredictionResults.(res_key) = res;
