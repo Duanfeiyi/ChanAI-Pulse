@@ -34,6 +34,10 @@ raw_data/
 *.onnx
 *.h5
 *.hdf5
+*.mat
+*.pth
+*.pt
+*.ckpt
 
 # Real measured datasets stay local by default.
 datasets/measured/
@@ -41,9 +45,13 @@ legacy/
 
 # Keep synthetic demo data trackable
 !demo_data/
+!demo_data/**
+!demo_data/**/*.mat
 !demo_data/*.mat
 !demo_data/*.m
 !demo_data/README.md
+!demo_data/chanais_demo/data/
+!demo_data/chanais_demo/data/**
 
 # Experiment and runtime outputs
 experiments/exp_*/
@@ -51,6 +59,16 @@ results/*
 !results/README.md
 models/*
 !models/README.md
+
+# Local presentation, report, and temporary authoring outputs
+output/
+outputs/
+tmp/
+*.ppt
+*.pptx
+*.pdf
+*.doc
+*.docx
 
 # OS/editor files
 .DS_Store
