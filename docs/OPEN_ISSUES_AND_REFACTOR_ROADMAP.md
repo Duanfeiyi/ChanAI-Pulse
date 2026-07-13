@@ -1,7 +1,7 @@
 # ChanAI Pulse 待解决问题与后续路线图
 
-**最后更新：** 2026-07-13  
-**当前状态：** Step 7 已合并；Step 8 Unified Prediction Engine 正在 PR 审阅。  
+**最后更新：** 2026-07-13
+**当前状态：** Step 7 已合并；Step 8 Unified Prediction Engine 正在 PR 审阅。
 
 本文件记录暂缓问题、后续研究任务和拆分顺序，防止多人协作时遗漏已发现的工程或科学问题。
 
