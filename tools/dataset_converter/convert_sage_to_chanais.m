@@ -20,6 +20,7 @@ end
 files = resolveMatFiles(inputPath);
 records = struct([]);
 warnings = strings(0, 1);
+recordWarnings = strings(0, 1);
 
 for fileIdx = 1:numel(files)
     filePath = files(fileIdx);
@@ -53,9 +54,20 @@ for fileIdx = 1:numel(files)
         record = copyIfPresent(record, source, "cir_e", "", "cir_estimated");
         record = copyIfPresent(record, source, "likelihood", "quality", "likelihood");
 
-        missing = requiredSageFieldsMissing(source);
-        if ~isempty(missing)
-            record.warning = "Missing SAGE fields: " + strjoin(missing, ", ");
+        missingRecommended = recommendedSageFieldsMissing(source);
+        hasChannelRepresentation = isfield(source, "cir") || isfield(source, "cir_e") || ...
+            isfield(source, "alpha");
+        if ~hasChannelRepresentation
+            record.validation_status = "FAIL";
+            record.warning = "No usable CIR, estimated CIR, or path amplitude is present.";
+        elseif ~isempty(missingRecommended)
+            record.validation_status = "WARNING";
+            record.warning = "Missing recommended SAGE fields: " + strjoin(missingRecommended, ", ");
+        else
+            record.validation_status = "PASS";
+        end
+        if isfield(record, "warning")
+            recordWarnings(end + 1, 1) = record.record_id + ": " + record.warning; %#ok<AGROW>
         end
 
         records = [records, record]; %#ok<AGROW>
@@ -71,7 +83,9 @@ chanais.converter = struct( ...
     "name", "convert_sage_to_chanais", ...
     "version", "v1.1.0-draft", ...
     "input_path", inputPath, ...
-    "warnings", warnings);
+    "warnings", warnings, ...
+    "record_warnings", recordWarnings, ...
+    "conversion_status", conversionStatus(records));
 
 if outputDir ~= ""
     if ~isfolder(outputDir)
@@ -140,8 +154,23 @@ else
 end
 end
 
-function missing = requiredSageFieldsMissing(source)
-required = ["alpha", "doa", "delay", "cir", "cir_e", "likelihood"];
-missing = required(~isfield(source, required));
+function missing = recommendedSageFieldsMissing(source)
+recommended = ["alpha", "doa", "delay", "cir_e", "likelihood"];
+missing = recommended(~isfield(source, recommended));
 end
 
+function status = conversionStatus(records)
+if isempty(records)
+    status = "FAIL";
+    return;
+end
+
+statuses = string({records.validation_status});
+if any(statuses == "FAIL")
+    status = "FAIL";
+elseif any(statuses == "WARNING")
+    status = "WARNING";
+else
+    status = "PASS";
+end
+end

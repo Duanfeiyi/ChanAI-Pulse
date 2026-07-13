@@ -18,9 +18,9 @@ dataset = struct();
 dataset.root = datasetRoot;
 dataset.metadata = metadata;
 dataset.validation = validation;
+dataset.status = validation.status;
 dataset.files = struct();
 dataset.files.mat = string(fullfile({matFiles.folder}, {matFiles.name}));
 dataset.files.json = string(fullfile({jsonFiles.folder}, {jsonFiles.name}));
 dataset.loaded_at = string(datetime("now", "Format", "yyyy-MM-dd HH:mm:ss"));
 end
-

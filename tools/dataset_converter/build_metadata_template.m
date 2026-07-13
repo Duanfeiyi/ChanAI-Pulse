@@ -1,8 +1,9 @@
 function metadata = build_metadata_template(varargin)
 %BUILD_METADATA_TEMPLATE Create a ChanAIs metadata template.
 %   metadata = build_metadata_template("dataset_id", "demo") returns a
-%   struct with required ChanAIs Dataset fields. Name-value pairs override
-%   the default placeholders.
+%   struct with core, recommended, and optional ChanAIs fields. Name-value
+%   pairs override placeholders. Replace "unspecified" core values before
+%   attempting strict dataset validation.
 
 metadata = struct();
 metadata.schema_version = "ChanAIs-Dataset-v1.0-draft";
@@ -37,4 +38,3 @@ for idx = 1:2:numel(varargin)
     metadata.(matlab.lang.makeValidName(name)) = value;
 end
 end
-

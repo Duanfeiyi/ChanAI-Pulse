@@ -8,6 +8,10 @@ It is not measured data. It does not contain private channel measurement files, 
 
 The demo is designed to resemble a SAGE-compatible dataset structure so that ChanAI Pulse can evolve from simple `Load MAT` workflows toward future `Load ChanAIs Dataset` workflows.
 
+Its metadata is intentionally complete enough to return `PASS` from
+`validate_chanais_dataset`. Use it as a public reference for the expected
+folder structure, not as measured evidence or a benchmark dataset.
+
 ## Layout
 
 ```text
@@ -45,4 +49,3 @@ run("demo_data/chanais_demo/generate_chanais_demo_sage.m")
 ```
 
 Generated files are small and intended for public testing only.
-
