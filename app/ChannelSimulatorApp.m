@@ -647,14 +647,8 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 N_snaps = round(app.SnapEdit.Value);
                 
                 B_Hz = app.BandwidthEdit.Value * 1e6;
-                delay_grid_step_ns = 1.0; 
-                delay_max_ns = 300; 
-                Ns = round(delay_max_ns / delay_grid_step_ns) + 1;
-                
-                app.GeneratedH = zeros(1, 1, N_snaps, Ns) + 1i*zeros(1, 1, N_snaps, Ns);
-                app.GeneratedDelay = zeros(1, 1, N_snaps, Ns);
-                
-                ds_all_ns = zeros(N_snaps, 1);
+                delay_grid_step_ns = 1.0;
+                delay_max_ns = 300;
                 
                 if strcmp(app.CurrentLang, 'CN')
                     d = uiprogressdlg(app.UIFigure, 'Title', '原生引擎运行中', 'Message', '生成物理多径张量...');
@@ -668,42 +662,28 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 if contains(gen_val, '卫星') || contains(gen_val, 'Satellite'), fd = 4000; end
                 if contains(gen_val, '无人机') || contains(gen_val, 'UAV'), fd = 500; end
                 
-                t = (0:N_snaps-1)' * 1e-3;
-                
-                for i = 1:N_snaps
-                    ds = 10^(randn * DS_sigma + DS_mu);
-                    taus = sort(exprnd(ds * r_DS, [1, num_clusters]));
-                    taus = taus - min(taus); 
-                    
-                    powers = exp(-taus / ds) .* (10.^(-randn(1, num_clusters)/10)); 
-                    K_lin = 10^((randn * KF_sigma + KF_mu) / 10);
-                    powers(1) = powers(1) + K_lin * sum(powers);
-                    powers = powers / sum(powers); 
-                    
-                    h_CIR = sqrt(powers) .* (randn(1, num_clusters) + 1i*randn(1, num_clusters)) / sqrt(2);
-                    
-                    df = B_Hz / Ns;
-                    f = (-floor(Ns/2):ceil(Ns/2)-1) * df;
-                    F = zeros(1, Ns);
-                    for k = 1:num_clusters
-                        fading = sum(exp(1i * 2 * pi * fd * t(i) * rand(1,5) + rand(1,5)*2*pi)) / sqrt(5);
-                        F = F + h_CIR(k) * fading * exp(-1i * 2 * pi * f * taus(k));
-                    end
-                    h_delay = ifft(ifftshift(F));
-                    
-                    app.GeneratedH(1, 1, i, :) = h_delay;
-                    delay_axis_ns = (0:Ns-1) / B_Hz * 1e9;
-                    app.GeneratedDelay(1, 1, i, :) = delay_axis_ns * 1e-9;
-                    
-                    pdp_linear = abs(h_delay).^2;
-                    ds_all_ns(i) = app.calc_ds_native(delay_axis_ns * 1e-9, pdp_linear) * 1e9;
-                    
-                    if i == 1
-                        first_h_delay = h_delay;
-                        first_taus = taus;
-                        first_h_CIR = h_CIR;
-                    end
-                end
+                generationConfig = default_6gpcm_lite_config();
+                generationConfig.bandwidth_hz = B_Hz;
+                generationConfig.delay_grid_step_ns = delay_grid_step_ns;
+                generationConfig.delay_max_ns = delay_max_ns;
+                generationConfig.ds_mu = DS_mu;
+                generationConfig.ds_sigma = DS_sigma;
+                generationConfig.r_ds = r_DS;
+                generationConfig.clusters = num_clusters;
+                generationConfig.rays = num_rays;
+                generationConfig.kf_mu_db = KF_mu;
+                generationConfig.kf_sigma_db = KF_sigma;
+                generationConfig.snapshots = N_snaps;
+                generationConfig.doppler_hz = fd;
+                generationResult = generate_6gpcm_lite(generationConfig);
+
+                app.GeneratedH = generationResult.cir;
+                app.GeneratedDelay = generationResult.delay;
+                ds_all_ns = generationResult.delay_spread_ns;
+                first_h_delay = generationResult.preview.cir;
+                first_taus = generationResult.preview.cluster_delays_s;
+                first_h_CIR = generationResult.preview.cluster_gains;
+                delay_axis_ns = generationResult.preview.delay_axis_ns;
                 t_gen_end = toc(t_gen_start);
                 
                 %% =================== Perfect Plot Rendering ===================
@@ -777,13 +757,14 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                     app.GenStartButton.Text = 'Generate Channel';
                 end
                 
+                delayBinCount = size(app.GeneratedH, 4);
                 tensor_mem = (numel(app.GeneratedH) * 8) / (1024^2);
                 if strcmp(app.CurrentLang, 'CN')
-                    bench_msg = sprintf('原生引擎仿真成功!\n\n[数据库规模]\n生成4D张量: 1x1x%dx%d\n内存占用: %.2f MB\n生成时间: %.2f s', N_snaps, Ns, tensor_mem, t_gen_end);
-                    uialert(app.UIFigure, bench_msg, '成功 (基准信息)');
+                    bench_msg = sprintf('原生引擎仿真成功!\n\n[数据库规模]\n生成4D张量: 1x1x%dx%d\n内存占用: %.2f MB\n生成时间: %.2f s', N_snaps, delayBinCount, tensor_mem, t_gen_end);
+                    uialert(app.UIFigure, bench_msg, '成功 (基准信息)', 'Icon', 'success');
                 else
-                    bench_msg = sprintf('Native Engine Simulation Success!\n\n[Database Scale]\nGenerated 4D Tensor: 1x1x%dx%d\nRAM Footprint: %.2f MB\nGeneration Time: %.2f s', N_snaps, Ns, tensor_mem, t_gen_end);
-                    uialert(app.UIFigure, bench_msg, 'Success (Benchmark Info)');
+                    bench_msg = sprintf('Native Engine Simulation Success!\n\n[Database Scale]\nGenerated 4D Tensor: 1x1x%dx%d\nRAM Footprint: %.2f MB\nGeneration Time: %.2f s', N_snaps, delayBinCount, tensor_mem, t_gen_end);
+                    uialert(app.UIFigure, bench_msg, 'Success (Benchmark Info)', 'Icon', 'success');
                 end
                 
             catch ME
@@ -814,12 +795,8 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 d = uiprogressdlg(app.UIFigure, 'Title', 'Data Pipeline', 'Message', 'Interpolating & Augmenting Data...');
             end
             try
-                cir_squeeze = squeeze(app.GeneratedH); 
-                n_fft = size(cir_squeeze, 2);
-                H_CTF_native = fft(cir_squeeze, n_fft, 2); 
-                
-                ai_data = abs(H_CTF_native).^2; 
-                dpsd_dbm_sim = 10*log10(ai_data.' / 1e-3 + 1e-20); 
+                generationResult = struct('cir', app.GeneratedH);
+                dpsd_dbm_sim = generation_result_to_dpsd(generationResult);
                 
                 len_dpsd = 200;
                 gen_val = app.GenModelDropDown.Value;
