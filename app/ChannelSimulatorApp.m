@@ -99,6 +99,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         LoadedData     = {}       
         ChannelMetrics = {}       
         DatasetPaths   = {}       
+        DatasetMetadata = {}
         PredictionResults = struct(); 
         CurrentPredDataset = '';
         
@@ -111,6 +112,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         GeneratedH     single                 
         GeneratedDelay single  
         LastTrainTime  = 0;
+        ExperimentContext = struct();
         
         % --- [语言切换核心] 语言状态: 'CN' 或 'EN' (修正默认值为英文) ---
         CurrentLang = 'EN';
@@ -592,12 +594,18 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 app.LoadedData{curr_len+1} = h_dbm_matrix; 
                 app.ChannelMetrics{curr_len+1} = mets;
                 app.DatasetPaths{curr_len+1} = ds_name;
+                app.DatasetMetadata{curr_len+1} = struct( ...
+                    'kind', "real_local", ...
+                    'real_source_index', curr_len + 1, ...
+                    'generated_sequence', [], ...
+                    'source_label', string(ds_name));
                 app.DatasetDropDown.Items = app.DatasetPaths; 
                 app.DatasetDropDown.Value = ds_name;
                 
                 if ~strcmp(app.CurrentPredDataset, ds_name)
                     app.PredictionResults = struct();
                     app.CurrentPredDataset = ds_name;
+                    app.ExperimentContext = struct();
                 end
                 
                 app.updateVisualizations(); 
@@ -807,12 +815,13 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 
                 has_source = false;
                 source_data = [];
-                raw_label = 'Raw';
-                if strcmp(app.CurrentLang, 'CN'), raw_label = '原始'; end
+                source_idx = [];
                 if ~isempty(app.LoadedData) && ~strcmp(app.DatasetDropDown.Value, '[None]')
                     for idx = 1:length(app.DatasetPaths)
-                        if contains(app.DatasetPaths{idx}, ['[' raw_label ']'])
+                        if contains(app.DatasetPaths{idx}, '[Raw]') || ...
+                                contains(app.DatasetPaths{idx}, '[原始]')
                             source_data = app.LoadedData{idx};
+                            source_idx = idx;
                             len_dpsd = size(source_data, 1);
                             has_source = true;
                             break;
@@ -867,6 +876,19 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 app.LoadedData{curr_len+1} = dpsd_dbm_combined; 
                 app.ChannelMetrics{curr_len+1} = mets;
                 app.DatasetPaths{curr_len+1} = ds_name;
+                if has_source
+                    app.DatasetMetadata{curr_len+1} = struct( ...
+                        'kind', "augmented_real_plus_synthetic", ...
+                        'real_source_index', source_idx, ...
+                        'generated_sequence', dpsd_dbm_sim, ...
+                        'source_label', string(ds_name));
+                else
+                    app.DatasetMetadata{curr_len+1} = struct( ...
+                        'kind', "synthetic_generated", ...
+                        'real_source_index', [], ...
+                        'generated_sequence', dpsd_dbm_sim, ...
+                        'source_label', string(ds_name));
+                end
                 
                 app.DatasetDropDown.Items = app.DatasetPaths; 
                 app.DatasetDropDown.Value = ds_name;
@@ -874,6 +896,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 if ~strcmp(app.CurrentPredDataset, ds_name)
                     app.PredictionResults = struct();
                     app.CurrentPredDataset = ds_name;
+                    app.ExperimentContext = struct();
                 end
                 
                 app.updateVisualizations();
@@ -903,36 +926,64 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         function metrics = analyzeChannelData_Generic(~, dpsd_dbm, B_hz)
             metrics = analyze_channel_data(dpsd_dbm, B_hz);
         end
+
+        function metadata = getDatasetMetadata(app, datasetIndex)
+            metadata = struct( ...
+                'kind', "legacy_unknown", ...
+                'real_source_index', datasetIndex, ...
+                'generated_sequence', [], ...
+                'source_label', string(app.DatasetPaths{datasetIndex}));
+            if datasetIndex <= numel(app.DatasetMetadata) && ...
+                    ~isempty(app.DatasetMetadata{datasetIndex})
+                metadata = app.DatasetMetadata{datasetIndex};
+            end
+        end
         
         function success = trainModel_Generic(app)
             success = false;
             if isempty(app.DatasetPaths) || strcmp(app.DatasetDropDown.Value, '[None]'), return; end
             idx = find(strcmp(app.DatasetPaths, app.DatasetDropDown.Value), 1);
-            dpsd_dbm = double(app.LoadedData{idx}); [nL, nSnaps] = size(dpsd_dbm);
-            
-            if nSnaps < 2
-                dpsd_dbm = [dpsd_dbm, dpsd_dbm + randn(size(dpsd_dbm))*0.1];
-                nSnaps = 2;
+            try
+                metadata = app.getDatasetMetadata(idx);
+                evaluationIndex = idx;
+                evaluationSequence = double(app.LoadedData{idx}.');
+                trainingPolicy = "real_only_chronological";
+                if string(metadata.kind) == "augmented_real_plus_synthetic"
+                    evaluationIndex = metadata.real_source_index;
+                    if isempty(evaluationIndex) || evaluationIndex > numel(app.LoadedData)
+                        error('ChanAI:MissingRealSource', ...
+                            'The real source sequence for this augmented dataset is unavailable.');
+                    end
+                    evaluationSequence = double(app.LoadedData{evaluationIndex}.');
+                    experiment = prepare_temporal_prediction_experiment(evaluationSequence, ...
+                        'WindowLength', 10);
+                    experiment = append_generated_training_windows(experiment, ...
+                        double(metadata.generated_sequence.'), ...
+                        'GeneratedSourceId', string(metadata.source_label));
+                    trainingPolicy = "real_train_plus_synthetic_generated";
+                else
+                    experiment = prepare_temporal_prediction_experiment(evaluationSequence, ...
+                        'WindowLength', 10);
+                    if string(metadata.kind) == "synthetic_generated"
+                        trainingPolicy = "synthetic_only_chronological";
+                    end
+                end
+                XTrain = experiment.train.input_cells;
+                YTrain = experiment.train.targets;
+                XValidation = experiment.validation.input_cells;
+                YValidation = experiment.validation.targets;
+                nL = size(YTrain, 2);
+                layers = build_prediction_layers(app.selectedAlgo, nL);
+            catch ME
+                if strcmp(app.CurrentLang, 'CN')
+                    uialert(app.UIFigure, ['无法建立训练、验证与测试切分: ' ME.message], '错误');
+                else
+                    uialert(app.UIFigure, ['Unable to prepare train/validation/test split: ' ME.message], 'Error');
+                end
+                return;
             end
-            
-            mu_v = mean(dpsd_dbm, 2); sig_v = std(dpsd_dbm, 0, 2); sig_v(sig_v == 0) = 1;
-            data_norm = (dpsd_dbm - mu_v) ./ sig_v; 
-            app.NormParams.Mu = mu_v; app.NormParams.Sigma = sig_v;
-            
-            win = min(10, nSnaps - 1); app.PredictionWindow = win; 
-            
-            num_s = nSnaps - win;
-            XTrain = cell(num_s, 1); YTrain = zeros(num_s, nL);
-            for i = 1:num_s, XTrain{i} = data_norm(:, i : i+win-1); YTrain(i, :) = data_norm(:, i+win).'; end
-            
-            if strcmp(app.selectedAlgo, 'TCN')
-                numFilters = 64; filterSize = 3;
-                layers = [sequenceInputLayer(nL, 'Name', 'in'), convolution1dLayer(filterSize, numFilters, 'Padding', 'causal', 'DilationFactor', 1, 'Name', 'conv1'), batchNormalizationLayer('Name', 'bn1'), reluLayer('Name', 'relu1'), convolution1dLayer(filterSize, numFilters, 'Padding', 'causal', 'DilationFactor', 2, 'Name', 'conv2'), batchNormalizationLayer('Name', 'bn2'), reluLayer('Name', 'relu2'), convolution1dLayer(filterSize, numFilters, 'Padding', 'causal', 'DilationFactor', 4, 'Name', 'conv3'), batchNormalizationLayer('Name', 'bn3'), reluLayer('Name', 'relu3'), globalAveragePooling1dLayer('Name', 'gap_reducer'), fullyConnectedLayer(nL, 'Name', 'fc'), regressionLayer('Name', 'out')];
-            elseif strcmp(app.selectedAlgo, 'GRU')
-                layers = [sequenceInputLayer(nL, 'Name', 'in'), gruLayer(256, 'OutputMode', 'sequence', 'Name', 'gru1'), dropoutLayer(0.2, 'Name', 'drop1'), gruLayer(256, 'OutputMode', 'last', 'Name', 'gru2'), dropoutLayer(0.2, 'Name', 'drop2'), fullyConnectedLayer(nL, 'Name', 'fc'), regressionLayer('Name', 'out')];
-            else
-                layers = [sequenceInputLayer(nL, 'Name', 'in'), lstmLayer(256, 'OutputMode', 'sequence', 'Name', 'lstm1'), dropoutLayer(0.2, 'Name', 'drop1'), lstmLayer(256, 'OutputMode', 'last', 'Name', 'lstm2'), dropoutLayer(0.2, 'Name', 'drop2'), fullyConnectedLayer(nL, 'Name', 'fc'), regressionLayer('Name', 'out')];
-            end
+            app.NormParams = experiment.norm_params;
+            app.PredictionWindow = experiment.window_length;
             
             prevState = app.UIFigure.WindowState;
             
@@ -959,11 +1010,29 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 drawnow limitrate; pause(0.1); 
             end
             
-            opts = trainingOptions('adam', 'MaxEpochs', 500, 'MiniBatchSize', 16, 'InitialLearnRate', 0.005, 'LearnRateSchedule', 'piecewise', 'LearnRateDropPeriod', 200, 'LearnRateDropFactor', 0.5, 'GradientThreshold', 1, 'Plots', plot_mode, 'Verbose', 0);
+            validationFrequency = max(1, floor(numel(XTrain) / 16));
+            opts = trainingOptions('adam', 'MaxEpochs', 500, 'MiniBatchSize', 16, ...
+                'InitialLearnRate', 0.005, 'LearnRateSchedule', 'piecewise', ...
+                'LearnRateDropPeriod', 200, 'LearnRateDropFactor', 0.5, ...
+                'GradientThreshold', 1, 'ValidationData', {XValidation, YValidation}, ...
+                'ValidationFrequency', validationFrequency, 'Plots', plot_mode, 'Verbose', 0);
             
             t_train = tic;
             try
-                app.TrainedNet = trainNetwork(XTrain, YTrain, layers, opts);
+                trainedNet = trainNetwork(XTrain, YTrain, layers, opts);
+                [validationPrediction, ~] = predict_holdout_partition( ...
+                    trainedNet, experiment.validation, experiment.norm_params);
+                validationRMSE = compute_rmse(validationPrediction, experiment.validation.raw_targets);
+                validationNRMSE = compute_nrmse(validationRMSE, experiment.validation.raw_targets);
+                app.TrainedNet = trainedNet;
+                app.ExperimentContext = struct( ...
+                    'experiment', experiment, ...
+                    'evaluation_dataset_index', evaluationIndex, ...
+                    'evaluation_dataset_label', string(app.DatasetPaths{evaluationIndex}), ...
+                    'training_dataset_index', idx, ...
+                    'training_policy', trainingPolicy, ...
+                    'validation_rmse', validationRMSE, ...
+                    'validation_nrmse', validationNRMSE);
                 success = true;
             catch ME
                 if ~isvalid(app) || ~isvalid(app.UIFigure), return; end
@@ -995,12 +1064,29 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         end
         
         function runPredictionLogic_Generic(app, noise_test, prefix)
-            if isempty(app.DatasetPaths), return; end
+            if isempty(app.DatasetPaths) || ~isfield(app.ExperimentContext, 'experiment')
+                if strcmp(app.CurrentLang, 'CN')
+                    uialert(app.UIFigure, '请重新训练当前数据集，以建立独立验证集和测试集。', '提示');
+                else
+                    uialert(app.UIFigure, 'Please retrain the current dataset to create hold-out validation and test sets.', 'Info');
+                end
+                return;
+            end
             curr_ds = app.DatasetDropDown.Value;
             idx = find(strcmp(app.DatasetPaths, curr_ds), 1);
-            
-            gt_dbm = double(app.LoadedData{idx}.'); [nS, curr_dim] = size(gt_dbm);
-            metric_data = app.ChannelMetrics{idx};
+            if idx ~= app.ExperimentContext.training_dataset_index
+                if strcmp(app.CurrentLang, 'CN')
+                    uialert(app.UIFigure, '数据集已切换。请重新训练后再预测。', '提示');
+                else
+                    uialert(app.UIFigure, 'Dataset selection changed. Please retrain before prediction.', 'Info');
+                end
+                return;
+            end
+            experiment = app.ExperimentContext.experiment;
+            evaluationIndex = app.ExperimentContext.evaluation_dataset_index;
+            gt_dbm = experiment.test.raw_targets;
+            [nS, curr_dim] = size(gt_dbm);
+            metric_data = app.ChannelMetrics{evaluationIndex};
             
             prevState = app.UIFigure.WindowState;
             if strcmp(app.CurrentLang, 'CN')
@@ -1010,31 +1096,15 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             end
             drawnow;
             
-            if nS < 2
-                gt_dbm = [gt_dbm; gt_dbm + randn(size(gt_dbm))*0.1];
-                nS = 2;
-            end
-            
-            mu_v = app.NormParams.Mu; sig_v = app.NormParams.Sigma;
-            mu_v_t = mu_v'; sig_v_t = sig_v';
-            win = app.PredictionWindow; if isempty(win) || win == 0, win = 1; end
+            mu_v = app.NormParams.Mu;
+            sig_v = app.NormParams.Sigma;
+            mu_v_t = mu_v';
+            sig_v_t = sig_v';
+            win = app.PredictionWindow;
             
             t_infer = tic;
-            if ~isempty(app.TrainedNet)
-                preds_dbm = zeros(nS, curr_dim); req_dim = app.TrainedNet.Layers(1).InputSize;
-                if curr_dim ~= req_dim, gt_res = interp1(linspace(0,1,curr_dim), gt_dbm', linspace(0,1,req_dim))'; else, gt_res = gt_dbm; end
-                
-                d_norm = (gt_res' - mu_v) ./ sig_v; 
-                if size(d_norm,2) > win
-                    inp = cell(nS-win, 1); for i=1:nS-win, inp{i} = d_norm(:, i:i+win-1); end
-                    p_norm = predict(app.TrainedNet, inp); 
-                    p_val = p_norm .* sig_v_t + mu_v_t; 
-                    if curr_dim ~= req_dim, p_res = interp1(linspace(0,1,req_dim), p_val', linspace(0,1,curr_dim))'; else, p_res = p_val; end
-                    preds_dbm(win+1:nS, :) = p_res; preds_dbm(1:win, :) = gt_dbm(1:win, :);
-                else, preds_dbm = gt_dbm; end
-            else
-                preds_dbm = gt_dbm + randn(size(gt_dbm))*2;
-            end
+            [preds_dbm, ~] = predict_holdout_partition( ...
+                app.TrainedNet, experiment.test, app.NormParams);
             
             future_len = round(app.PredLengthEdit.Value);
             batch_size = round(app.BatchSizeEdit.Value);
@@ -1042,7 +1112,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             
             future_preds_cell = cell(batch_size, 1);
             if future_len > 0 && ~isempty(app.TrainedNet)
-                num_cols = size(d_norm, 2); base_window_norm = d_norm(:, num_cols-win+1:num_cols); 
+                base_window_norm = experiment.test.input_cells{end};
                 for b = 1:batch_size
                     current_window_norm = base_window_norm;
                     if batch_size > 1, current_window_norm = current_window_norm + randn(size(current_window_norm)) * 0.02; end
@@ -1050,8 +1120,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                     for step = 1:future_len
                         p_norm = predict(app.TrainedNet, {current_window_norm}); 
                         p_val = p_norm .* sig_v_t + mu_v_t;
-                        if curr_dim ~= req_dim, p_res = interp1(linspace(0,1,req_dim), p_val', linspace(0,1,curr_dim))'; else, p_res = p_val; end
-                        curr_future(step, :) = p_res;
+                        curr_future(step, :) = p_val;
                         c_cols = size(current_window_norm, 2); current_window_norm = [current_window_norm(:, 2:c_cols), p_norm'];
                     end
                     future_preds_cell{b} = curr_future;
@@ -1076,20 +1145,28 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             
             res.RMSE = compute_rmse(preds_dbm, gt_dbm);
             res.NRMSE = compute_nrmse(res.RMSE, gt_dbm);
+            res.ValidationRMSE = app.ExperimentContext.validation_rmse;
+            res.ValidationNRMSE = app.ExperimentContext.validation_nrmse;
             
             [res.xp, res.fp, res.xo, res.fo] = compute_ds_cdf(preds_dbm, gt_dbm, B_hz);
             res.Raw_Pre = preds_dbm; res.Raw_Ori = gt_dbm; res.Future_Pre = future_preds_cell; res.Metrics = metric_data; 
             
             if contains(curr_ds, '[增强]') || contains(curr_ds, '[Augmented]')
-                res_key = sprintf('%s_Aug', app.selectedAlgo); tag_label = 'Augmented';
+                res_key = sprintf('%s_Aug', app.selectedAlgo); tag_label = 'Real + Synthetic Train';
             elseif contains(curr_ds, '[原始]') || contains(curr_ds, '[Raw]')
                 res_key = sprintf('%s_Raw', app.selectedAlgo); tag_label = 'Raw';
             else
                 res_key = sprintf('%s_Sim', app.selectedAlgo); tag_label = 'Simulated';
             end
             
-            res.DataScale = sprintf('%d Bins × %d Snaps', curr_dim, nS);
+            if strcmp(app.CurrentLang, 'CN')
+                res.DataScale = sprintf('%d Bins × %d 测试目标', curr_dim, nS);
+            else
+                res.DataScale = sprintf('%d Bins × %d Test Targets', curr_dim, nS);
+            end
             res.TrainTime = app.LastTrainTime; res.InferTime = t_infer_end; res.TagLabel = tag_label;
+            res.TrainingPolicy = app.ExperimentContext.training_policy;
+            res.EvaluationDataset = app.ExperimentContext.evaluation_dataset_label;
             app.PredictionResults.(res_key) = res;
             
             if ~isvalid(app) || ~isvalid(app.UIFigure), return; end
@@ -1134,9 +1211,19 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 ok_text = 'OK';
             end
             
-            rptFig = uifigure('Name', rpt_name, 'Position', [100, 100, 420, 430], 'WindowStyle', 'modal');
+            if strcmp(app.CurrentLang, 'CN')
+                validation_rmse_label = '验证 RMSE';
+                test_nrmse_label = '测试 NRMSE';
+                test_rmse_label = '测试 RMSE';
+            else
+                validation_rmse_label = 'Validation RMSE';
+                test_nrmse_label = 'Test NRMSE';
+                test_rmse_label = 'Test RMSE';
+            end
+
+            rptFig = uifigure('Name', rpt_name, 'Position', [100, 100, 420, 470], 'WindowStyle', 'modal');
             rptFig.Color = [0.94 0.94 0.94]; movegui(rptFig, 'center'); 
-            uilabel(rptFig, 'Text', title_str, 'Position', [20, 380, 380, 35], 'FontSize', 20, 'FontWeight', 'bold', 'FontColor', 'k', 'HorizontalAlignment', 'center', 'FontName', 'Times New Roman');
+            uilabel(rptFig, 'Text', title_str, 'Position', [20, 420, 380, 35], 'FontSize', 20, 'FontWeight', 'bold', 'FontColor', 'k', 'HorizontalAlignment', 'center', 'FontName', 'Times New Roman');
             
             html_text = sprintf([...
                 '<html><body style="font-family: ''Times New Roman'', serif; font-size: 14px; line-height: 1.8; color: #000000;">' ...
@@ -1144,6 +1231,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 '<b>%s:</b> %s (%s %s)<hr style="border:0; border-top:1px solid #E5E5EA;">' ...
                 '<b>%s</b><br>' ...
                 '<b>%s:</b> <span style="font-size:16px; color:#0071E3;"><b>%.2f %%</b></span><br>' ...
+                '<b>%s:</b> <span style="font-size:16px;"><b>%.4f dBm</b></span><br>' ...
                 '<b>%s:</b> <span style="font-size:16px;"><b>%.2f %%</b></span><br>' ...
                 '<b>%s:</b> <span style="font-size:16px;"><b>%.4f dBm</b></span>' ...
                 '<hr style="border:0; border-top:1px solid #E5E5EA;">' ...
@@ -1154,13 +1242,14 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                 '</div></body></html>'], ...
                 algo_label, algo, res.TagLabel, data_label, ...
                 acc_label, cap_label, res.CapAcc, ...
-                ds_label, res.NRMSE, ...
-                rmse_label, res.RMSE, ...
+                validation_rmse_label, res.ValidationRMSE, ...
+                test_nrmse_label, res.NRMSE, ...
+                test_rmse_label, res.RMSE, ...
                 perf_label, dim_label, res.DataScale, ...
                 time_label, res.TrainTime, ...
                 delay_label, res.InferTime);
             
-            uihtml(rptFig, 'HTMLSource', html_text, 'Position', [20, 70, 380, 300]);
+            uihtml(rptFig, 'HTMLSource', html_text, 'Position', [20, 70, 380, 340]);
             uibutton(rptFig, 'Text', ok_text, 'Position', [140, 15, 140, 40], 'FontSize', 16, 'FontWeight', 'bold', 'ButtonPushedFcn', @(btn,event) close(rptFig), 'FontName', 'Times New Roman', 'BackgroundColor', [0.2 0.2 0.2], 'FontColor', 'white');
         end
         
@@ -1592,9 +1681,9 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         end
         
         function ClearDataButtonPushed(app, ~)
-            app.LoadedData={}; app.ChannelMetrics={}; app.DatasetPaths={}; 
+            app.LoadedData={}; app.ChannelMetrics={}; app.DatasetPaths={}; app.DatasetMetadata={};
             app.DatasetDropDown.Items={'[None]'}; app.PredictionResults=struct(); 
-            app.TrainedNet=[]; app.showPlaceholderPlots(); app.showPredPlaceholderPlots(); 
+            app.TrainedNet=[]; app.ExperimentContext=struct(); app.showPlaceholderPlots(); app.showPredPlaceholderPlots();
             app.DataScaleInfoLabel.Text = app.getStatusText('cleared'); 
         end
         
