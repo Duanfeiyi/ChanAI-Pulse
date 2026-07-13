@@ -572,27 +572,7 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
                     f1 = load(fullfile(fp, fns{i})); data = app.extract_raw_data(f1); 
                     [angle_xaxis, all_aps(:, i)] = app.calculate_angular_spectrum(data);
                     
-                    if isreal(data)
-                        dpsd_dbm = squeeze(data); if size(dpsd_dbm, 1) == 1 && size(dpsd_dbm, 2) > 1, dpsd_dbm = dpsd_dbm.'; end
-                        if all(dpsd_dbm(:) >= 0) && max(dpsd_dbm(:)) < 1e5, dpsd_dbm = 10 * log10(dpsd_dbm / 1e-3 + 1e-20); end
-                    else
-                        if contains(scenario_name, 'RIS')
-                            if ndims(data) == 5, h_freq = squeeze(sum(sum(sum(data, 1), 2), 3)); elseif ndims(data) == 4, h_freq = squeeze(sum(sum(data, 1), 2)); elseif ndims(data) == 3, h_freq = squeeze(sum(data, 1)); else, h_freq = squeeze(data); end
-                            if size(h_freq, 1) == 1 && size(h_freq, 2) > 1, h_freq = h_freq.'; end
-                            h_time = ifft(h_freq); dpsd_dbm = 10 * log10(abs(h_time).^2 / 1e-3 + 1e-20);
-                        elseif contains(scenario_name, 'Sub-6')
-                            if ndims(data) >= 3, pdp_lin = squeeze(sum(sum(abs(data).^2, 1), 2)); else, pdp_lin = abs(data).^2; end
-                            if size(pdp_lin, 1) == 1 && size(pdp_lin, 2) > 1, pdp_lin = pdp_lin.'; end
-                            dpsd_dbm = 10 * log10(pdp_lin / 1e-3 + 1e-20);
-                        else 
-                            if ndims(data) >= 4, cir_slice = squeeze(data(1, 1, :, :)); elseif ndims(data) == 3, cir_slice = squeeze(data(1, 1, :)); else, cir_slice = squeeze(data); end
-                            if size(cir_slice, 1) == 1 && size(cir_slice, 2) > 1, cir_slice = cir_slice.'; end
-                            dpsd_dbm = 10 * log10(abs(cir_slice).^2 / 1e-3 + 1e-20);
-                        end
-                    end
-                    
-                    dpsd_dbm = real(dpsd_dbm(:));
-                    if length(dpsd_dbm) >= len_dpsd, dpsd_dbm = dpsd_dbm(1:len_dpsd); else, pad = zeros(len_dpsd - length(dpsd_dbm), 1) - 130; dpsd_dbm = [dpsd_dbm; pad]; end
+                    dpsd_dbm = prepare_dpsd_snapshot(data, string(scenario_name), len_dpsd);
                     h_dbm_matrix(:, i) = dpsd_dbm; 
                 end
                 
