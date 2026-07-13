@@ -35,6 +35,8 @@
 | GEN-001 | P1 | 6GPCM-lite 的 delay grid 与物理 delay axis 尚未严格校准。 | 仅能称为 synthetic, geometry-inspired generator。 | 6D |
 | GEN-002 | P1 | 生成数据是否提升真实 Test 性能尚未完成 A/B 证明。 | 不能宣称增强一定提高泛化。 | 6E |
 | PHY-001 | P2 | Angular PSD 与 Doppler 当前主要是展示结果。 | 不能据此宣称角度或多普勒已被独立准确预测。 | 6C / v1.2 |
+| DOMAIN-001 | P1 | Frequency-domain prediction 尚未实现。`Freq` 按钮目前只改变 UI 选中状态。 | 当前仍运行时序预测流程，不能宣称已完成 CTF 或子载波预测。 | Step 9 后 / v1.2 |
+| DOMAIN-002 | P1 | Spatial-domain prediction 尚未实现。`Space` 按钮目前只改变 UI 选中状态。 | 当前 Angular PSD 是展示结果，不能宣称已完成天线、角度或位置域预测。 | Step 9 后 / v1.2 |
 | REPRO-001 | P2 | 实验配置、随机种子、模型、图和指标尚未自动归档。 | 多人复现实验成本较高。 | Step 9 |
 | BENCH-001 | P2 | 尚无固定任务、基线和统一报告的 Benchmark。 | 不适合正式横向论文比较。 | Step 10 / v1.2 |
 
@@ -60,14 +62,33 @@
 
 TCN-Res、注意力、WeightNorm、可调隐藏层或早停都值得研究，但必须作为独立模型版本和独立 PR；不得在没有对照实验时替换现有 baseline。
 
+## 未完成的 Frequency / Space 域任务
+
+目前第三页的三个按钮表达的是平台目标，而不是三个都已落地的预测模式：`Time` 已实现；`Freq` 和 `Space` 仍是待实现入口。现阶段请保持选择 `Time`，以避免对实验含义产生误解。
+
+### Frequency domain（Freq）
+
+1. 明确输入数据为 CTF、子载波响应或频率采样后的特征张量，并在 Dataset Specification 中写清维度和单位；
+2. 定义具体任务，例如由已知子载波补全缺失子载波，或由部分频段预测目标频段；
+3. 为频域任务建立独立的数据预处理、训练入口、评价指标和图表；
+4. 只有当 `selectedTarget="Freq"` 真正路由到上述流程后，才能将其称为频域预测。
+
+### Spatial domain（Space）
+
+1. 明确空间维度来自天线阵元、AoA/AoD、波束或空间位置，而不是仅显示 Angular PSD；
+2. 定义具体任务，例如缺失阵元补全、角度谱预测或空间位置之间的信道插值；
+3. 建立独立的空间数据形状、切分方法、模型入口和误差指标；
+4. 只有当 `selectedTarget="Space"` 真正路由到上述流程后，才能将其称为空间域预测。
+
 ## 后续工作顺序
 
 1. **完成 Step 8 PR 审阅与人工验收**：确认 TCN、LSTM、GRU 都能从 App 训练、预测和显示报告。
 2. **6C 评估严谨化**：经验 DS CDF、完整 Group RMSE、训练尺度说明。
 3. **6D / 6E 生成器校准与增强 A/B 实验**：固定真实 Test 集，不以训练曲线替代 Test 结论。
 4. **Step 9 Experiment Manager**：自动保存 config、seed、模型、归一化参数、指标、图和日志。
-5. **Step 10 Benchmark**：固定任务、划分、baseline 和报告。
-6. **模型升级 PR**：以 `TCN-Res` 为优先，再做 TCN 感受野和 LSTM/GRU 超参数研究。
+5. **Frequency / Space 域实现 PR**：在可复现实验记录的基础上，分别实现真实的频域和空间域任务，不能只增加按钮。
+6. **Step 10 Benchmark**：固定任务、划分、baseline 和报告。
+7. **模型升级 PR**：以 `TCN-Res` 为优先，再做 TCN 感受野和 LSTM/GRU 超参数研究。
 
 ## 数据安全边界
 
