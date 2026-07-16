@@ -687,75 +687,18 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
 
                 app.GeneratedH = generationResult.cir;
                 app.GeneratedDelay = generationResult.delay;
-                ds_all_ns = generationResult.delay_spread_ns;
-                first_h_delay = generationResult.preview.cir;
-                first_taus = generationResult.preview.cluster_delays_s;
-                first_h_CIR = generationResult.preview.cluster_gains;
-                delay_axis_ns = generationResult.preview.delay_axis_ns;
                 t_gen_end = toc(t_gen_start);
                 
-                %% =================== Perfect Plot Rendering ===================
-                avg_pdp_linear = abs(first_h_delay).^2;
-                avg_pdp_linear = avg_pdp_linear / max(avg_pdp_linear + eps);
-                
-                noise_floor_dB = -60;
-                noise_amplitude_dB = 5.0;
-                noise_trace_dB = noise_floor_dB + noise_amplitude_dB * (2 * rand(size(delay_axis_ns)) - 1);
-                noise_linear = 10.^(noise_trace_dB / 10);
-                pdp_plot_dB = 10 * log10(avg_pdp_linear + noise_linear + eps);
-                
-                delete(app.GenPDPAxes.Children);
-                m_idx = round(linspace(1, length(delay_axis_ns), 20));
-                h_pdp = plot(app.GenPDPAxes, delay_axis_ns, pdp_plot_dB, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', m_idx, 'MarkerFaceColor', app.Color_Primary);
-                
-                tap_power_linear = abs(first_h_CIR).^2;
-                tap_power_linear = tap_power_linear / max(tap_power_linear + eps);
-                tap_power_dB = 10 * log10(tap_power_linear + eps);
-                hold(app.GenPDPAxes, 'on');
-                h_scatter = plot(app.GenPDPAxes, first_taus * 1e9, tap_power_dB, 's', 'Color', app.Color_Secondary, 'LineWidth', 1.2, 'MarkerSize', 6, 'MarkerFaceColor', app.Color_Secondary);
-                hold(app.GenPDPAxes, 'off');
-                
-                if strcmp(app.CurrentLang, 'CN')
-                    lgd_str1 = 'PDP 带噪声底'; lgd_str2 = '多径分量';
-                    pdp_title = sprintf('时延功率谱 (%s)', app.GenModelDropDown.Value);
-                    app.applyAxesStyle(app.GenPDPAxes, pdp_title, '时延 (ns)', '功率 (dB)');
-                else
-                    lgd_str1 = 'PDP with noise floor'; lgd_str2 = 'Multipath components';
-                    pdp_title = sprintf('Delay Power Spectrum (%s)', app.GenModelDropDown.Value);
-                    app.applyAxesStyle(app.GenPDPAxes, pdp_title, 'Delay (ns)', 'Power (dB)');
-                end
-                lgd1 = legend(app.GenPDPAxes, [h_pdp, h_scatter], {lgd_str1, lgd_str2}, 'Location', 'best');
-                lgd1.Color = 'none'; lgd1.EdgeColor = 'none'; lgd1.TextColor = app.Color_Text; lgd1.FontName = 'Times New Roman'; lgd1.FontSize = 12;
-                
-                xlim(app.GenPDPAxes, [0 delay_max_ns]);
-                
-                ds_sorted = sort(ds_all_ns(:));
-                cdf_y = (1:numel(ds_sorted))' / numel(ds_sorted);
-                [ds_unique, ia] = unique(ds_sorted, 'stable');
-                cdf_unique = cdf_y(ia);
-                
-                if length(ds_unique) > 1
-                    x_fine = linspace(ds_unique(1), ds_unique(end), 500);
-                    cdf_smooth = interp1(ds_unique, cdf_unique, x_fine, 'pchip');
-                    cdf_smooth = cummax(cdf_smooth);
-                    cdf_smooth = min(max(cdf_smooth, 0), 1);
-                else
-                    x_fine = [0, ds_unique, max(1, ds_unique*2)];
-                    cdf_smooth = [0, 1, 1];
-                end
-                
-                delete(app.GenCDFAxes.Children);
-                m_idx_cdf = round(linspace(1, length(x_fine), 20));
-                plot(app.GenCDFAxes, x_fine, cdf_smooth, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.8, 'MarkerSize', 5, 'MarkerIndices', m_idx_cdf, 'MarkerFaceColor', app.Color_Primary);
-                if strcmp(app.CurrentLang, 'CN')
-                    cdf_title = '时延扩展的累积分布函数';
-                    app.applyAxesStyle(app.GenCDFAxes, cdf_title, '时延扩展 (ns)', 'CDF'); 
-                else
-                    cdf_title = 'CDF of DS';
-                    app.applyAxesStyle(app.GenCDFAxes, cdf_title, 'DS (ns)', 'CDF'); 
-                end
-                xlim(app.GenCDFAxes, [x_fine(1), x_fine(end)]);
-                ylim(app.GenCDFAxes, [0, 1]);
+                axesHandles = struct( ...
+                    'pdp', app.GenPDPAxes, ...
+                    'cdf', app.GenCDFAxes);
+                style = struct( ...
+                    'language', app.CurrentLang, ...
+                    'model_label', app.GenModelDropDown.Value, ...
+                    'primary_color', app.Color_Primary, ...
+                    'secondary_color', app.Color_Secondary, ...
+                    'text_color', app.Color_Text);
+                render_generation_plots(axesHandles, generationResult, style);
                 
                 if isvalid(d), delete(d); end
                 app.GenStartButton.Enable = 'on';
