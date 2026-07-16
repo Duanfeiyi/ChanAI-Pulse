@@ -1556,71 +1556,19 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         
         function updateVisualizations(app)
             if isempty(app.DatasetPaths), return; end
-            idx = find(strcmp(app.DatasetPaths, app.DatasetDropDown.Value), 1); m = app.ChannelMetrics{idx};
-            
-            if strcmp(app.CurrentLang, 'CN')
-                no_data_str = '无数据';
-                ang_title = '角度功率谱 (Angle Power Spectrum)';
-                delay_title = '时延功率谱密度 (Delay PSD)';
-                cdf_title = '扩展累积分布函数 (Spread CDF)';
-                dop_title = '多普勒谱 (Doppler)';
-                ang_x = '角度 (deg)'; ang_y = '归一化功率 (dB)';
-                del_x = 'ns'; del_y = 'dB';
-                cdf_x = 'Val'; cdf_y = 'CDF';
-                dop_x = 'Hz'; dop_y = 'dB';
-            else
-                no_data_str = 'No Data';
-                ang_title = 'Angle Power Spectrum';
-                delay_title = 'Delay PSD';
-                cdf_title = 'Spread CDF';
-                dop_title = 'Doppler';
-                ang_x = 'Angle (deg)'; ang_y = 'Norm Power (dB)';
-                del_x = 'ns'; del_y = 'dB';
-                cdf_x = 'Val'; cdf_y = 'CDF';
-                dop_x = 'Hz'; dop_y = 'dB';
-            end
-            
-            delete(app.AngularPowerAxes.Children); 
-            if max(m.space.psd) > -900
-                m_idx_ang = round(linspace(1, length(m.space.angle), 20));
-                plot(app.AngularPowerAxes, m.space.angle, m.space.psd, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', m_idx_ang, 'MarkerFaceColor', app.Color_Primary);
-                app.applyAxesStyle(app.AngularPowerAxes, ang_title, ang_x, ang_y);
-                app.applyYLimMargin(app.AngularPowerAxes, m.space.psd); 
-                app.setFullWidthAxes(app.AngularPowerAxes, m.space.angle);
-            else
-                set(app.AngularPowerAxes, 'XTick', [], 'YTick', []);
-                text(app.AngularPowerAxes, 0.5, 0.5, no_data_str, 'Units', 'normalized', 'HorizontalAlignment', 'center', 'FontSize', 14, 'FontWeight', 'bold', 'Color', app.Color_TextDim, 'FontName', 'Times New Roman');
-                app.applyAxesStyle(app.AngularPowerAxes, ang_title, ang_x, ang_y);
-            end
-            
-            dy = m.delay.y;
-            delete(app.DelayPowerAxes.Children); 
-            m_idx_del = round(linspace(1, length(m.delay.x), 20));
-            plot(app.DelayPowerAxes, m.delay.x, dy, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', m_idx_del, 'MarkerFaceColor', app.Color_Primary); 
-            app.applyAxesStyle(app.DelayPowerAxes, delay_title, del_x, del_y); 
-            app.setFullWidthAxes(app.DelayPowerAxes, m.delay.x); 
-            app.applyYLimMargin(app.DelayPowerAxes, dy);
-            
-            delete(app.SpreadCDFAxes.Children); 
-            m_idx_cdf2 = round(linspace(1, length(m.delay.cdf_x), 20));
-            plot(app.SpreadCDFAxes, m.delay.cdf_x, m.delay.cdf_y, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', m_idx_cdf2, 'MarkerFaceColor', app.Color_Primary); 
-            app.applyAxesStyle(app.SpreadCDFAxes, cdf_title, cdf_x, cdf_y); 
-            app.SpreadCDFAxes.YLim = [0, 1]; 
-            app.setFullWidthAxes(app.SpreadCDFAxes, m.delay.cdf_x);
-            
-            delete(app.DopplerPowerAxes.Children); 
-            if isfield(m, 'time') && max(m.time.y) > -900
-                m_idx_dop = round(linspace(1, length(m.time.x), 20));
-                plot(app.DopplerPowerAxes, m.time.x, m.time.y, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', m_idx_dop, 'MarkerFaceColor', app.Color_Primary); 
-                app.applyAxesStyle(app.DopplerPowerAxes, dop_title, dop_x, dop_y); 
-                app.applyYLimMargin(app.DopplerPowerAxes, m.time.y);
-                app.setFullWidthAxes(app.DopplerPowerAxes, m.time.x);
-            else
-                set(app.DopplerPowerAxes, 'XTick', [], 'YTick', []);
-                text(app.DopplerPowerAxes, 0.5, 0.5, no_data_str, 'Units', 'normalized', 'HorizontalAlignment', 'center', 'FontSize', 14, 'FontWeight', 'bold', 'Color', app.Color_TextDim, 'FontName', 'Times New Roman');
-                app.applyAxesStyle(app.DopplerPowerAxes, dop_title, dop_x, dop_y);
-            end
-            drawnow limitrate;
+            idx = find(strcmp(app.DatasetPaths, app.DatasetDropDown.Value), 1);
+            metrics = app.ChannelMetrics{idx};
+            axesHandles = struct( ...
+                'angular', app.AngularPowerAxes, ...
+                'delay', app.DelayPowerAxes, ...
+                'spread', app.SpreadCDFAxes, ...
+                'doppler', app.DopplerPowerAxes);
+            style = struct( ...
+                'language', app.CurrentLang, ...
+                'primary_color', app.Color_Primary, ...
+                'text_color', app.Color_Text, ...
+                'text_dim_color', app.Color_TextDim);
+            render_characterization_plots(axesHandles, metrics, style);
         end
         
         function ClearDataButtonPushed(app, ~)
