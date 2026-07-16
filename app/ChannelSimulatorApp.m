@@ -390,32 +390,6 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
             end
         end
         
-        function setFullWidthAxes(~, ax, x_data)
-            try
-                if isempty(x_data), return; end
-                xmin = min(x_data(:)); xmax = max(x_data(:));
-                if xmin == xmax, xmax = xmin + 1; end
-                ax.XLim = [xmin, xmax];
-                try ax.XLimitMethod = 'tight'; catch; end 
-            catch
-            end
-        end
-        
-        function applyYLimMargin(~, ax, y_data)
-            try
-                if isempty(y_data), return; end
-                y_val = double(y_data(isfinite(y_data(:))));
-                if isempty(y_val), return; end
-                min_y = min(y_val); max_y = max(y_val);
-                hasBar = ~isempty(findobj(ax, 'Type', 'bar'));
-                if hasBar, min_y = min(0, min_y); end
-                yrange = max_y - min_y;
-                if yrange == 0, yrange = max(1, abs(max_y) * 0.1); end
-                ax.YLim = [min_y - 0.1*yrange, max_y + 0.1*yrange];
-            catch
-            end
-        end
-        
         function [band, scen] = autoDetectScenario(~, searchStr)
             band = ''; scen = ''; lowerStr = lower(searchStr);
             if contains(lowerStr, 'sub-6') || contains(lowerStr, 'sub6'), band = 'Sub-6'; end
@@ -1140,222 +1114,46 @@ classdef ChannelSimulatorApp < matlab.apps.AppBase
         end
         
         function updatePredictionPlots_Generic(app, prefix)
-            algos_all = fieldnames(app.PredictionResults);
-            if isempty(algos_all), return; end
-            
-            curr_ds = app.DatasetDropDown.Value;
-            if contains(curr_ds, '[增强]') || contains(curr_ds, '[Augmented]'), curr_tag = '_Aug';
-            elseif contains(curr_ds, '[原始]') || contains(curr_ds, '[Raw]'), curr_tag = '_Raw';
-            else, curr_tag = '_Sim'; end
-            
-            algos = {};
-            for i = 1:length(algos_all)
-                if endsWith(algos_all{i}, curr_tag), algos{end+1} = algos_all{i}; end
-            end
-            if isempty(algos), return; end
-            
-            base_res = app.PredictionResults.(algos{1}); c_ori = app.Color_True; 
-            c_dict = struct(); c_dict.TCN = app.Color_TCN; c_dict.LSTM = app.Color_LSTM; c_dict.GRU = app.Color_GRU;
-            m_dict = struct(); m_dict.TCN = 'o'; m_dict.LSTM = '^'; m_dict.GRU = 'd';
-            
-            legend_opts = {'Location', 'best', 'TextColor', app.Color_Text, 'Color', 'none', 'EdgeColor', 'none', 'FontName', 'Times New Roman', 'FontSize', 12};
-            
-            if strcmp(app.CurrentLang, 'CN')
-                cap_leg_true = '真实容量 (虚线)'; cap_leg_pred = 'AI 预测容量 (实线)';
-                psd_leg_true = '测量值 (虚线)'; psd_leg_pred = '预测值 (实线)';
-                cdf_leg_true = '真实 CDF (虚线)'; cdf_leg_pred = '预测 CDF (实线)';
-                
-                cap_title = sprintf('【%s】容量验证 (准确率: %.2f%%)', prefix, base_res.CapAcc);
-                cap_xlab = 'SNR (dB)'; cap_ylab = '容量 (Gbps)';
-                
-                rmse_title = sprintf('【%s】分组 RMSE (NRMSE: %.2f%%)', prefix, base_res.NRMSE);
-                rmse_title2 = sprintf('【%s】整体 RMSE', prefix);
-                rmse_xlab = '分组索引'; rmse_ylab = 'RMSE (dBm)';
-                
-                psd_title = 'PSD 验证 (去噪后)';
-                psd_xlab = '时延 (ns)'; psd_ylab = '功率 (dBm)';
-                
-                cdf_title = sprintf('【%s】时延扩展 CDF', prefix);
-                cdf_xlab = '时延扩展 \tau (ns)'; cdf_ylab = 'CDF';
-                
-                ang_title = sprintf('【%s】角度功率谱', prefix);
-                ang_xlab = '角度 (deg)'; ang_ylab = '功率 (dB)';
-                
-                dop_title = sprintf('【%s】多普勒', prefix);
-                dop_xlab = 'Hz'; dop_ylab = 'dB';
-            else
-                cap_leg_true = 'Measurement'; cap_leg_pred = 'Predict';
-                psd_leg_true = 'Measurement'; psd_leg_pred = 'Predict';
-                cdf_leg_true = 'Measurement CDF'; cdf_leg_pred = 'Predict CDF';
-                
-                cap_title = sprintf('[%s] Capacity', prefix);
-                cap_xlab = 'SNR (dB)'; cap_ylab = 'Capacity (Gbps)';
-                
-                rmse_title = sprintf('[%s] Group RMSE', prefix);
-                rmse_title2 = sprintf('[%s] Overall RMSE', prefix);
-                rmse_xlab = 'Group Index'; rmse_ylab = 'RMSE (dBm)';
-                
-                [~, worst_g] = max(base_res.GroupRMSE);
-                psd_title = sprintf('PSD Verification (Worst-Case Group %d)', worst_g);
-                psd_xlab = 'Delay (ns)'; psd_ylab = 'Power (dBm)';
-                
-                cdf_title = sprintf('[%s] DS CDF', prefix);
-                cdf_xlab = 'DS \tau (ns)'; cdf_ylab = 'CDF';
-                
-                ang_title = sprintf('[%s] Angular PSD', prefix);
-                ang_xlab = 'Angle (deg)'; ang_ylab = 'Power (dB)';
-                
-                dop_title = sprintf('[%s] Doppler', prefix);
-                dop_xlab = 'Hz'; dop_ylab = 'dB';
-            end
-            
-            % --- 1. 容量 ---
-            delete(app.PredCapacityAxes.Children); hold(app.PredCapacityAxes, 'on');
-            m_idx_cap = round(linspace(1, length(base_res.SNR), 5)); 
-            h_cori = plot(app.PredCapacityAxes, base_res.SNR, base_res.C_ori, '--s', 'Color', c_ori, 'LineWidth', 1.5, 'MarkerSize', 6, 'MarkerIndices', m_idx_cap, 'MarkerFaceColor', c_ori); 
-            lgds_cap = {h_cori}; strs_cap = {cap_leg_true}; y_cap_all = base_res.C_ori;
-            for i = 1:length(algos)
-                key = algos{i}; r = app.PredictionResults.(key);
-                if contains(key, 'TCN'), alg_base='TCN'; elseif contains(key, 'LSTM'), alg_base='LSTM'; else, alg_base='GRU'; end
-                if isfield(c_dict, alg_base), c_pre = c_dict.(alg_base); else, c_pre = app.Color_Primary; end
-                if isfield(m_dict, alg_base), m_pre = m_dict.(alg_base); else, m_pre = 'o'; end
-                h_cpre = plot(app.PredCapacityAxes, r.SNR, r.C_pre, ['-', m_pre], 'Color', c_pre, 'LineWidth', 1.5, 'MarkerFaceColor', c_pre, 'MarkerSize', 6, 'MarkerIndices', round(linspace(1, length(r.SNR), 5))); 
-                lgds_cap{end+1} = h_cpre;
-                if strcmp(app.CurrentLang, 'CN')
-                    strs_cap{end+1} = cap_leg_pred; 
-                else
-                    strs_cap{end+1} = [alg_base ' ' cap_leg_pred];
-                end
-                y_cap_all = [y_cap_all; r.C_pre(:)];
-            end
-            hold(app.PredCapacityAxes, 'off');
-            legend(app.PredCapacityAxes, [lgds_cap{:}], strs_cap, legend_opts{:});
-            app.applyAxesStyle(app.PredCapacityAxes, cap_title, cap_xlab, cap_ylab); 
-            app.applyYLimMargin(app.PredCapacityAxes, y_cap_all); app.setFullWidthAxes(app.PredCapacityAxes, base_res.SNR);
-            
-            % --- 2. RMSE ---
-            delete(app.PredRMSEAxes.Children); hold(app.PredRMSEAxes, 'on');
-            if length(base_res.GroupRMSE) > 1
-                lgds_rmse = {}; strs_rmse = {}; y_rmse_all = [];
-                for i = 1:length(algos)
-                    key = algos{i}; r = app.PredictionResults.(key);
-                    if contains(key, 'TCN'), alg_base='TCN'; elseif contains(key, 'LSTM'), alg_base='LSTM'; else, alg_base='GRU'; end
-                    if isfield(c_dict, alg_base), c_pre = c_dict.(alg_base); else, c_pre = app.Color_Primary; end
-                    if isfield(m_dict, alg_base), m_pre = m_dict.(alg_base); else, m_pre = 'o'; end
-                    h_rmse = plot(app.PredRMSEAxes, 1:length(r.GroupRMSE), r.GroupRMSE, ['-', m_pre], 'Color', c_pre, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', round(linspace(1, length(r.GroupRMSE), min(10, length(r.GroupRMSE)))), 'MarkerFaceColor', c_pre); 
-                    lgds_rmse{end+1} = h_rmse; strs_rmse{end+1} = alg_base; y_rmse_all = [y_rmse_all; r.GroupRMSE(:)];
-                end
-                legend(app.PredRMSEAxes, [lgds_rmse{:}], strs_rmse, legend_opts{:});
-                app.applyAxesStyle(app.PredRMSEAxes, rmse_title, rmse_xlab, rmse_ylab); 
-                app.applyYLimMargin(app.PredRMSEAxes, y_rmse_all); app.setFullWidthAxes(app.PredRMSEAxes, 1:length(base_res.GroupRMSE));
-            else
-                vals = zeros(1, length(algos));
-                for i = 1:length(algos), vals(i) = app.PredictionResults.(algos{i}).RMSE; end
-                b = bar(app.PredRMSEAxes, 1:length(algos), vals, 0.4, 'FaceColor', 'flat', 'EdgeColor', 'none'); 
-                for i = 1:length(algos)
-                    key = algos{i}; if contains(key, 'TCN'), alg_base='TCN'; elseif contains(key, 'LSTM'), alg_base='LSTM'; else, alg_base='GRU'; end
-                    if isfield(c_dict, alg_base), b.CData(i,:) = c_dict.(alg_base); else, b.CData(i,:) = app.Color_Primary; end
-                end
-                app.PredRMSEAxes.XTick = 1:length(algos); 
-                tick_labels = {}; for i=1:length(algos), if contains(algos{i}, 'TCN'), tick_labels{i}='TCN'; elseif contains(algos{i}, 'LSTM'), tick_labels{i}='LSTM'; else, tick_labels{i}='GRU'; end; end
-                app.PredRMSEAxes.XTickLabel = tick_labels;
-                app.applyAxesStyle(app.PredRMSEAxes, rmse_title2, 'Algorithm', rmse_ylab); app.applyYLimMargin(app.PredRMSEAxes, vals);
-            end
-            hold(app.PredRMSEAxes, 'off');
-            
-            % --- 3. 原始全景 PSD ---
-            delete(app.PredRawDataAxes.Children); hold(app.PredRawDataAxes, 'on');
-            [~, worst_g] = max(base_res.GroupRMSE); total_snaps = size(base_res.Raw_Ori, 1); group_size = max(1, floor(total_snaps / 10));
-            s_idx = (worst_g - 1) * group_size + 1; e_idx = min(total_snaps, worst_g * group_size);
-            x_delay_raw = base_res.Metrics.delay.x; x_delay = x_delay_raw(:);
-            tmp_ori_pwr = mean(10.^(base_res.Raw_Ori(s_idx:e_idx, :)/10), 1); raw_ori_pdp = 10*log10(tmp_ori_pwr(:) + 1e-20);
-            
-            m_idx_psd = round(linspace(1, length(x_delay), 20)); 
-            h_rori = plot(app.PredRawDataAxes, x_delay, raw_ori_pdp, '--s', 'Color', [c_ori, 0.7], 'LineWidth', 1.5, 'MarkerSize', 6, 'MarkerIndices', m_idx_psd, 'MarkerFaceColor', c_ori); 
-            lgds_psd = {h_rori}; strs_psd = {psd_leg_true}; y_all_raw = raw_ori_pdp(:); 
-            
-            for i = 1:length(algos)
-                key = algos{i}; r = app.PredictionResults.(key);
-                if contains(key, 'TCN'), alg_base='TCN'; elseif contains(key, 'LSTM'), alg_base='LSTM'; else, alg_base='GRU'; end
-                if isfield(c_dict, alg_base), c_pre = c_dict.(alg_base); else, c_pre = app.Color_Primary; end
-                if isfield(m_dict, alg_base), m_pre = m_dict.(alg_base); else, m_pre = 'o'; end
-                
-                t_snaps = size(r.Raw_Pre, 1); g_size = max(1, floor(t_snaps / 10)); rs_idx = (worst_g - 1) * g_size + 1; re_idx = min(t_snaps, worst_g * g_size);
-                tmp_pre_pwr = mean(10.^(r.Raw_Pre(rs_idx:re_idx, :)/10), 1); raw_pre_pdp = 10*log10(tmp_pre_pwr(:) + 1e-20);
-                
-                h_rpre = plot(app.PredRawDataAxes, x_delay, raw_pre_pdp, ['-', m_pre], 'Color', c_pre, 'LineWidth', 1.5, 'MarkerSize', 6, 'MarkerIndices', m_idx_psd, 'MarkerFaceColor', c_pre); 
-                lgds_psd{end+1} = h_rpre; 
-                if strcmp(app.CurrentLang, 'CN')
-                    strs_psd{end+1} = psd_leg_pred;
-                else
-                    strs_psd{end+1} = [alg_base ' ' psd_leg_pred];
-                end
-                y_all_raw = [y_all_raw; raw_pre_pdp(:)];
-            end
-            hold(app.PredRawDataAxes, 'off');
-            legend(app.PredRawDataAxes, [lgds_psd{:}], strs_psd, legend_opts{:});
-            app.applyAxesStyle(app.PredRawDataAxes, psd_title, psd_xlab, psd_ylab);
-            app.applyYLimMargin(app.PredRawDataAxes, y_all_raw); app.setFullWidthAxes(app.PredRawDataAxes, x_delay);
-            
-            % --- 4. DS CDF ---
-            delete(app.PredSpreadAxes.Children); hold(app.PredSpreadAxes, 'on');
-            m_idx_cdf = round(linspace(1, length(base_res.xo), 15));
-            h_sfo = plot(app.PredSpreadAxes, base_res.xo, base_res.fo, '--s', 'Color', c_ori, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', m_idx_cdf, 'MarkerFaceColor', c_ori); 
-            lgds_cdf = {h_sfo}; strs_cdf = {cdf_leg_true}; 
-            for i = 1:length(algos)
-                key = algos{i}; r = app.PredictionResults.(key);
-                if contains(key, 'TCN'), alg_base='TCN'; elseif contains(key, 'LSTM'), alg_base='LSTM'; else, alg_base='GRU'; end
-                if isfield(c_dict, alg_base), c_pre = c_dict.(alg_base); else, c_pre = app.Color_Primary; end
-                if isfield(m_dict, alg_base), m_pre = m_dict.(alg_base); else, m_pre = 'o'; end
-                h_sfp = plot(app.PredSpreadAxes, r.xp, r.fp, ['-', m_pre], 'Color', c_pre, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', round(linspace(1, length(r.xp), 15)), 'MarkerFaceColor', c_pre); 
-                lgds_cdf{end+1} = h_sfp;
-                if strcmp(app.CurrentLang, 'CN')
-                    strs_cdf{end+1} = cdf_leg_pred;
-                else
-                    strs_cdf{end+1} = [alg_base ' ' cdf_leg_pred];
-                end
-            end
-            hold(app.PredSpreadAxes, 'off');
-            legend(app.PredSpreadAxes, [lgds_cdf{:}], strs_cdf, legend_opts{:});
-            app.applyAxesStyle(app.PredSpreadAxes, cdf_title, cdf_xlab, cdf_ylab); 
-            app.PredSpreadAxes.YLim = [0, 1]; app.setFullWidthAxes(app.PredSpreadAxes, base_res.xp);
-            
-            % --- 5. 角度与多普勒 ---
-            if strcmp(app.CurrentLang, 'CN')
-                no_data_str = '无数据';
-            else
-                no_data_str = 'No Data';
-            end
-            delete(app.PredAngularAxes.Children); m = base_res.Metrics;
-            if isfield(m, 'space') && max(m.space.psd) > -900
-                plot(app.PredAngularAxes, m.space.angle, m.space.psd, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', round(linspace(1, length(m.space.angle), 20)), 'MarkerFaceColor', app.Color_Primary);
-                app.applyAxesStyle(app.PredAngularAxes, ang_title, ang_xlab, ang_ylab);
-                app.applyYLimMargin(app.PredAngularAxes, m.space.psd); app.setFullWidthAxes(app.PredAngularAxes, m.space.angle);
-            else
-                set(app.PredAngularAxes, 'XTick', [], 'YTick', []);
-                text(app.PredAngularAxes, 0.5, 0.5, no_data_str, 'Units', 'normalized', 'HorizontalAlignment', 'center', 'FontSize', 14, 'FontWeight', 'bold', 'Color', app.Color_TextDim, 'FontName', 'Times New Roman');
-                app.applyAxesStyle(app.PredAngularAxes, ang_title, ang_xlab, ang_ylab);
-            end
-            
-            delete(app.PredDopplerAxes.Children);
-            if isfield(m, 'time') && max(m.time.y) > -900
-                plot(app.PredDopplerAxes, m.time.x, m.time.y, '-o', 'Color', app.Color_Primary, 'LineWidth', 1.5, 'MarkerSize', 5, 'MarkerIndices', round(linspace(1, length(m.time.x), 20)), 'MarkerFaceColor', app.Color_Primary);
-                app.applyAxesStyle(app.PredDopplerAxes, dop_title, dop_xlab, dop_ylab);
-                app.applyYLimMargin(app.PredDopplerAxes, m.time.y); app.setFullWidthAxes(app.PredDopplerAxes, m.time.x);
-            else
-                set(app.PredDopplerAxes, 'XTick', [], 'YTick', []);
-                text(app.PredDopplerAxes, 0.5, 0.5, no_data_str, 'Units', 'normalized', 'HorizontalAlignment', 'center', 'FontSize', 14, 'FontWeight', 'bold', 'Color', app.Color_TextDim, 'FontName', 'Times New Roman');
-                app.applyAxesStyle(app.PredDopplerAxes, dop_title, dop_xlab, dop_ylab);
-            end
-            drawnow limitrate;
+            axesHandles = struct( ...
+                'capacity', app.PredCapacityAxes, ...
+                'rmse', app.PredRMSEAxes, ...
+                'raw_data', app.PredRawDataAxes, ...
+                'spread', app.PredSpreadAxes, ...
+                'angular', app.PredAngularAxes, ...
+                'doppler', app.PredDopplerAxes);
+            style = struct( ...
+                'language', app.CurrentLang, ...
+                'dataset_label', app.DatasetDropDown.Value, ...
+                'prefix', prefix, ...
+                'true_color', app.Color_True, ...
+                'primary_color', app.Color_Primary, ...
+                'tcn_color', app.Color_TCN, ...
+                'lstm_color', app.Color_LSTM, ...
+                'gru_color', app.Color_GRU, ...
+                'text_color', app.Color_Text, ...
+                'text_dim_color', app.Color_TextDim);
+            render_prediction_plots(axesHandles, app.PredictionResults, style);
         end
     end
     
     %% ==================== 界面响应与防缩放排版 ====================
     methods (Access = private)
         function startupFcn(app)
+            app.ensureProjectRuntimePaths();
             % 强制进行一次全局多语言同步，确保初始启动界面的所有元素绝对一致
             app.updateAllUIText();
+        end
+
+        function ensureProjectRuntimePaths(app)
+            % External renderers and core functions live below the App folder.
+            % Register them when the App is opened directly from app/ rather
+            % than from a MATLAB session that already used genpath(projectRoot).
+            appFile = which(class(app));
+            appFolder = fileparts(appFile);
+            projectRoot = fileparts(appFolder);
+            addpath(appFolder);
+            addpath(fullfile(appFolder, 'plotting'));
+            addpath(genpath(fullfile(projectRoot, 'core')));
         end
         
         function ConfigValueChanged(app, ~)
