@@ -1,0 +1,3078 @@
+{
+  "dataset_name": "ChanAI Pulse QuaDRiGa Dataset",
+  "version": "1.0",
+  "generated_at": "2026-07-21 11:00:17",
+  "generator": "QuaDRiGa v2.8.1",
+  "total_files": 200,
+  "scenarios": [
+    "3GPP_38.901_UMi-LOS",
+    "3GPP_38.901_UMa-LOS"
+  ],
+  "carrier_freqs_ghz": [
+    3.5,
+    28
+  ],
+  "bandwidths_mhz": [
+    100,
+    200,
+    400
+  ],
+  "snapshots": 150,
+  "subcarriers": 64,
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50
+  ],
+  "datasets": [
+    [
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed1.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 1,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7448028
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed2.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 2,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5951374
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed3.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 3,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7272529
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed4.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 4,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6982527
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed5.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 5,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6651066
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed6.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 6,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.720201
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed7.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 7,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.641988
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed8.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 8,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7194352
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed9.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 9,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6032975
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed10.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 10,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6676063
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed11.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 11,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6290986
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed12.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 12,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5906083
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed13.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 13,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7265592
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed14.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 14,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6535567
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed15.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 15,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.614331
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed16.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 16,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6014141
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed17.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 17,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6320297
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed18.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 18,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7669314
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed19.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 19,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7083085
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed20.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 20,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6772006
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed21.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 21,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.64044
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed22.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 22,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.637609
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed23.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 23,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7097855
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed24.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 24,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6384656
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed25.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 25,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7046448
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed26.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 26,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6529638
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed27.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 27,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8085877
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed28.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 28,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7571683
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed29.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 29,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8217009
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed30.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 30,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6546422
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed31.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 31,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7059506
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed32.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 32,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7262703
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed33.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 33,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7370842
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed34.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 34,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6162208
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed35.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 35,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7839305
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed36.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 36,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8065847
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed37.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 37,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7698745
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed38.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 38,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7550348
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed39.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 39,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7789958
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed40.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 40,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7684625
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed41.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 41,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7962454
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed42.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 42,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8030333
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed43.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 43,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8148685
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed44.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 44,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7632825
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed45.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 45,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7349732
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed46.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 46,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6120148
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed47.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 47,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5626866
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed48.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 48,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6919902
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed49.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 49,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7313996
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_4GHz_seed50.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 50,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6868823
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed1.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 1,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7691606
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed2.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 2,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6043484
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed3.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 3,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.707154
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed4.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 4,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7018464
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed5.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 5,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6936532
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed6.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 6,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7187157
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed7.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 7,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5941906
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed8.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 8,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.731791
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed9.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 9,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6180456
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed10.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 10,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5936516
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed11.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 11,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6146719
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed12.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 12,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6154973
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed13.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 13,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7120843
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed14.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 14,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.699481
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed15.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 15,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6050422
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed16.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 16,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5785979
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed17.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 17,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5981882
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed18.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 18,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7352075
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed19.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 19,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7059003
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed20.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 20,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7011846
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed21.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 21,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6041665
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed22.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 22,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5969894
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed23.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 23,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6543114
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed24.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 24,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.605478
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed25.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 25,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6673426
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed26.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 26,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6210928
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed27.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 27,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.712551
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed28.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 28,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7566539
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed29.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 29,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7082079
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed30.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 30,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6365204
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed31.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 31,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8573371
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed32.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 32,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.768452
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed33.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 33,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7368492
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed34.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 34,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6578854
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed35.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 35,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.713913
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed36.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 36,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7114609
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed37.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 37,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6862639
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed38.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 38,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6188356
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed39.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 39,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7117546
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed40.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 40,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7016794
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed41.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 41,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6687748
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed42.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 42,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6784767
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed43.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 43,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6630673
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed44.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 44,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7952846
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed45.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 45,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6561278
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed46.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 46,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6414085
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed47.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 47,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6092578
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed48.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 48,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7082463
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed49.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 49,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6842731
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMi-LOS_28GHz_seed50.mat",
+        "scenario": "3GPP_38.901_UMi-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 50,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6760851
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed1.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 1,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6307422
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed2.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 2,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6027567
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed3.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 3,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7501707
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed4.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 4,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.785322
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed5.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 5,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5949491
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed6.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 6,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6527148
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed7.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 7,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5636641
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed8.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 8,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7676801
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed9.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 9,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6162615
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed10.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 10,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.597609
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed11.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 11,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5981622
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed12.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 12,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6488036
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed13.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 13,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7403849
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed14.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 14,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6954331
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed15.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 15,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5651835
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed16.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 16,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5320449
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed17.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 17,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5807657
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed18.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 18,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7515834
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed19.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 19,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7260058
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed20.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 20,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6646146
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed21.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 21,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6989771
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed22.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 22,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6083841
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed23.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 23,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7336657
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed24.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 24,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5812475
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed25.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 25,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6652933
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed26.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 26,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5994684
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed27.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 27,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6940605
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed28.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 28,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7499502
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed29.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 29,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6950898
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed30.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 30,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6195193
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed31.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 31,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7037645
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed32.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 32,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7355205
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed33.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 33,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7039507
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed34.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 34,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5845201
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed35.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 35,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.605341
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed36.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 36,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7352052
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed37.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 37,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7881096
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed38.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 38,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7142486
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed39.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 39,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7257228
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed40.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 40,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7477778
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed41.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 41,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.629295
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed42.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 42,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8216078
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed43.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 43,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.708229
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed44.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 44,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7222751
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed45.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 45,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5363901
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed46.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 46,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5844854
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed47.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 47,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5972727
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed48.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 48,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7209979
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed49.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 49,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7463739
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_4GHz_seed50.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 3.5,
+        "bandwidth_mhz": 100,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 50,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7635566
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed1.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 1,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6405692
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed2.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 2,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5851355
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed3.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 3,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7298894
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed4.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 4,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7108857
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed5.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 5,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5372944
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed6.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 6,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7131048
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed7.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 7,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5720975
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed8.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 8,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6724663
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed9.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 9,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5446688
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed10.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 10,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6594808
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed11.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 11,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5983586
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed12.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 12,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5972264
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed13.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 13,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7249044
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed14.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 14,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7187751
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed15.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 15,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6011057
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed16.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 16,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5738872
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed17.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 17,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5967079
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed18.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 18,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7181221
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed19.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 19,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.728331
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed20.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 20,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7319752
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed21.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 21,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6294395
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed22.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 22,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5941622
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed23.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 23,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8857214
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed24.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 24,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7720882
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed25.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 25,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.8287629
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed26.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 26,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6399268
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed27.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 27,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7182615
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed28.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 28,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7194162
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed29.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 29,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7266151
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed30.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 30,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5696654
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed31.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 31,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7153278
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed32.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 32,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7031335
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed33.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 33,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7117475
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed34.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 34,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6351732
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed35.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 35,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6977537
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed36.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 36,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7697781
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed37.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 37,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6585722
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed38.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 38,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7286195
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed39.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 39,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7146083
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed40.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 40,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6887567
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed41.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 41,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5560794
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed42.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 42,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.756676
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed43.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 43,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7063126
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed44.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 44,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7146974
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed45.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 45,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6022404
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed46.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 46,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6327024
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed47.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 47,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.5671381
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed48.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 48,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7278832
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed49.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 49,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.7858623
+      },
+      {
+        "filename": "quadriga_3GPP_38901_UMa-LOS_28GHz_seed50.mat",
+        "scenario": "3GPP_38.901_UMa-LOS",
+        "carrier_freq_ghz": 28,
+        "bandwidth_mhz": 200,
+        "snapshots": 150,
+        "subcarriers": 64,
+        "seed": 50,
+        "trajectory_type": "",
+        "complex_h_size": [
+          150,
+          64
+        ],
+        "generation_time_s": 1.6816716
+      }
+    ]
+  ]
+}
