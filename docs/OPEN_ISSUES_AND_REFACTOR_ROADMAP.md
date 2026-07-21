@@ -1,7 +1,7 @@
 # ChanAI Pulse 待解决问题与后续拆分路线图
 
-**最后更新：** 2026-07-13
-**当前基线：** PR #7 已合并；Step 8 Unified Prediction Engine 正在 PR #8 审阅。App 已具备时序 `70% / 15% / 15%` 的 Train / Validation / Test 流程。
+**最后校准：** 2026-07-21
+**当前基线：** Unified Prediction Engine 与三组外提绘图已合并到 `main`；App 已具备时序 `70% / 15% / 15%` 的 Train / Validation / Test 流程。
 
 本文件记录暂缓工作、后续研究任务和拆分顺序，防止多人协作时遗漏已经发现的工程或科学问题。
 
@@ -24,7 +24,7 @@
 - 预测实验已具备独立 Train / Validation / Test；归一化只由训练段计算。
 - `Real + Synthetic` 模式中，生成数据只扩充训练，不进入验证和最终 Test。
 - ChanAIs Dataset 的分级元数据、SAGE 转换、公开 synthetic demo 和 Dataset Manager 已合并。
-- Step 8 已将 TCN、LSTM、GRU 的共享训练、预测、递归预测和评估逻辑外提到 `core/prediction/`，等待 PR #8 审阅。
+- TCN、LSTM、GRU 的共享训练、预测、递归预测和评估逻辑已外提到 `core/prediction/`；三组绘图已位于 `app/plotting/`。
 
 ## 三、待解决问题清单
 
@@ -136,8 +136,8 @@ Synthetic pretraining + real fine-tuning
 
 ## 八、后续工作顺序
 
-1. **完成 Step 8 PR 审阅与人工验收**：确认 TCN、LSTM、GRU 都能从 App 训练、预测和显示报告。
-2. **Step 9 Experiment Manager**：自动保存 config、seed、模型、归一化参数、指标、图和日志。
+1. **人工回归验收现有 Time 流程**：确认 TCN、LSTM、GRU 都能从 App 训练、预测和显示报告。
+2. **Experiment Manager**：自动保存 config、seed、模型、归一化参数、指标、图和日志。
 3. **6C 评估严谨化**：经验 DS CDF、完整 Group RMSE、训练尺度说明。
 4. **6D / 6E 生成器校准与增强 A/B 实验**：固定真实 Test 集，不以训练曲线替代 Test 结论。
 5. **Frequency / Space 域实现 PR**：在可复现实验记录的基础上，分别实现真实的频域和空间域任务，不能只增加按钮。
