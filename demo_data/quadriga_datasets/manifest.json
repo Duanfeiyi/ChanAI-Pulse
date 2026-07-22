@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-07-22 18:06:11",
+  "generator": "QuaDRiGa v2.8.1",
+  "adapter_version": "v2.0-step-v2-1",
+  "frequency_grid": "DFT: delta_f = B/N, (-N/2:N/2-1)*delta_f",
+  "datasets": [
+    {
+      "filename": "quadriga_3GPP_38901_UMa_3.5GHz_seed42.mat",
+      "sha256": "19184a0000000004000000004d00332b00002a7b5d7600004e006f0000000000",
+      "size_bytes": 374536,
+      "scenario": "3GPP_38.901_UMa",
+      "quadriga_exact_scenario": "3GPP_38.901_UMa_NLOS",
+      "trajectory_type": "random",
+      "carrier_freq_hz": 3.5E+9,
+      "bandwidth_hz": 1.0E+8,
+      "delta_f_hz": 1.5625E+6,
+      "num_subcarriers": 64,
+      "num_snapshots": 100,
+      "random_seed": 42,
+      "adapter_version": "v2.0-step-v2-1"
+    },
+    {
+      "filename": "quadriga_3GPP_38901_UMi-LOS_3.5GHz_seed42.mat",
+      "sha256": "0000586b00000023000952005100710000000012003900000d27006e00000f00",
+      "size_bytes": 310430,
+      "scenario": "3GPP_38.901_UMi-LOS",
+      "quadriga_exact_scenario": "3GPP_38.901_UMi_LOS",
+      "trajectory_type": "random",
+      "carrier_freq_hz": 3.5E+9,
+      "bandwidth_hz": 1.0E+8,
+      "delta_f_hz": 1.5625E+6,
+      "num_subcarriers": 64,
+      "num_snapshots": 100,
+      "random_seed": 42,
+      "adapter_version": "v2.0-step-v2-1"
+    },
+    {
+      "filename": "quadriga_3GPP_38901_UMi_3.5GHz_seed42.mat",
+      "sha256": "0900001e04007800195f26470000243160007300001757004554000e00160000",
+      "size_bytes": 367308,
+      "scenario": "3GPP_38.901_UMi",
+      "quadriga_exact_scenario": "3GPP_38.901_UMi_NLOS",
+      "trajectory_type": "random",
+      "carrier_freq_hz": 3.5E+9,
+      "bandwidth_hz": 1.0E+8,
+      "delta_f_hz": 1.5625E+6,
+      "num_subcarriers": 64,
+      "num_snapshots": 100,
+      "random_seed": 42,
+      "adapter_version": "v2.0-step-v2-1"
+    }
+  ]
+}

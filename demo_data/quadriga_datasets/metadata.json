@@ -1,7 +1,7 @@
 {
   "dataset_name": "ChanAI Pulse QuaDRiGa Dataset",
   "version": "1.0",
-  "generated_at": "2026-07-22 15:20:18",
+  "generated_at": "2026-07-22 18:06:01",
   "generator": "QuaDRiGa v2.8.1",
   "total_files": 3,
   "scenarios": [
@@ -24,12 +24,12 @@
         "snapshots": 100,
         "subcarriers": 64,
         "seed": 42,
-        "trajectory_type": "",
+        "trajectory_type": "random",
         "complex_h_size": [
           100,
           64
         ],
-        "generation_time_s": 1.6562148
+        "generation_time_s": 1.3897206
       },
       {
         "filename": "quadriga_3GPP_38901_UMi-LOS_3.5GHz_seed42.mat",
@@ -39,12 +39,12 @@
         "snapshots": 100,
         "subcarriers": 64,
         "seed": 42,
-        "trajectory_type": "",
+        "trajectory_type": "random",
         "complex_h_size": [
           100,
           64
         ],
-        "generation_time_s": 1.5212711
+        "generation_time_s": 1.2621854
       },
       {
         "filename": "quadriga_3GPP_38901_UMa_3.5GHz_seed42.mat",
@@ -54,12 +54,12 @@
         "snapshots": 100,
         "subcarriers": 64,
         "seed": 42,
-        "trajectory_type": "",
+        "trajectory_type": "random",
         "complex_h_size": [
           100,
           64
         ],
-        "generation_time_s": 1.5442897
+        "generation_time_s": 1.3410478
       }
     ]
   ]
