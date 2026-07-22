@@ -57,7 +57,7 @@ for s = 1:numel(scenarios)
             cfg.random_seed = seeds(r);
             
             % Generate
-            fprintf('[%03d] %s @ %.1f GHz (seed=%d, traj=%s) ... ', idx, scenarios(s), freqs(f), seeds(r), result.trajectory_type);
+            fprintf('[%03d] %s @ %.1f GHz (seed=%d) ... ', idx, scenarios(s), freqs(f), seeds(r));
             t_start = tic;
             result = quadriga_adapter(cfg);
             t_elapsed = toc(t_start);
