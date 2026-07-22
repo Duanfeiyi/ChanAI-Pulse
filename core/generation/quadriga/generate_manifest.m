@@ -30,7 +30,7 @@ if exist(metadataPath, 'file') == 2
 else
     manifest.metadata_sha256 = "not_present";
 end
-manifest.datasets = struct([]);
+datasetEntries = cell(1, numel(matFiles));
 
 for k = 1:numel(matFiles)
     filePath = fullfile(demoDir, matFiles(k).name);
@@ -68,11 +68,13 @@ for k = 1:numel(matFiles)
     entry.adapter_version = result.adapter_version;
     entry.adapter_git_commit = sourceRevision;
     entry.generation_time_s = result.generation_time_s;
-    manifest.datasets(k) = entry;
+    datasetEntries{k} = entry;
 
     fprintf('[%d] %s  SHA-256: %s\n', ...
         k, matFiles(k).name, entry.sha256);
 end
+
+manifest.datasets = [datasetEntries{:}];
 
 outputPath = fullfile(demoDir, 'manifest.json');
 fid = fopen(outputPath, 'w', 'n', 'UTF-8');
