@@ -140,8 +140,8 @@ nSubcarriers = config.num_subcarriers;
 % Time axis
 time_axis_s = (0:nSnapshots-1) * config.snapshot_interval_s;
 
-% Frequency axis (baseband)
-freq_axis_hz = linspace(-bw_hz/2, bw_hz, nSubcarriers);
+% Frequency axis (baseband, symmetric around 0)
+freq_axis_hz = linspace(-bw_hz/2, bw_hz/2, nSubcarriers);
 
 % Get the channel object (SISO: 1 link)
 ch = h_channel(1, 1);  % [Rx=1, Tx=1]
@@ -215,6 +215,11 @@ end
 
 result.num_clusters = config.num_clusters;
 result.num_rays = config.num_rays_per_cluster;
+result.config_source = struct( ...
+    'requested_clusters', config.num_clusters, ...
+    'requested_rays', config.num_rays_per_cluster, ...
+    'actual_source', 'scenario_config_file', ...
+    'note', 'Clusters/rays are determined by QuaDRiGa scenario config files, not directly configurable via API');
 result.random_seed = config.random_seed;
 result.generation_time_s = toc;
 result.data_source = "quadriga_synthetic";
@@ -328,26 +333,25 @@ end
 
 function qs = map_to_quadriga_scenario(scenario_name)
 %MAP_TO_QUADRIGA_SCENARIO Map our scenario names to QuaDRiGa supported names.
-%   QuaDRiGa set_scenario() accepts these parent names (auto LOS/NLOS):
-%     3GPP_38.901_UMi, 3GPP_38.901_UMa, 3GPP_38.901_RMa,
-%     3GPP_38.901_Indoor_Mixed_Office, 3GPP_38.901_Indoor_Open_Office,
-%     3GPP_38.901_InF_SL/DL/SH/DH, mmMAGIC_UMi, etc.
+%   For scenarios with explicit LOS/NLOS variants, use the exact variant.
+%   For generic scenarios, use the parent name (set_scenario handles LOS/NLOS).
 
 switch upper(scenario_name)
     case "3GPP_38.901_UMI"
-        qs = '3GPP_38.901_UMi';
+        qs = '3GPP_38.901_UMi_NLOS';  % Force explicit NLOS for generic UMi
     case "3GPP_38.901_UMI-LOS"
-        qs = '3GPP_38.901_UMi';  % set_scenario handles LOS automatically
+        qs = '3GPP_38.901_UMi_LOS';   % Force explicit LOS
     case "3GPP_38.901_UMA"
-        qs = '3GPP_38.901_UMa';
+        qs = '3GPP_38.901_UMa_NLOS';  % Force explicit NLOS for generic UMa
     case "3GPP_38.901_UMA-LOS"
-        qs = '3GPP_38.901_UMa';
+        qs = '3GPP_38.901_UMa_LOS';   % Force explicit LOS
     case "3GPP_38.901_RMA"
-        qs = '3GPP_38.901_RMa';
+        qs = '3GPP_38.901_RMa_NLOS';  % Force explicit NLOS
+    case "3GPP_38.901_RMA-LOS"
+        qs = '3GPP_38.901_RMa_LOS';   % Force explicit LOS
     case "3GPP_38.901_INH"
-        qs = '3GPP_38.901_Indoor_Mixed_Office';
+        qs = '3GPP_38.901_Indoor_NLOS';
     otherwise
-        % Try passing the name directly
         qs = scenario_name;
 end
 end

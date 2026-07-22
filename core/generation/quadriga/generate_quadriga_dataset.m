@@ -10,12 +10,12 @@ function datasets = generate_quadriga_dataset(varargin)
 %     generate_quadriga_dataset('Scenarios', {'3GPP_38.901_UMi'})  % Single scenario
 
 p = inputParser;
-addParameter(p, 'Scenarios', {"3GPP_38.901_UMi", "3GPP_38.901_UMa", "3GPP_38.901_INH"});
-addParameter(p, 'CarrierFreqs_GHz', [3.5, 28, 100]);
-addParameter(p, 'Bandwidths_MHz', [100, 200, 400]);
+addParameter(p, 'Scenarios', {"3GPP_38.901_UMi", "3GPP_38.901_UMi-LOS", "3GPP_38.901_UMa"});
+addParameter(p, 'CarrierFreqs_GHz', [3.5]);
+addParameter(p, 'Bandwidths_MHz', [100]);
 addParameter(p, 'Snapshots', 100);
 addParameter(p, 'Subcarriers', 64);
-addParameter(p, 'Seeds', 1:20);
+addParameter(p, 'Seeds', [42]);
 addParameter(p, 'OutputDir', fullfile(pwd, 'demo_data', 'quadriga_datasets'));
 addParameter(p, 'SavePlots', false);
 parse(p, varargin{:});
@@ -64,7 +64,7 @@ for s = 1:numel(scenarios)
             fprintf('%.1f s, %dx%d, traj=%s\n', t_elapsed, size(result.complex_h, 1), size(result.complex_h, 2), result.config.trajectory_type);
             
             % Save
-            filename = sprintf('quadriga_%s_%.0fGHz_seed%d.mat', ...
+            filename = sprintf('quadriga_%s_%.1fGHz_seed%d.mat', ...
                 strrep(char(scenarios(s)), '.', ''), freqs(f), seeds(r));
             filepath = fullfile(outputDir, filename);
             save(filepath, 'result', '-v7.3');
