@@ -1,51 +1,42 @@
-# 实验数据切分与增强规范
+# Experiment Data Protocol
 
-## 目的
+**Status:** Implemented for the current time-domain DPSD prediction workflow. It does not define a Complex-H benchmark.
 
-本规范定义 ChanAI Pulse 后续训练实验如何使用本地真实数据和合成生成数据。它不改变当前 App 的训练行为；后续训练接入必须遵守本规范。
+## Current split policy
 
-## 基本原则
+For an ordered real/evaluation sequence, the App uses chronological default partitions:
 
 ```text
-真实本地时序数据
-  -> Train (70%)
-  -> Validation (15%)
-  -> Test (15%)
-
-生成数据
-  -> 只能加入 Train
+first 70% -> Train
+next  15% -> Validation
+last  15% -> Test
 ```
 
-真实数据不得上传 GitHub。生成数据若公开，必须标记为 synthetic 或经过脱敏的 measurement-calibrated synthetic。
+The split occurs before sliding-window construction. A window and its target therefore remain within one partition; no training window can consume a validation/test target. Normalization parameters are fitted to the real training segment only.
 
-## 为什么按时间切分
+## Generated data policy
 
-信道快拍前后相关。随机打乱会让相邻甚至几乎相同的快拍同时出现在训练和测试中，造成未来信息泄漏。必须先按时间或测量轨迹切分，再分别构造预测滑窗。
+```text
+real train windows + generated train windows -> training
+real validation windows                      -> validation
+real test windows                            -> final held-out metrics
+```
 
-## 窗口规则
+Generated samples are permitted for augmentation experiments only in the training source. They must never be silently mixed into validation or test. A successful augmented run shows pipeline compatibility, not proof that synthetic augmentation improves real-world generalization.
 
-预测窗口不得跨越分区边界。例如窗口长度为 10、预测步长为 1 时，验证段的首个可用样本必须完全由验证段内的 10 个历史快拍构成；训练段末尾不能借用验证段作为目标。
+## Current metrics and limitations
 
-## 数据来源标签
+The App reports legacy DPSD-oriented RMSE, NRMSE, Capacity Accuracy, timing and DS-CDF-related views. The DS-CDF calculation currently uses a Gaussian approximation; it is not an empirical CDF. Capacity Accuracy is a legacy comparative metric, not a complete communication-system evaluation. See `EVAL-001` and related items in [Open Issues](OPEN_ISSUES_AND_REFACTOR_ROADMAP.md).
 
-| `source_type` | 用途 | 是否可用于最终指标 |
-| --- | --- | --- |
-| `real_train` | 模型训练 | 否 |
-| `real_validation` | 选择训练轮数、模型与参数 | 否 |
-| `real_test` | 最终独立测试 | 是 |
-| `synthetic_generated` | 训练集扩充或预训练 | 否 |
-| `measurement_calibrated_synthetic` | 已脱敏的校准合成数据 | 否，除非另做生成质量评估 |
+## Reporting requirements
 
-## 正式实验应报告什么
+For an experiment comparison, record locally:
 
-至少比较以下三组，并在同一份 `real_test` 上报告结果：
+- code revision and algorithm;
+- data provenance category, never private paths or raw data;
+- split/window/horizon and normalization policy;
+- generator seed and configuration if synthetic augmentation was used;
+- train, validation and test sample counts;
+- held-out test metrics and training/inference time.
 
-1. Real-only training
-2. Real + generated augmentation
-3. Generated pretraining + real fine-tuning
-
-报告应包括 Train、Validation 与 Test 的数据规模，以及 Test RMSE、NRMSE、Capacity Accuracy、DS CDF / K-S Distance 和推理时间。
-
-## 当前状态
-
-本阶段只提供纯函数和合成测试。下一阶段才会将该协议接入 TCN、LSTM、GRU 训练与 App 训练进度窗口。
+Do not publish a benchmark claim until a fixed task, dataset authorization, repeatable seeds and scientifically reviewed metrics have been established.

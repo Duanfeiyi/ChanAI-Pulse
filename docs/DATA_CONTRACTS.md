@@ -1,20 +1,31 @@
 # ChanAI Pulse Data Contracts
 
-## Purpose
+**Status:** Current implementation contract for the MATLAB baseline. Future Complex-H contracts are explicitly marked Planned.
 
-This document defines the data exchanged between the three platform modules: Channel Characteristics, Channel Generation, and Channel Prediction. It keeps algorithm code independent from GUI controls and makes future pull requests easier to review.
+## Core rule
 
-## Core Rule
+Core functions accept ordinary MATLAB arrays and structs and return arrays or structs. They must not read UI controls, create App components, or depend on page layout. The App owns file selection, user messages and export locations.
 
-Core functions must receive ordinary MATLAB data and configuration structs, then return ordinary MATLAB structs or arrays. They must not read UI controls, create App components, or depend on a specific page layout.
+## Current App sequence representation
 
-## Channel Record
+The active App prediction pipeline uses legacy DPSD values in dBm:
 
-Each normalized channel record uses the following conceptual structure:
+```text
+dpsdDbm: [delay bins x snapshots] in characterization / App state
+sequence: [snapshots x delay bins] for the prediction experiment
+inputs:   [samples x delay bins x window length]
+targets:  [samples x delay bins]
+```
+
+The default App target size is normally 200 delay bins (500 for selected Industrial/mmWave handling), window length 10 and horizon 1. These are current defaults, not universal channel-data limits.
+
+## Channel record
+
+Dataset helpers use the conceptual record below. Fields are optional unless indicated; a usable record requires `record_id`, `data_type`, and at least one channel representation.
 
 ```matlab
-record.record_id
-record.data_type
+record.record_id                 % required identifier
+record.data_type                 % required supported type
 record.path_parameters.alpha
 record.path_parameters.doa
 record.path_parameters.delay
@@ -27,29 +38,9 @@ record.quality
 record.metadata
 ```
 
-Fields may be absent when the source format does not provide them. `record_id`, `data_type`, and at least one channel representation are required.
+`canonicalize_cir` converts numeric CIR into conceptual `[antenna x delay_or_frequency x snapshot]` layout while preserving complex values and original-shape metadata. This dataset API is not currently the App's direct MAT-file ingestion route.
 
-## Canonical CIR Layout
-
-`core/dataset/canonicalize_cir.m` converts a numeric CIR to:
-
-```text
-[antenna, delay_or_frequency, snapshot]
-```
-
-Examples:
-
-```text
-1 x 16 x 683  -> 16 x 683 x 1
-16 x 683      -> 16 x 683 x 1
-683 x 1       -> 1 x 683 x 1
-```
-
-The function preserves complex values. Original dimensions remain available through returned metadata for traceability.
-
-## SAGE Contract
-
-SAGE sources may be cell arrays or struct arrays. Each SAGE item maps as follows:
+## SAGE mapping
 
 ```text
 sage.alpha      -> record.path_parameters.alpha
@@ -60,15 +51,38 @@ sage.cir_e      -> record.cir_estimated
 sage.likelihood -> record.quality.likelihood
 ```
 
-## Generation Contract
+SAGE input may be a cell array or struct array. Missing path fields produce a warning in the converter/validator when a usable CIR remains available.
 
-The future generation module will receive a `GenerationConfig` struct containing scenario, frequency, bandwidth, antenna settings, random seed, generation parameters, and optional reference statistics. It will return a `GenerationResult` struct containing generated channel data, derived features, metadata, and validation metrics.
+## 6GPCM-lite generation result
 
-## Prediction Contract
+`generate_6gpcm_lite(config)` returns a MATLAB struct whose primary current fields include:
 
-The prediction module will receive normalized input windows, a `PredictionConfig`, and optional normalization parameters. It will return predictions, targets when available, metrics, model metadata, and timing information.
+```text
+result.cir                 [1 x 1 x snapshots x delayBins], complex
+result.delay_axis_seconds  [1 x delayBins]
+result.delay_spread_ns     [snapshots x 1]
+result.config              generation configuration
+result.cluster_*           generated cluster/ray information
+```
 
-## Privacy Contract
+`generation_result_to_dpsd(result)` produces legacy `dpsdDbm [delayBins x snapshots]` for the current training pipeline. The generator is synthetic and internal; its delay-axis calibration limitation is tracked as `GEN-001`.
 
-Private measured data remains local. Public demo files must declare `visibility: public_demo` and `data_source: synthetic_demo` or `measurement_calibrated_synthetic`. No raw measured snapshots, file names, collection locations, device identifiers, or experiment timestamps may enter public demo files.
+## Prediction experiment contract
 
+`prepare_temporal_prediction_experiment` creates chronological default partitions:
+
+```text
+first 70% -> train
+next  15% -> validation
+last  15% -> test
+```
+
+Windows are created inside each partition. Z-score mean and standard deviation are derived only from the real training segment. `append_generated_training_windows` may append generated windows to `train` only. Validation and test remain from the real/evaluation sequence.
+
+## Planned Complex-H contract
+
+Complex-valued \(H(t,f)\), phase-aware tensors, MIMO axes, Base Models and online adaptation are **not implemented**. The proposed v2.0 design is maintained in `docs/ideas_and_todos/`; it must not be used as the contract of the current MATLAB App.
+
+## Privacy boundary
+
+Public demo files must be synthetic and declare public/demo provenance. Do not include private measurement snapshots, source filenames, locations, device identifiers, user paths, timestamps, model checkpoints or experiment outputs in this repository or its documentation.

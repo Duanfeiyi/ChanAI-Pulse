@@ -2,7 +2,7 @@
 
 This folder contains release asset documentation for ChanAI Pulse v1.0.0.
 
-ChanAI Pulse is an AI-driven universal channel characterization, generation and prediction platform for full-frequency and full-scenario wireless channel research, with 6G-oriented applications.
+Historical v1.0 release-asset draft. It describes a MATLAB legacy research prototype and does not establish verified all-frequency, all-scenario, Complex-H, or standalone-installer capability.
 
 ## Main Package
 

@@ -2,7 +2,7 @@
 
 ## 1. Benchmark Motivation
 
-ChanAI Pulse aims to support full-frequency and full-scenario wireless channel research with 6G-oriented applications. A reproducible benchmark is needed to compare channel characterization methods, channel generation models, and AI-based prediction models under consistent data splits, metrics, and reporting rules.
+ChanAI Pulse has a long-term research ambition to support broader wireless-channel studies. A reproducible benchmark is needed before comparing characterization, generation, or prediction methods under consistent data splits, metrics, and reporting rules. This benchmark is not implemented.
 
 The benchmark plan is currently a roadmap. No private measured datasets are included in this repository, and no new benchmark implementation is added in this stage.
 

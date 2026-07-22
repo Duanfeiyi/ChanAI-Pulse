@@ -1,35 +1,34 @@
-# ChanAI Pulse Preprocessing Pipeline
+# Preprocessing Pipeline
 
-## Purpose
+## Module goal and status
 
-This pipeline converts local channel-derived sequences into reproducible model inputs without changing the original source files.
+The repository contains reusable sequence/window utilities and the active prediction-experiment preparation path. **Implemented:** chronological DPSD preparation. **Not implemented:** generic frequency, spatial or Complex-H preprocessing.
 
-## DPSD Workflow
-
-```text
-Naturally sorted DPSD MAT files
-  -> load_dpsd_sequence
-  -> optional power_to_dbm
-  -> build_sliding_windows
-  -> normalize_samples
-  -> create_train_test_split
-```
-
-## Data Shapes
+## Active App flow
 
 ```text
-Raw sequence:       [record, feature]
-Model input:        [sample, feature, time_window]
-Prediction target:  [sample, feature]
+DPSD sequence [snapshots x features]
+  -> prepare_temporal_prediction_experiment
+  -> chronological 70/15/15 partitions
+  -> partition-local sliding windows
+  -> training-only z-score normalization
+  -> train / validation / test structures
 ```
 
-The original historical workflow uses 200 feature bins and a 10-record input window. These are defaults from the old experiments, not hard-coded limits of the platform.
+The App invokes this flow before model training. Generated sequence windows can be appended to `train` through `append_generated_training_windows`; they do not enter validation/test.
 
-## Safety Rules
+## Auxiliary helpers
 
-- Input files are read only.
-- Train/test splitting is chronological by default to avoid future-data leakage.
-- Normalization parameters must be saved with a trained model.
-- Private DPSD, model input, and output files remain local.
-- Public repositories may contain only synthetic demo data.
+`load_dpsd_sequence`, `natural_sort_files`, `power_to_dbm`, `build_sliding_windows`, `normalize_samples`, `denormalize_samples`, `create_train_test_split`, and `create_chronological_train_val_test_split` remain reusable helpers. The generic min-max `normalize_samples` API is not the same as the active experiment's z-score normalization.
 
+## Shapes and safeguards
+
+- Raw prediction sequence: `[snapshots x features]`.
+- Inputs: `[samples x features x windowLength]`; targets: `[samples x features]`.
+- Splitting happens before window creation, so windows do not cross partition boundaries.
+- The two-way `create_train_test_split` utility is legacy/helper functionality; it is not the App's formal evaluation policy.
+
+## Tests and planned work
+
+- Automated: `test_preprocessing.m`, `test_experiment_split.m`, `test_prediction_experiment.m`.
+- Planned: metadata-aware conversion of complex time/frequency/antenna tensors and explicit task-specific preprocessing routes.
