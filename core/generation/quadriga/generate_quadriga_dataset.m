@@ -130,13 +130,17 @@ metadata.bandwidths_mhz = bws;
 metadata.snapshots = nSnaps;
 metadata.subcarriers = nSub;
 metadata.seeds = seeds;
-metadata.datasets = {datasets};
+metadata.datasets = datasets;
 
 jsonStr = jsonencode(metadata, 'PrettyPrint', true);
 jsonPath = fullfile(outputDir, 'metadata.json');
 fid = fopen(jsonPath, 'w', 'n', 'UTF-8');
 fprintf(fid, '%s', jsonStr);
 fclose(fid);
+
+% Generate the authoritative audit manifest after every dataset file and
+% metadata.json have been written.
+generate_manifest(outputDir);
 
 fprintf('\n============================================================\n');
 fprintf('  Generation Complete\n');

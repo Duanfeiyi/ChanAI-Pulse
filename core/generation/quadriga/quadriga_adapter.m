@@ -66,8 +66,11 @@ bw_hz = config.bandwidth_mhz * 1e6;
 c_light = 3e8;
 lambda = c_light / fc_hz;
 max_interval = lambda / (2 * config.ue_speed_mps);  % Max allowed interval
+requested_snapshot_interval_s = config.snapshot_interval_s;
+sampling_interval_adjusted = false;
 if config.snapshot_interval_s > max_interval
     config.snapshot_interval_s = max_interval * 0.9;  % 10% margin
+    sampling_interval_adjusted = true;
 end
 
 % Load scenario physical parameters
@@ -228,6 +231,9 @@ result.bandwidth_hz = bw_hz;
 result.num_subcarriers = nSubcarriers;
 result.num_snapshots = nSnapshots;
 result.trajectory_type = traj_type;  % Actual trajectory type used
+result.requested_snapshot_interval_s = requested_snapshot_interval_s;
+result.effective_snapshot_interval_s = config.snapshot_interval_s;
+result.sampling_interval_adjusted = sampling_interval_adjusted;
 
 if config.save_path_coefficients
     result.path_coefficients = path_coefficients;
@@ -241,12 +247,11 @@ if config.save_trajectory
     result.bs_position_m = [0, 0, config.bs_height_m];
 end
 
-result.requested_clusters = "determined_by_scenario_config";
-result.requested_rays = "determined_by_scenario_config";
-result.actual_clusters = "determined_by_scenario_config";
-result.actual_rays = "determined_by_scenario_config";
-result.config_source = struct( ...
-    'note', 'Clusters/rays are set by QuaDRiGa scenario config files, not directly configurable via API');
+result.cluster_ray_metadata = struct( ...
+    'status', "not_extracted", ...
+    'source', string(exact_scenario), ...
+    'note', "QuaDRiGa scenario configuration controls clusters and rays; " + ...
+        "effective counts are not extracted by this adapter");
 result.random_seed = config.random_seed;
 result.generation_time_s = toc;
 result.data_source = "quadriga_synthetic";

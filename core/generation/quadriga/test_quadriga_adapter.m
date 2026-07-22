@@ -49,6 +49,9 @@ results.details = {};
 % Test 13: Sampling theorem compliance
 [results, ~] = run_test(results, 'Sampling Theorem Compliance', @test_sampling_theorem);
 
+% Test 14: SHA-256 implementation matches the standard test vector
+[results, ~] = run_test(results, 'Standard SHA-256', @test_standard_sha256);
+
 % Summary
 fprintf('\n=== Summary: %d passed, %d failed, %d skipped ===\n', ...
     results.passed, results.failed, results.skipped);
@@ -305,12 +308,39 @@ for idx = 1:numel(bands)
     cfg.snapshot_interval_s = 0.01;  % Intentionally large to trigger auto-adjust
     result = quadriga_adapter(cfg);
     
-    % Verify the adapter auto-adjusted the interval
+    % Verify the adapter records both requested and effective intervals.
     fc_hz = bands(idx).freq * 1e9;
     lambda = c_light / fc_hz;
     max_allowed = lambda / (2 * cfg.ue_speed_mps);
     assert(result.config.snapshot_interval_s <= max_allowed, ...
         sprintf('Snapshot interval %.6f exceeds max %.6f for %.1f GHz', ...
         result.config.snapshot_interval_s, max_allowed, bands(idx).freq));
+    assert(result.requested_snapshot_interval_s == cfg.snapshot_interval_s, ...
+        'Requested snapshot interval was not preserved');
+    assert(result.effective_snapshot_interval_s == result.config.snapshot_interval_s, ...
+        'Effective snapshot interval does not match result config');
+    expected_adjustment = cfg.snapshot_interval_s > max_allowed;
+    assert(result.sampling_interval_adjusted == expected_adjustment, ...
+        'Sampling-adjustment flag is incorrect');
+end
+end
+
+function test_standard_sha256()
+tempPath = string(tempname) + ".txt";
+cleanup = onCleanup(@() delete_if_exists(tempPath)); %#ok<NASGU>
+fid = fopen(tempPath, 'wb');
+assert(fid >= 0, 'Unable to create SHA-256 test file');
+fwrite(fid, uint8('abc'), 'uint8');
+fclose(fid);
+
+actual = compute_file_sha256(tempPath);
+expected = "ba7816bf8f01cfea414140de5dae2223" + ...
+    "b00361a396177a9cb410ff61f20015ad";
+assert(actual == expected, 'SHA-256 does not match the standard abc vector');
+end
+
+function delete_if_exists(filePath)
+if exist(filePath, 'file') == 2
+    delete(filePath);
 end
 end

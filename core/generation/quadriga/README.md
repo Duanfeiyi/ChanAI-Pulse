@@ -11,12 +11,9 @@ Complex-H channel data `H(t,f)` with 3GPP-standard scenarios.
 
 QuaDRiGa is provided by Fraunhofer HHI under its own
 [Software License for The QuaDRiGa Channel Model](https://quadriga-channel-model.de/).
-Key terms:
-
-- **Non-commercial use only** — academic research and education
-- **No redistribution** — QuaDRiGa source code must NOT be included in this repository
-- **Separate installation required** — users must obtain QuaDRiGa independently
-- **License file** — see `QuaDriGa_2023.12.13_v2.8.1-0/QuaDRiGa_License.txt` (local reference only)
+Its license separately governs use, modification, and redistribution. This
+project intentionally does not vendor or redistribute QuaDRiGa; users must
+obtain it independently and review the official license for their use case.
 
 This repository contains ONLY the adapter code (`.m` files in `core/generation/quadriga/`),
 NOT the QuaDRiGa source, config files, or binary artifacts.
@@ -25,7 +22,6 @@ NOT the QuaDRiGa source, config files, or binary artifacts.
 
 - MATLAB R2022b+
 - QuaDRiGa 2.6+ installed separately and on MATLAB path
-- Deep Learning Toolbox
 
 ## Quick Start
 
@@ -61,11 +57,12 @@ result = quadriga_adapter(config);
 | 3GPP_38.901_RMa-LOS | 35m | 30 km/h | Rural Macro LOS |
 | 3GPP_38.901_INH | 3m | 3 km/h | Indoor Hotspot |
 
-## Multi-Band Support
+## Validated Bands
 
-- Sub-6 GHz (1-6 GHz)
-- mmWave (24-40 GHz)
-- THz (100-300 GHz)
+The automated adapter test exercises 3.5 GHz, 28 GHz, and 100 GHz. These
+checks validate dimensions, the DFT frequency grid, and sampling-interval
+compliance at those three carrier frequencies. They are not evidence of
+validated operation across every frequency within a broader band.
 
 ## Testing
 
