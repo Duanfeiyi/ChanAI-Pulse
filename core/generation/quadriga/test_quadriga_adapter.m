@@ -46,6 +46,9 @@ results.details = {};
 % Test 12: LOS/NLOS distinction
 [results, ~] = run_test(results, 'LOS/NLOS Distinction', @test_los_nlos);
 
+% Test 13: Sampling theorem compliance
+[results, ~] = run_test(results, 'Sampling Theorem Compliance', @test_sampling_theorem);
+
 % Summary
 fprintf('\n=== Summary: %d passed, %d failed, %d skipped ===\n', ...
     results.passed, results.failed, results.skipped);
@@ -88,7 +91,7 @@ names = ["3GPP_38.901_UMi", "3GPP_38.901_UMi-LOS", "3GPP_38.901_UMa", ...
 for idx = 1:numel(names)
     sc = quadriga_scenarios(names(idx));
     assert(~isempty(sc.bs_height_m), 'Missing bs_height_m');
-    assert(sc.num_clusters > 0, 'Missing num_clusters');
+    assert(~isempty(sc.scenario_type), 'Missing scenario_type');
 end
 end
 
@@ -139,7 +142,7 @@ cfg.snapshots = 10;
 cfg.num_subcarriers = 16;
 result = quadriga_adapter(cfg);
 assert(~isreal(result.complex_h), 'complex_h is real (should have imaginary part)');
-assert(any(imag(result.complex_h) ~= 0), 'complex_h has no non-zero imaginary parts');
+assert(any(imag(result.complex_h) ~= 0, 'all'), 'complex_h has no non-zero imaginary parts');
 end
 
 function test_dimensions()
@@ -167,17 +170,24 @@ cfg.num_subcarriers = 16;
 cfg.bandwidth_mhz = 100;
 result = quadriga_adapter(cfg);
 
-% Frequency axis must be symmetric around 0
+% Frequency axis must use DFT grid: delta_f = B/N
 bw_hz = cfg.bandwidth_mhz * 1e6;
-expected_range = bw_hz;  % Total range should equal bandwidth
-actual_range = result.freq_axis_hz(end) - result.freq_axis_hz(1);
-assert(abs(actual_range - expected_range) < 1e-6, ...
-    sprintf('Freq axis range wrong: expected %.0f MHz, got %.0f MHz', ...
-    expected_range/1e6, actual_range/1e6));
+expected_delta_f = bw_hz / cfg.num_subcarriers;
+actual_delta_f = result.freq_axis_hz(2) - result.freq_axis_hz(1);
+assert(abs(actual_delta_f - expected_delta_f) < 1e-6, ...
+    sprintf('delta_f wrong: expected %.0f Hz, got %.0f Hz', expected_delta_f, actual_delta_f));
 
-% Must be symmetric around 0
-assert(abs(result.freq_axis_hz(1) + result.freq_axis_hz(end)) < 1e-6, ...
-    'Freq axis not symmetric around 0');
+% Must have N points
+assert(length(result.freq_axis_hz) == cfg.num_subcarriers, ...
+    'Frequency axis length does not match num_subcarriers');
+
+% Must be symmetric around 0 (for even N)
+assert(abs(result.freq_axis_hz(1) + result.freq_axis_hz(end) + actual_delta_f) < 1e-6, ...
+    'Frequency axis not symmetric around 0');
+
+% Verify delta_f matches bandwidth / N
+assert(abs(result.delta_f_hz - expected_delta_f) < 1e-6, ...
+    'delta_f_hz field does not match B/N');
 end
 
 function test_time_continuity()
@@ -238,11 +248,16 @@ for idx = 1:numel(bands)
     result = quadriga_adapter(cfg);
     assert(size(result.complex_h, 2) == 16, ...
         'Wrong subcarrier count for band');
-    % Verify frequency axis matches bandwidth
-    freq_range = result.freq_axis_hz(end) - result.freq_axis_hz(1);
-    expected_range = bands(idx).bandwidth_mhz * 1e6;
-    assert(abs(freq_range - expected_range) < 1e-6, ...
+    % Verify DFT frequency grid: range = (N-1)*delta_f = (N-1)*B/N
+    N = cfg.num_subcarriers;
+    B = bands(idx).bandwidth_mhz * 1e6;
+    expected_range = (N - 1) * B / N;
+    actual_range = result.freq_axis_hz(end) - result.freq_axis_hz(1);
+    assert(abs(actual_range - expected_range) < 1e-6, ...
         sprintf('Freq range wrong for %.1f GHz band', bands(idx).carrier_freq_ghz));
+    % Verify delta_f = B/N
+    assert(abs(result.delta_f_hz - B/N) < 1e-6, ...
+        'delta_f_hz does not match B/N');
 end
 end
 
@@ -269,4 +284,33 @@ result_los = quadriga_adapter(cfg_los);
 
 assert(~isequal(result_nlos.complex_h, result_los.complex_h), ...
     'UMi and UMi-LOS produce identical output with same seed');
+end
+
+function test_sampling_theorem()
+env = quadriga_check();
+if ~env.is_available
+    error('SKIP: QuaDRiGa not installed');
+end
+% Test that auto-adjustment satisfies sampling theorem
+c_light = 3e8;
+bands = [struct('freq', 3.5, 'bw', 100), ...
+         struct('freq', 28, 'bw', 200), ...
+         struct('freq', 100, 'bw', 400)];
+for idx = 1:numel(bands)
+    cfg = default_quadriga_config();
+    cfg.carrier_freq_ghz = bands(idx).freq;
+    cfg.bandwidth_mhz = bands(idx).bw;
+    cfg.snapshots = 10;
+    cfg.num_subcarriers = 16;
+    cfg.snapshot_interval_s = 0.01;  % Intentionally large to trigger auto-adjust
+    result = quadriga_adapter(cfg);
+    
+    % Verify the adapter auto-adjusted the interval
+    fc_hz = bands(idx).freq * 1e9;
+    lambda = c_light / fc_hz;
+    max_allowed = lambda / (2 * cfg.ue_speed_mps);
+    assert(result.config.snapshot_interval_s <= max_allowed, ...
+        sprintf('Snapshot interval %.6f exceeds max %.6f for %.1f GHz', ...
+        result.config.snapshot_interval_s, max_allowed, bands(idx).freq));
+end
 end

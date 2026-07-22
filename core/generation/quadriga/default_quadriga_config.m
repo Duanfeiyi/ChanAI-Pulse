@@ -25,10 +25,6 @@ config.trajectory_type = '';  % 'linear','random','circular','zigzag' or '' for 
 config.bs_antenna_elements = 1;
 config.ue_antenna_elements = 1;
 
-% --- 3GPP channel model parameters ---
-config.num_clusters = [];
-config.num_rays_per_cluster = [];
-
 % --- QuaDRiGa version requirement ---
 config.quadriga_version = "2.6";
 

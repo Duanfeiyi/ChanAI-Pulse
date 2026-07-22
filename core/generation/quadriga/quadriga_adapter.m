@@ -17,27 +17,40 @@ tic;
 % Validate config and fill scenario defaults
 config = validate_quadriga_config(config);
 
-% Verify QuaDRiGa is available, try to add if not
-env = quadriga_check();
-if ~env.is_available
-    % Try common installation paths
-    quadriga_paths = { ...
-        'D:\QuaDriGa_2023.12.13_v2.8.1-0\quadriga_src', ...
-        'C:\QuaDriGa\quadriga_src', ...
-        fullfile(getenv('USERPROFILE'), 'QuaDriGa', 'quadriga_src') ...
-    };
-    for p = 1:numel(quadriga_paths)
-        if exist(quadriga_paths{p}, 'dir')
-            addpath(genpath(quadriga_paths{p}));
-            fprintf('Added QuaDRiGa to path: %s\n', quadriga_paths{p});
-            break;
-        end
+% Always ensure QuaDRiGa is on path (needed for supported_scenarios config search)
+quadriga_paths = { ...
+    'D:\QuaDriGa_2023.12.13_v2.8.1-0\quadriga_src', ...
+    'C:\QuaDriGa\quadriga_src', ...
+    fullfile(getenv('USERPROFILE'), 'QuaDriGa', 'quadriga_src') ...
+};
+quadriga_root = '';
+for p = 1:numel(quadriga_paths)
+    if exist(quadriga_paths{p}, 'dir')
+        quadriga_root = quadriga_paths{p};
+        break;
     end
+end
+if isempty(quadriga_root)
+    % Try automatic detection
     env = quadriga_check();
     if ~env.is_available
         error("quadriga_adapter:QuaDRiGaUnavailable", ...
             "QuaDRiGa is not available. Run quadriga_check() for details.");
     end
+    quadriga_root = env.quadriga_path;
+end
+% Add to path (idempotent - safe to call multiple times)
+if ~isempty(quadriga_root)
+    all_paths = path;
+    if isempty(strfind(all_paths, quadriga_root))
+        addpath(genpath(quadriga_root));
+        fprintf('Added QuaDRiGa to path: %s\n', quadriga_root);
+    end
+end
+env = quadriga_check();
+if ~env.is_available
+    error("quadriga_adapter:QuaDRiGaUnavailable", ...
+        "QuaDRiGa is not available. Run quadriga_check() for details.");
 end
 
 % Set random seed for reproducibility
@@ -46,6 +59,16 @@ rng(config.random_seed, "twister");
 % Convert units
 fc_hz = config.carrier_freq_ghz * 1e9;
 bw_hz = config.bandwidth_mhz * 1e6;
+
+% Sampling theorem check: auto-adjust snapshot interval if needed
+% Nyquist: sample_density >= 2 * f_c * v / c (dual mobility)
+% For single mobility: sample_interval <= lambda / (2 * v)
+c_light = 3e8;
+lambda = c_light / fc_hz;
+max_interval = lambda / (2 * config.ue_speed_mps);  % Max allowed interval
+if config.snapshot_interval_s > max_interval
+    config.snapshot_interval_s = max_interval * 0.9;  % 10% margin
+end
 
 % Load scenario physical parameters
 scenario_info = quadriga_scenarios(config.scenario);
@@ -76,6 +99,7 @@ if isempty(config.ue_trajectory)
     end
 else
     trajectory = config.ue_trajectory;
+    traj_type = 'user_provided';
 end
 
 % --- Build QuaDRiGa layout using the official API ---
@@ -108,18 +132,17 @@ track.initial_position = trajectory(1, :)';  % [x0; y0; z0]
 relative_pos = (trajectory - trajectory(1, :))';  % 3×N
 track.positions = relative_pos;
 
-% 5. Set scenario via layout method (handles LOS/NLOS automatically)
-%    Use layout.set_scenario() instead of track.scenario directly
-%    because QuaDRiGa needs exact variants like 3GPP_38.901_UMi_NLOS
+% 5. Set scenario on track directly
+%    track.scenario requires exact _LOS/_NLOS variant
+%    We skip layout.set_scenario() to avoid internal API issues
 
 % 6. Assign track to layout
 layout.rx_track = track;
 
-% 7. Set scenario via layout method (handles LOS/NLOS automatically)
-%    This assigns the correct LOS/NLOS variant based on distance
-%    Map our scenario names to QuaDRiGa supported names
-quadriga_scenario = map_to_quadriga_scenario(char(config.scenario));
-layout.set_scenario(quadriga_scenario);
+% 7. Set exact scenario on track
+exact_scenario = map_to_exact_scenario(char(config.scenario));
+track.scenario = {exact_scenario};
+layout.rx_track = track;
 
 % 8. Set antenna arrays (omni for SISO)
 layout.tx_array = qd_arrayant('omni');
@@ -140,8 +163,9 @@ nSubcarriers = config.num_subcarriers;
 % Time axis
 time_axis_s = (0:nSnapshots-1) * config.snapshot_interval_s;
 
-% Frequency axis (baseband, symmetric around 0)
-freq_axis_hz = linspace(-bw_hz/2, bw_hz/2, nSubcarriers);
+% Frequency axis (DFT grid: delta_f = B/N, symmetric for even N)
+delta_f_hz = bw_hz / nSubcarriers;
+freq_axis_hz = (-nSubcarriers/2 : nSubcarriers/2-1) * delta_f_hz;
 
 % Get the channel object (SISO: 1 link)
 ch = h_channel(1, 1);  % [Rx=1, Tx=1]
@@ -193,19 +217,23 @@ end
 result = struct();
 result.engine = "QuaDRiGa";
 result.scenario = char(config.scenario);
+result.quadriga_exact_scenario = exact_scenario;  % Exact variant set on track
 result.config = config;
 result.complex_h = complex_h;
 result.time_axis_s = time_axis_s;
 result.freq_axis_hz = freq_axis_hz;
+result.delta_f_hz = delta_f_hz;
 result.carrier_freq_hz = fc_hz;
 result.bandwidth_hz = bw_hz;
 result.num_subcarriers = nSubcarriers;
 result.num_snapshots = nSnapshots;
+result.trajectory_type = traj_type;  % Actual trajectory type used
 
 if config.save_path_coefficients
     result.path_coefficients = path_coefficients;
     result.path_delays_s = path_delays_s;
-    result.path_doppler_hz = cell(nSnapshots, 1);  % Not directly available
+    result.path_doppler_hz = [];  % Not implemented - marked explicitly
+    result.path_doppler_note = "Not implemented: per-path Doppler extraction requires additional QuaDRiGa post-processing";
 end
 
 if config.save_trajectory
@@ -213,18 +241,18 @@ if config.save_trajectory
     result.bs_position_m = [0, 0, config.bs_height_m];
 end
 
-result.num_clusters = config.num_clusters;
-result.num_rays = config.num_rays_per_cluster;
+result.requested_clusters = "determined_by_scenario_config";
+result.requested_rays = "determined_by_scenario_config";
+result.actual_clusters = "determined_by_scenario_config";
+result.actual_rays = "determined_by_scenario_config";
 result.config_source = struct( ...
-    'requested_clusters', config.num_clusters, ...
-    'requested_rays', config.num_rays_per_cluster, ...
-    'actual_source', 'scenario_config_file', ...
-    'note', 'Clusters/rays are determined by QuaDRiGa scenario config files, not directly configurable via API');
+    'note', 'Clusters/rays are set by QuaDRiGa scenario config files, not directly configurable via API');
 result.random_seed = config.random_seed;
 result.generation_time_s = toc;
 result.data_source = "quadriga_synthetic";
 result.is_reproducible = true;
 result.scenario_info = scenario_info;
+result.adapter_version = "v2.0-step-v2-1";
 end
 
 function trajectory = generate_linear_trajectory(nSnapshots, dt, speed_mps, height_m)
@@ -331,24 +359,23 @@ z = height_m * ones(1, nSnapshots);
 trajectory = [x(:), y(:), z(:)];
 end
 
-function qs = map_to_quadriga_scenario(scenario_name)
-%MAP_TO_QUADRIGA_SCENARIO Map our scenario names to QuaDRiGa supported names.
-%   For scenarios with explicit LOS/NLOS variants, use the exact variant.
-%   For generic scenarios, use the parent name (set_scenario handles LOS/NLOS).
+function qs = map_to_exact_scenario(scenario_name)
+%MAP_TO_EXACT_SCENARIO Map to exact QuaDRiGa LOS/NLOS variant for track.scenario.
+%   track.scenario requires the exact variant like '3GPP_38.901_UMi_NLOS'.
 
 switch upper(scenario_name)
     case "3GPP_38.901_UMI"
-        qs = '3GPP_38.901_UMi_NLOS';  % Force explicit NLOS for generic UMi
+        qs = '3GPP_38.901_UMi_NLOS';
     case "3GPP_38.901_UMI-LOS"
-        qs = '3GPP_38.901_UMi_LOS';   % Force explicit LOS
+        qs = '3GPP_38.901_UMi_LOS';
     case "3GPP_38.901_UMA"
-        qs = '3GPP_38.901_UMa_NLOS';  % Force explicit NLOS for generic UMa
+        qs = '3GPP_38.901_UMa_NLOS';
     case "3GPP_38.901_UMA-LOS"
-        qs = '3GPP_38.901_UMa_LOS';   % Force explicit LOS
+        qs = '3GPP_38.901_UMa_LOS';
     case "3GPP_38.901_RMA"
-        qs = '3GPP_38.901_RMa_NLOS';  % Force explicit NLOS
+        qs = '3GPP_38.901_RMa_NLOS';
     case "3GPP_38.901_RMA-LOS"
-        qs = '3GPP_38.901_RMa_LOS';   % Force explicit LOS
+        qs = '3GPP_38.901_RMa_LOS';
     case "3GPP_38.901_INH"
         qs = '3GPP_38.901_Indoor_NLOS';
     otherwise

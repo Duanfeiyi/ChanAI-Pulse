@@ -37,8 +37,8 @@ scenario_names = ["3GPP_38.901_UMi", "3GPP_38.901_UMi-LOS", ...
                   "3GPP_38.901_RMa", "3GPP_38.901_INH"];
 for i = 1:numel(scenario_names)
     sc = quadriga_scenarios(scenario_names(i));
-    fprintf('  [%d] %s: BS=%dm, Speed=%.2fm/s, Clusters=%d, Env=%s\n', ...
-        i, sc.name, sc.bs_height_m, sc.ue_speed_mps, sc.num_clusters, sc.environment);
+    fprintf('  [%d] %s: BS=%dm, Speed=%.2fm/s, Type=%s, Env=%s\n', ...
+        i, sc.name, sc.bs_height_m, sc.ue_speed_mps, sc.scenario_type, sc.environment);
 end
 fprintf('\n');
 
@@ -53,7 +53,7 @@ fprintf('  Default snapshots: %d\n', cfg.snapshots);
 fprintf('  Default seed:      %d\n', cfg.random_seed);
 
 cfg = validate_quadriga_config(cfg);
-fprintf('  After validation:  BS height=%dm, Clusters=%d\n', cfg.bs_height_m, cfg.num_clusters);
+fprintf('  After validation:  BS height=%dm, UE height=%.1fm\n', cfg.bs_height_m, cfg.ue_height_m);
 fprintf('\n');
 
 %% Part 4: Single Generation Test
