@@ -76,3 +76,6 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# Third-party dependencies (users must install separately)
+QuaDriGa_*
