@@ -1,53 +1,18 @@
-# ChanAIs Dataset Converter Framework
+# ChanAIs Dataset Converter
 
-This folder contains lightweight converter utilities for ChanAIs Dataset v1.0 planning.
+These explicit MATLAB utilities inspect compatible MAT files, create ChanAIs metadata templates and convert SAGE-like structures into a normalized local ChanAIs representation.
 
-The current scope is a framework only. It does not convert or publish private measured datasets automatically.
+## Available tools
 
-## Goals
+- `inspect_mat_dataset.m`: read-only variable, class, shape and channel-field inspection.
+- `build_metadata_template.m`: builds metadata from supplied name-value fields.
+- `convert_sage_to_chanais.m`: converts compatible top-level `sage` structures when the caller explicitly supplies input, output and metadata.
 
-- Inspect MATLAB `.mat` files without modifying the source data.
-- Read SAGE-compatible structures.
-- Build a metadata template for ChanAIs Dataset.
-- Convert SAGE-like `.mat` files into a normalized ChanAIs-compatible structure when explicitly called by the user.
+## Boundaries
 
-## Files
+- The tools never modify original MAT files.
+- Use a local output location for private inputs; never commit converter outputs derived from private data.
+- The converter supports SAGE structures with usable `cir`, `cir_e`, or `alpha` records; missing path fields are reported as warnings where possible.
+- A successful conversion does not automatically make the output App-ready or scientifically benchmark-qualified.
 
-- `inspect_mat_dataset.m`: read-only inspection of variables, classes, dimensions, and likely channel-related fields.
-- `build_metadata_template.m`: creates a ChanAIs metadata struct with core, recommended, and optional fields.
-- `convert_sage_to_chanais.m`: maps SAGE-compatible `.mat` files to a normalized `chanais` MATLAB structure.
-
-## Safety Rules
-
-- Do not modify original `.mat` files.
-- Do not copy private measured data into public folders.
-- Do not commit generated conversion outputs from private datasets.
-- Treat `datasets/measured/raw_archives/` and `datasets/measured/extracted_preview/` as local-only.
-
-## Example
-
-```matlab
-inputFile = "private/path/Pol_0_SAGE_F7_MovingR1_0-1s.mat";
-outputDir = "local_outputs/chanais_preview";
-metadata = build_metadata_template("dataset_id", "local_sage_preview", ...
-    "visibility", "internal_only", ...
-    "data_source", "private_measured");
-
-report = inspect_mat_dataset(inputFile);
-chanais = convert_sage_to_chanais(inputFile, outputDir, metadata);
-```
-
-Generated outputs from private datasets should stay local.
-
-## Validation Status
-
-The dataset validator returns `PASS`, `WARNING`, or `FAIL`.
-
-- `PASS`: core and recommended metadata are available and channel files are present.
-- `WARNING`: the dataset can be loaded safely, but recommended context is incomplete.
-- `FAIL`: core identity metadata or usable channel data is missing.
-
-For SAGE conversion, `sage.cir`, `sage.cir_e`, or `sage.alpha` is sufficient
-for a record to remain usable. Missing `doa`, `delay`, or likelihood becomes a
-warning so historical data can still be inspected without being silently
-misrepresented as complete.
+See [Dataset Specification](../../docs/DATASET_SPECIFICATION.md) and [Data Contracts](../../docs/DATA_CONTRACTS.md).

@@ -1,70 +1,39 @@
-# Roadmap
+# ChanAI Pulse Roadmap
 
-This roadmap is directional and does not commit to specific release dates.
+This roadmap distinguishes code currently present on `main` from research direction. It does not commit to release dates.
 
-## v1.0.0 - Platform Prototype
+## Completed
 
-Status: completed.
+- MATLAB desktop App with Characterization, Channel Generation, and Prediction & Training pages.
+- GUI-independent extraction of characterization, generation, prediction and plotting functions.
+- Legacy DPSD/power time-domain Train / Validation / Test workflow with training-only normalization.
+- Baseline TCN, LSTM and GRU training and recursive prediction flow.
+- Internal 6GPCM-lite synthetic CIR generator and legacy DPSD conversion.
+- ChanAIs schema validation, SAGE-compatible conversion helpers, synthetic demo fixtures and data-provenance rules.
+- v1.1.0 release tag for the legacy baseline and v2.0 planning documents.
 
-- MATLAB desktop research prototype.
-- Three-module workflow: Channel Characterization, Channel Generation, Channel Prediction & Training.
-- Public source code release.
-- MATLAB App Package release.
-- Synthetic demo data.
-- Dataset policy and collaboration documentation.
+## In progress
 
-## v1.1.0 - ChanAIs Dataset
+- Documentation synchronization and clearer separation of the legacy baseline from v2.0 research plans.
+- Scientific review of legacy evaluation and generation boundaries, including DS CDF and delay-axis consistency.
 
-Status: active planning and initial framework.
+## Next
 
-Goals:
+- Establish a version-pinned, reproducible official QuaDRiGa minimal generation workflow.
+- Define and test a Complex-H data contract for dynamic wideband SISO data.
+- Build task-specific data ingestion, validation and visualization for that contract.
+- Create fixed, authorized benchmark fixtures and preserve the legacy power baseline as a comparison path.
 
-- Define ChanAIs Dataset v1.0.
-- Establish unified wireless channel data format.
-- Establish unified metadata specification.
-- Provide SAGE / CIR / CTF / PDP compatibility plan.
-- Add SAGE-compatible converter framework.
-- Add synthetic SAGE-like public demo dataset.
-- Add lightweight Dataset Manager interfaces.
+## Long-term
 
-Out of scope for v1.1.0:
+- Pre-train and register scenario-bounded Base Models, then implement explicit user-data adaptation with held-out protection.
+- Complex-valued \(H(t,f)\) prediction, then dynamic wideband MIMO and space-time-frequency H tensors.
+- Cross-scenario/cross-band experiments only after data, task, split and metric protocols are established.
+- A potential Python/Web service layer after the MATLAB research workflow is stable.
 
-- Benchmark leaderboard.
-- New prediction algorithms.
-- Physics-informed loss.
-- Web platform.
-- Public release of private measured datasets.
+## Out of current scope
 
-## v1.2.0 - ChanAI Benchmark
-
-Planned.
-
-- Define benchmark tasks and fixed dataset splits.
-- Add reproducible evaluation reports.
-- Add baseline result templates.
-- Prepare future leaderboard rules.
-
-## v2.0.0 - Physics-Informed Prediction
-
-Planned.
-
-- Explore physics-informed constraints for channel prediction.
-- Connect channel statistics, propagation priors, and AI models.
-- Preserve compatibility with ChanAIs Dataset and Benchmark formats.
-
-## v2.1.0 - Cross-Scenario Generalization
-
-Planned.
-
-- Study transfer across frequency bands, environments, mobility patterns, and antenna configurations.
-- Define cross-scenario validation protocols.
-- Extend dataset metadata and split strategy.
-
-## v3.0.0 - Web Platform & Cloud Deployment
-
-Planned.
-
-- Explore Web platform and cloud deployment after MATLAB workflow and dataset standards are stable.
-- Possible Python/FastAPI/React migration path.
-- Cloud-side experiment tracking and collaborative dataset browsing.
-
+- Claims of experimentally validated “all-frequency” or “all-scenario” prediction.
+- Official QuaDRiGa integration, Base Model registry, online adaptation and MIMO Complex-H prediction.
+- Web, FastAPI, React, cloud execution or a standalone installer.
+- Public release of private measurements or a ChanAIs research dataset without separate authorization.
