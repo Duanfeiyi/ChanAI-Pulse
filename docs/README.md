@@ -22,6 +22,8 @@ This index separates documentation that describes the current MATLAB implementat
 ## Data and experiments
 
 - [Data contracts](DATA_CONTRACTS.md)
+- [v3.0 unified CIR/CTF data contract](v3.0/DATA_CONTRACT.md)
+- [v3.0 data interface guide](v3.0/DATA_INTERFACE_GUIDE.md)
 - [ChanAIs dataset specification](DATASET_SPECIFICATION.md)
 - [Experiment data protocol](EXPERIMENT_DATA_PROTOCOL.md)
 - [Dataset policy](DATASET_POLICY.md)

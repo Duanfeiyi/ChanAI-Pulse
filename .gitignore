@@ -76,3 +76,7 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# Python generated files
+__pycache__/
+*.py[cod]

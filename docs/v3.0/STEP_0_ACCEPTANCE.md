@@ -25,7 +25,7 @@
 - [x] GitHub v3.0 总追踪 Issue：[#21](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/21)。
 - [x] GitHub Step 0 Issue：[#22](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/22)。
 - [x] GitHub v3.0 [Milestone](https://github.com/Duanfeiyi/ChanAI-Pulse/milestone/1)。
-- [ ] Step 0 PR。
+- [x] Step 0 PR：[#23](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/23) 已合并。
 
 ## 3. 尚未阻塞开发、但后续必须补齐的信息
 
