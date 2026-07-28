@@ -42,7 +42,7 @@ GitHub：
 主要复选项：
 
 - [x] Step 0：冻结需求、版本、资产和协作边界
-- [ ] Step 1：定义统一 CIR/CTF 数据标准
+- [x] Step 1：定义统一 CIR/CTF 数据标准
 - [ ] Step 2：制作四类标准测试数据
 - [ ] Step 3：验证完整版 6GPCM 最小无界面调用
 - [ ] Step 4：完成模块一信道数据输入流程
@@ -92,6 +92,9 @@ GitHub：
 - [Step 1 Issue #24](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/24)
 - 工作分支：`codex/v3-step-1-data-contract`
 - 目标：定义统一 CIR/CTF 数据标准、内插/外推任务契约、MATLAB 验证接口和 MATLAB/Python HDF5 映射。
+- [Step 1 PR #25](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/25)
+  已于 2026-07-28 合并到 `main`。
+- Step 1 Issue 已关闭，总 Roadmap 已勾选 Step 1。
 
 ## 4. 后续 Issue 创建规则
 
@@ -115,6 +118,8 @@ GitHub：
 - 已创建 `ChanAI Pulse v3.0.0` Milestone（编号 1）；
 - 已创建 Roadmap Issue #21；
 - 已创建 Step 0 Issue #22；
+- 已创建并关闭 Step 1 Issue #24；
+- Step 1 PR #25 已合并；
 - 两个 Issue 已指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
 - 本次通过已认证的 GitHub 网页会话完成创建；

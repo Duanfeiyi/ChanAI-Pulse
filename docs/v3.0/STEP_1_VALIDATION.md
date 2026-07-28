@@ -4,7 +4,7 @@
 >
 > 分支：`codex/v3-step-1-data-contract`
 >
-> 状态：本地实现和测试已通过，等待项目负责人审阅；尚未推送和创建 PR。
+> 状态：实现、验证、项目负责人审阅和 PR 合并均已完成。
 
 ## 1. 验证环境
 
@@ -76,10 +76,14 @@ MATLAB 把保存维度的向量写成二维列向量，而 Python 最初只按�
 修复后，Python 会先按 MATLAB 列优先顺序把维度数据展平，再重建五维数组。
 对应行为已经加入 Python 回归测试，避免以后重新出现。
 
-## 5. 尚未完成的项目流程
+## 5. 项目流程结果
 
-- 项目负责人审阅本地 Step 1 成果；
-- 经批准后提交、推送并创建 Step 1 PR；
-- PR 合并后勾选 Roadmap 的 Step 1，并关闭 Issue #24。
+- 项目负责人已审阅 Step 1 成果；
+- [PR #25](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/25)
+  已合并到 `main`；
+- [Issue #24](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/24)
+  已关闭；
+- [Roadmap #21](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/21)
+  的 Step 1 已勾选。
 
-这些是 GitHub 流程事项，不影响当前本地实现和测试已经通过的结论。
+Step 1 的实现、测试、文档、需求追踪、审阅和合并流程均已完成。
