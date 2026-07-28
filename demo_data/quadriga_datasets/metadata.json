@@ -1,0 +1,64 @@
+{
+  "dataset_name": "ChanAI Pulse QuaDRiGa Dataset",
+  "version": "1.0",
+  "generated_at": "2026-07-22 23:19:44",
+  "generator": "QuaDRiGa v2.8.1",
+  "total_files": 3,
+  "scenarios": [
+    "3GPP_38.901_UMi",
+    "3GPP_38.901_UMi-LOS",
+    "3GPP_38.901_UMa"
+  ],
+  "carrier_freqs_ghz": 3.5,
+  "bandwidths_mhz": 100,
+  "snapshots": 100,
+  "subcarriers": 64,
+  "seeds": 42,
+  "datasets": [
+    {
+      "filename": "quadriga_3GPP_38901_UMi_3.5GHz_seed42.mat",
+      "scenario": "3GPP_38.901_UMi",
+      "carrier_freq_ghz": 3.5,
+      "bandwidth_mhz": 100,
+      "snapshots": 100,
+      "subcarriers": 64,
+      "seed": 42,
+      "trajectory_type": "random",
+      "complex_h_size": [
+        100,
+        64
+      ],
+      "generation_time_s": 1.3297154
+    },
+    {
+      "filename": "quadriga_3GPP_38901_UMi-LOS_3.5GHz_seed42.mat",
+      "scenario": "3GPP_38.901_UMi-LOS",
+      "carrier_freq_ghz": 3.5,
+      "bandwidth_mhz": 100,
+      "snapshots": 100,
+      "subcarriers": 64,
+      "seed": 42,
+      "trajectory_type": "random",
+      "complex_h_size": [
+        100,
+        64
+      ],
+      "generation_time_s": 0.4565477
+    },
+    {
+      "filename": "quadriga_3GPP_38901_UMa_3.5GHz_seed42.mat",
+      "scenario": "3GPP_38.901_UMa",
+      "carrier_freq_ghz": 3.5,
+      "bandwidth_mhz": 100,
+      "snapshots": 100,
+      "subcarriers": 64,
+      "seed": 42,
+      "trajectory_type": "random",
+      "complex_h_size": [
+        100,
+        64
+      ],
+      "generation_time_s": 0.4487877
+    }
+  ]
+}
