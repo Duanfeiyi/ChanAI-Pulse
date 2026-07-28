@@ -35,7 +35,8 @@
 - [x] 现有 ChanAIs 数据契约回归测试通过。
 - [x] `git diff --check` 通过。
 - [x] 需求追踪表更新。
-- [ ] Step 1 PR 审阅并合并到 `main`。
+- [x] [Step 1 PR #25](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/25)
+  已审阅并合并到 `main`。
 
 详细命令、环境和结果见
 [Step 1 验证记录](STEP_1_VALIDATION.md)。
