@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0 执行基线
+> 状态：Step 1 本地实现已完成，等待审阅和 PR
 >
 > 决策日期：2026-07-28
 >
@@ -25,12 +25,16 @@
 
 - [正式需求](REQUIREMENTS.md)
 - [需求追踪表](REQUIREMENTS_TRACEABILITY.md)
+- [统一 CIR/CTF 数据契约](DATA_CONTRACT.md)
+- [数据接口调用指南](DATA_INTERFACE_GUIDE.md)
 - [历史与第三方资产登记表](ASSET_REGISTER.md)
 - [第三方代码和数据政策](THIRD_PARTY_POLICY.md)
 - [版本命名规则](VERSIONING.md)
 - [v3.0 开发与 PR 流程](DEVELOPMENT_WORKFLOW.md)
 - [GitHub 制作计划](GITHUB_PLAN.md)
 - [Step 0 验收清单](STEP_0_ACCEPTANCE.md)
+- [Step 1 验收清单](STEP_1_ACCEPTANCE.md)
+- [Step 1 验证记录](STEP_1_VALIDATION.md)
 
 ## 变更规则
 

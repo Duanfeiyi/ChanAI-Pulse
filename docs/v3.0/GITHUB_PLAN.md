@@ -41,7 +41,7 @@ GitHub：
 
 主要复选项：
 
-- [ ] Step 0：冻结需求、版本、资产和协作边界
+- [x] Step 0：冻结需求、版本、资产和协作边界
 - [ ] Step 1：定义统一 CIR/CTF 数据标准
 - [ ] Step 2：制作四类标准测试数据
 - [ ] Step 3：验证完整版 6GPCM 最小无界面调用
@@ -83,9 +83,15 @@ GitHub：
 - [x] 建立需求追踪表；
 - [x] 建立资产登记表；
 - [x] 建立 PR 和 Issue 模板；
-- [ ] 项目负责人审阅 Step 0 文档；
-- [ ] Step 0 PR 合并到 `main`；
-- [ ] 关闭 Step 0 Issue。
+- [x] 项目负责人审阅 Step 0 文档；
+- [x] Step 0 PR #23 合并到 `main`；
+- [x] 关闭 Step 0 Issue。
+
+## 3.1 Step 1 Issue
+
+- [Step 1 Issue #24](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/24)
+- 工作分支：`codex/v3-step-1-data-contract`
+- 目标：定义统一 CIR/CTF 数据标准、内插/外推任务契约、MATLAB 验证接口和 MATLAB/Python HDF5 映射。
 
 ## 4. 后续 Issue 创建规则
 
