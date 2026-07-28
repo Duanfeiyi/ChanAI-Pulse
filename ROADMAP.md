@@ -16,9 +16,16 @@ This roadmap distinguishes code currently present on `main` from research direct
 
 - Documentation synchronization and clearer separation of the legacy baseline from v2.0 research plans.
 - Scientific review of legacy evaluation and generation boundaries, including DS CDF and delay-axis consistency.
+- ChanAI Pulse v3.0 requirement, data-contract and interface work. The frozen v3.0 requirements are planning baselines and are not claims of completed functionality.
 
 ## Next
 
+- Define path-domain CIR and frequency-domain CTF contracts for interpolation and extrapolation tasks.
+- Validate a headless full-6GPCM call without modifying its core implementation.
+- Build capability-aware visualization shared by the input and prediction modules.
+- Add real Grid Search and simulated annealing behind optimizer interfaces.
+- Predict target-region channel parameters and convert them to predicted complex CIR through 6GPCM.
+- Keep prediction-accuracy evaluation in a standalone benchmark outside the platform UI.
 - Establish a version-pinned, reproducible official QuaDRiGa minimal generation workflow.
 - Define and test a Complex-H data contract for dynamic wideband SISO data.
 - Build task-specific data ingestion, validation and visualization for that contract.

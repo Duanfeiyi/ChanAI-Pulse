@@ -4,8 +4,11 @@
 
 - `main` is the stable legacy-release line. Do not commit directly to it.
 - `develop/v2.0` is the integration line for approved v2.0 work.
+- v3.0 work starts from current `main`, uses one focused short-lived branch per deliverable, and returns to `main` through a pull request.
 - Create a focused branch from the line that owns the work, for example `docs/...`, `feature/v2-...`, `fix/...`, or `test/...`.
 - Open a pull request for review. The repository owner performs every merge manually; never enable or use automatic merge.
+
+For v3.0-specific branch names, completion criteria, and third-party checks, see [v3.0 Development Workflow](v3.0/DEVELOPMENT_WORKFLOW.md).
 
 ## Before coding
 

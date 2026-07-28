@@ -38,8 +38,9 @@ This index separates documentation that describes the current MATLAB implementat
 ## Planning and historical records
 
 - [Roadmap](../ROADMAP.md)
+- [v3.0 frozen requirements and development baseline](v3.0/README.md)
 - [Open issues and refactor roadmap](OPEN_ISSUES_AND_REFACTOR_ROADMAP.md)
 - [v2.0 design notes and work plan](ideas_and_todos/README.md)
 - [Documentation audit report](DOCUMENTATION_AUDIT_REPORT.md)
 
-Files under `ideas_and_todos/`, the benchmark plan, and the release-history records describe planning or past decisions. They do not by themselves establish that a feature is implemented.
+Files under `v3.0/`, `ideas_and_todos/`, the benchmark plan, and the release-history records describe requirements, planning or past decisions. They do not by themselves establish that a feature is implemented.
