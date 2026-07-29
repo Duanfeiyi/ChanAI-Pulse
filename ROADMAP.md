@@ -10,6 +10,9 @@ This roadmap distinguishes code currently present on `main` from research direct
 - Baseline TCN, LSTM and GRU training and recursive prediction flow.
 - Internal 6GPCM-lite synthetic CIR generator and legacy DPSD conversion.
 - ChanAIs schema validation, SAGE-compatible conversion helpers, synthetic demo fixtures and data-provenance rules.
+- ChanAI Pulse v3 CIR/CTF and interpolation/extrapolation task contracts.
+- Four deterministic v3 CIR/CTF standard fixture families and capability baselines.
+- A read-only, fixed-seed, headless full-6GPCM technical probe with canonical CIR conversion and core-integrity verification.
 - v1.1.0 release tag for the legacy baseline and v2.0 planning documents.
 
 ## In progress
@@ -20,8 +23,7 @@ This roadmap distinguishes code currently present on `main` from research direct
 
 ## Next
 
-- Define path-domain CIR and frequency-domain CTF contracts for interpolation and extrapolation tasks.
-- Validate a headless full-6GPCM call without modifying its core implementation.
+- Build the v3 module-one channel-data ingestion, validation and task-setup pipeline.
 - Build capability-aware visualization shared by the input and prediction modules.
 - Add real Grid Search and simulated annealing behind optimizer interfaces.
 - Predict target-region channel parameters and convert them to predicted complex CIR through 6GPCM.

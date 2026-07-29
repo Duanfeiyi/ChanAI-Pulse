@@ -1,6 +1,6 @@
 # Step 3 验收清单
 
-> 当前状态：实现、自动测试、PR 前人工审阅、提交、推送、Draft PR #30 创建和 PR 自审均已完成，等待项目负责人决定是否转为 Ready 并合并。
+> 当前状态：Step 3 实现、测试、人工审阅、PR 自审和合并均已完成；Issue #29 已关闭，总 Roadmap 已同步。
 
 ## 范围
 
@@ -63,5 +63,7 @@
 - [x] 推送分支；
 - [x] 创建 [Draft PR #30](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/30)；
 - [x] PR 自审：文件范围正确、可合并、无阻塞性代码问题；仓库未配置远程自动检查；
-- [ ] 项目负责人决定是否合并；
-- [ ] 合并后关闭 Issue #29 并勾选总 Roadmap Step 3。
+- [x] 项目负责人决定合并；
+- [x] [PR #30](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/30) 已合并到 `main`；
+- [x] Issue #29 已自动关闭；
+- [x] GitHub 总 Roadmap 已勾选 Step 3。

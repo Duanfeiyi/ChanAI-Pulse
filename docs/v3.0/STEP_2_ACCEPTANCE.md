@@ -53,4 +53,4 @@
 - [x] PR自审
 - [x] 项目负责人决定合并
 - [x] 合并后关闭 Step 2 Issue
-- [ ] GitHub 总 Roadmap 的 Step 2 复选框仍待网页同步（不影响已合并代码）
+- [x] GitHub 总 Roadmap 已同步 Step 2
