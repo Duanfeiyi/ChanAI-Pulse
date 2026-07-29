@@ -6,11 +6,11 @@
 
 | ID | 正式需求 | 模块 | 计划 Step | 验收方式 | 当前状态 |
 |---|---|---|---:|---|---|
-| V3-REQ-001 | 任务类型只能明确选择内插或外推 | 模块一 | 1、4 | `tests/test_v3_data_contract.m`、`tests/test_step4_input_pipeline.m` 的手动与80/20合法/非法任务测试 | 进行中 |
+| V3-REQ-001 | 任务类型只能明确选择内插或外推 | 模块一 | 1、4 | `tests/test_v3_data_contract.m`、`tests/test_step4_input_pipeline.m` 的手动与80/20合法/非法任务测试 | 已验证 |
 | V3-REQ-002 | 规定内插和外推的数据输入格式 | 模块一 | 1 | `DATA_CONTRACT.md`、HDF5 往返和跨语言样例 | 已验证 |
-| V3-REQ-003 | 明确区分 `N_sample/Tx/Rx/Nt/Nf/Npath` | 模块一 | 1、4 | Step 2四类数据；Step 4标准导入；真实SAGE `1×16×683×1×337` 与WiFo `16×4×8×1×1000` 技术验证 | 进行中 |
-| V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、12 | Step 4输入结果返回能力表与原因；正式特性引擎和UI待Step 5/12 | 进行中 |
-| V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、12 | 同一 CIR 的跨模块一致性测试 | 待实现 |
+| V3-REQ-003 | 明确区分 `N_sample/Tx/Rx/Nt/Nf/Npath` | 模块一 | 1、4 | Step 2四类数据；Step 4标准导入；真实SAGE `1×16×683×1×337` 与WiFo `16×4×8×1×1000` 技术验证 | 已验证 |
+| V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、12 | Step 5 CIR/CTF标准数据精确开放1/3/6/9及合法热力图；SISO角度、单次观测空间相关反例；road1/WiFo按能力降级3/6；正式UI待Step 12 | 进行中 |
+| V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、12 | `test_step5_characteristics_engine.m` 验证同一 CIR 在 input/prediction 角色输出一致；正式UI待Step 12 | 进行中 |
 | V3-REQ-006 | 信道生成模块通过 Adapter 接入 6GPCM | 模块二 | 3、6 | `tests/test_full_6gpcm_external_smoke.m` 已验证最小无界面调用；正式 Adapter 留待 Step 6 | 进行中 |
 | V3-REQ-007 | 完整版 6GPCM 核心代码保持不变 | 模块二、三 | 0、3、6、11 | `hash_full_6gpcm_tree.m` 在真实调用前后核对 587 个文件总哈希 | 已验证 |
 | V3-REQ-008 | 实现真正的参数笛卡尔积 Grid Search | 模块二 | 7 | 固定参数空间枚举测试 | 待实现 |
