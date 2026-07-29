@@ -1,0 +1,24 @@
+{
+  "asset_id": "full_6gpcm_260317_candidate",
+  "step": 3,
+  "source_archive_name": "信道生成模块代码_260317.zip",
+  "source_version": "260317-candidate",
+  "archive_sha256": "fcf151adf94038a6cf10d86c6dd687938b085a8f78a64d6829b5439c1d6c5875",
+  "archive_size_bytes": 87189178,
+  "archive_entry_count": 615,
+  "extracted_file_count": 587,
+  "extracted_total_bytes": 94495472,
+  "tree_manifest_rule": "SHA-256 of UTF-8 LF-joined lines sorted by relative path using ordinal comparison: file_sha256<2 spaces>size_bytes<2 spaces>relative/path",
+  "tree_sha256": "e5e4ec49ef25090e2d472283914187967e801b38722e10a28694efa77bfccac0",
+  "entrypoint": "generate_channel_v1.m",
+  "entrypoint_sha256": "d511015d5f0ac8bd61468880f77ab01a6b592864a9d8410ff6b428325c24efa0",
+  "license_files_found": [],
+  "redistribution_status": "not_cleared",
+  "repository_policy": "external_only",
+  "verification": {
+    "safe_archive_paths": true,
+    "headless_probe_passed": true,
+    "fixed_seed_exact_repeatability": true,
+    "core_tree_unchanged": true
+  }
+}
