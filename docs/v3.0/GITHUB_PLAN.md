@@ -43,7 +43,7 @@ GitHub：
 
 - [x] Step 0：冻结需求、版本、资产和协作边界
 - [x] Step 1：定义统一 CIR/CTF 数据标准
-- [ ] Step 2：制作四类标准测试数据
+- [x] Step 2：制作四类标准测试数据
 - [ ] Step 3：验证完整版 6GPCM 最小无界面调用
 - [ ] Step 4：完成模块一信道数据输入流程
 - [ ] Step 5：建立统一信道特性引擎
@@ -101,8 +101,17 @@ GitHub：
 - [Step 2 Issue #27](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/27)
 - 工作分支：`codex/v3-step-2-standard-datasets`
 - 目标：制作四套确定性CIR/CTF标准数据、MATLAB/Python交叉验证、1/3/6/9能力分级和可选QuaDRiGa外围适配示例。
-- 当前状态：实现与自动测试完成，等待项目负责人完成PR前可视化审阅。
-- PR：项目负责人批准后创建。
+- [Step 2 PR #28](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/28)
+  已合并到 `main`。
+- Step 2 Issue 已关闭；本地计划已按实际完成状态勾选 Step 2，GitHub 总 Roadmap 的网页复选框仍待同步。
+
+## 3.3 Step 3 Issue
+
+- [Step 3 Issue #29](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/29)
+- 工作分支：`codex/v3-step-3-full-6gpcm-spike`
+- 目标：登记完整版 6GPCM 资产和哈希，在不修改核心的前提下验证最小无界面调用、固定种子复现性，并把原始输出转换成 v3 统一 CIR。
+- 当前状态：实现、自动测试、PR 前人工审阅、提交、推送、Draft PR 创建和 PR 自审完成，等待项目负责人决定是否转为 Ready 并合并。
+- [Draft PR #30](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/30)
 
 ## 4. 后续 Issue 创建规则
 
@@ -120,17 +129,19 @@ GitHub：
 
 ## 5. 当前远程执行状态
 
-2026-07-28 检查结果：
+2026-07-29 检查结果：
 
 - 仓库存在且当前浏览器会话可以看到仓库设置；
 - 已创建 `ChanAI Pulse v3.0.0` Milestone（编号 1）；
 - 已创建 Roadmap Issue #21；
 - 已创建 Step 0 Issue #22；
 - 已创建并关闭 Step 1 Issue #24；
-- 已创建 Step 2 Issue #27，并指派给 `Duanfeiyi`、关联 Milestone；
+- Step 2 Issue #27 已关闭，PR #28 已合并；
+- 已创建 Step 3 Issue #29，并指派给 `Duanfeiyi`、关联 Milestone；
 - Step 1 PR #25 已合并；
-- 两个 Issue 已指派给 `Duanfeiyi` 并关联 Milestone；
+- 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
+- GitHub 连接器更新 Roadmap 也返回 `403`；2026-07-29 核验发现远程 Roadmap 的 Step 2 复选框尚未同步；
 - 本次通过已认证的 GitHub 网页会话完成创建；
 - 后续如希望完全使用 GitHub 连接器自动管理 Issue，仍需要补充 Issues 写权限；
 - 远程对象必须以 GitHub 页面上的实际结果为准，不能因为已经准备了正文就宣称创建成功。

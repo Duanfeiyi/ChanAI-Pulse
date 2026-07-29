@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 1 已完成；Step 2 实现与自动测试完成，等待PR前可视化审阅
+> 状态：Step 0～2 已合并；Step 3 本地实现与自动测试完成，等待 PR 前人工审阅
 >
 > 决策日期：2026-07-28
 >
@@ -40,6 +40,11 @@
 - [Step 2 验证记录](STEP_2_VALIDATION.md)
 - [Step 2 PR前可视化审阅](STEP_2_VISUAL_REVIEW.md)
 - [Step 2 可选QuaDRiGa示例](QUADRIGA_OPTIONAL_EXAMPLE.md)
+- [Step 3 完整版 6GPCM 技术探针](STEP_3_FULL_6GPCM_SPIKE.md)
+- [完整版 6GPCM 外置配置](FULL_6GPCM_EXTERNAL_SETUP.md)
+- [Step 3 PR 前可视化审阅](STEP_3_VISUAL_REVIEW.md)
+- [Step 3 自动验证记录](STEP_3_VALIDATION.md)
+- [Step 3 验收清单](STEP_3_ACCEPTANCE.md)
 
 ## 变更规则
 

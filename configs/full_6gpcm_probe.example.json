@@ -1,0 +1,14 @@
+{
+  "engine_root": "C:/path/to/external/full-6gpcm",
+  "DS_mu": -7.925,
+  "DS_sigma": 0.06,
+  "r_DS": 2.8,
+  "num_clusters": 12,
+  "num_rays": 20,
+  "LNS_ksi": 3.0,
+  "KF_mu": -0.39,
+  "KF_sigma": 2.4,
+  "sample_count": 3,
+  "random_seed": 3103,
+  "snapshot_interval_s": 1.0
+}

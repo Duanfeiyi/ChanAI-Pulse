@@ -248,3 +248,38 @@ pair = generate_quadriga_v3_example( ...
 ```
 
 项目只保存外围示例和转换器，不复制或修改QuaDRiGa核心。详情见`QUADRIGA_OPTIONAL_EXAMPLE.md`。
+
+## 14. Step 3 外置完整版 6GPCM 技术探针
+
+```matlab
+engineRoot = "外置完整版 6GPCM 根目录";
+config = default_full_6gpcm_probe_config(engineRoot);
+result = run_full_6gpcm_probe(config);
+```
+
+主要返回：
+
+```matlab
+result.raw.H_all
+result.raw.delay_all
+result.dataset
+result.report
+result.manifest
+```
+
+原始单样本顺序：
+
+```text
+Tx × Rx × Nt × Npath
+```
+
+转换后的公共 CIR 顺序：
+
+```text
+Tx × Rx × Npath × Nt × N_sample
+```
+
+此处 `N_sample` 表示独立随机实现，不表示道路位置。完整配置、测试和边界见：
+
+- `FULL_6GPCM_EXTERNAL_SETUP.md`
+- `STEP_3_FULL_6GPCM_SPIKE.md`
