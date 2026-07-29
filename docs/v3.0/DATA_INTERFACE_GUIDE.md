@@ -207,3 +207,44 @@ GUI 可以输入 GHz/ns，但核心结构必须转换成 Hz/s。验证器遇到�
 - `examples/write_v3_ctf_hdf5_example.m`
 - `tests/test_v3_data_contract.m`
 - `tests/python/test_channel_hdf5_reader.py`
+
+## 12. Step 2 四套标准数据
+
+读取场景并在内存中生成一对CIR/CTF：
+
+```matlab
+scenarios = load_v3_standard_scenarios();
+pair = generate_v3_standard_pair(scenarios(4));
+
+size(pair.cir.cir.coefficient)
+size(pair.ctf.ctf.H)
+```
+
+输出全部八个HDF5文件到一个新的空目录：
+
+```matlab
+manifest = write_v3_standard_fixtures("新的输出目录");
+```
+
+Python：
+
+```powershell
+python -m pip install -r tools/python/requirements-v3-step2.txt
+python tools/python/generate_v3_standard_fixtures.py --output 新的输出目录
+```
+
+生成器拒绝覆盖已有文件。正式仓库内的审阅基线位于：
+
+```text
+demo_data/v3_standard_fixtures/
+```
+
+## 13. 外部QuaDRiGa转换
+
+```matlab
+pair = generate_quadriga_v3_example( ...
+    "外部QuaDRiGa根目录", ...
+    "新的输出目录");
+```
+
+项目只保存外围示例和转换器，不复制或修改QuaDRiGa核心。详情见`QUADRIGA_OPTIONAL_EXAMPLE.md`。

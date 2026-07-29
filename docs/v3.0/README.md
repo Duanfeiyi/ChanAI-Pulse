@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 1 已完成；Step 2 等待确认
+> 状态：Step 1 已完成；Step 2 实现与自动测试完成，等待PR前可视化审阅
 >
 > 决策日期：2026-07-28
 >
@@ -35,6 +35,11 @@
 - [Step 0 验收清单](STEP_0_ACCEPTANCE.md)
 - [Step 1 验收清单](STEP_1_ACCEPTANCE.md)
 - [Step 1 验证记录](STEP_1_VALIDATION.md)
+- [Step 2 四套标准数据说明](STEP_2_STANDARD_DATA.md)
+- [Step 2 验收清单](STEP_2_ACCEPTANCE.md)
+- [Step 2 验证记录](STEP_2_VALIDATION.md)
+- [Step 2 PR前可视化审阅](STEP_2_VISUAL_REVIEW.md)
+- [Step 2 可选QuaDRiGa示例](QUADRIGA_OPTIONAL_EXAMPLE.md)
 
 ## 变更规则
 

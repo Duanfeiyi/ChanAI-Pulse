@@ -18,6 +18,10 @@ They must not be used as scientific benchmark evidence.
 
 Real measured datasets remain local-only under `datasets/measured/` and must not be copied into this folder.
 
+The `v3_standard_fixtures/` subfolder contains the four Step 2 canonical
+CIR/CTF pairs. They follow the v3 five-dimensional contract and are used
+for MATLAB/Python, capability-gating and regression tests.
+
 To regenerate the demo files in MATLAB:
 
 ```matlab
