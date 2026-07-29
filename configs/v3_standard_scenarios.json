@@ -1,0 +1,64 @@
+{
+  "schema_version": "v3.0-standard-fixtures.1",
+  "sample_semantics": "ordered_route",
+  "sample_count": 32,
+  "route_spacing_m": 0.5,
+  "scenarios": [
+    {
+      "id": "narrowband_static_siso",
+      "display_name_zh": "窄带静态 SISO",
+      "seed": 2101,
+      "Tx": 1,
+      "Rx": 1,
+      "Nf": 1,
+      "Nt": 1,
+      "Npath": 1,
+      "center_frequency_hz": 3500000000,
+      "subcarrier_spacing_hz": 120000,
+      "snapshot_interval_s": 0.001,
+      "standard_plot_count": 1
+    },
+    {
+      "id": "wideband_static_siso",
+      "display_name_zh": "宽带静态 SISO",
+      "seed": 2202,
+      "Tx": 1,
+      "Rx": 1,
+      "Nf": 64,
+      "Nt": 1,
+      "Npath": 4,
+      "center_frequency_hz": 3500000000,
+      "subcarrier_spacing_hz": 120000,
+      "snapshot_interval_s": 0.001,
+      "standard_plot_count": 3
+    },
+    {
+      "id": "wideband_static_mimo",
+      "display_name_zh": "宽带静态 MIMO",
+      "seed": 2303,
+      "Tx": 2,
+      "Rx": 4,
+      "Nf": 64,
+      "Nt": 1,
+      "Npath": 6,
+      "center_frequency_hz": 3500000000,
+      "subcarrier_spacing_hz": 120000,
+      "snapshot_interval_s": 0.001,
+      "standard_plot_count": 6
+    },
+    {
+      "id": "wideband_dynamic_mimo",
+      "display_name_zh": "宽带动态 MIMO",
+      "seed": 2404,
+      "Tx": 2,
+      "Rx": 4,
+      "Nf": 64,
+      "Nt": 16,
+      "Npath": 6,
+      "center_frequency_hz": 3500000000,
+      "subcarrier_spacing_hz": 120000,
+      "snapshot_interval_s": 0.001,
+      "standard_plot_count": 9
+    }
+  ]
+}

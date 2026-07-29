@@ -104,3 +104,23 @@ verification_status
 - 文件大小是否适合 Git？
 
 只要其中一项无法解释，PR 就不能标记为“可发布”。
+
+## 6. Step 2 QuaDRiGa决定
+
+Step 2核验的上游为Fraunhofer HHI QuaDRiGa `2.8.1-0`，提交：
+
+```text
+277866650eb115adb5b3e8ac252b0d1df073596d
+```
+
+其许可限制为非商业科研、教育和标准化用途，并对源代码/二进制再分发提出保留许可与提供源码等条件。因此Step 2采用：
+
+```text
+外部QuaDRiGa checkout
+      ↓
+项目自有转换示例
+      ↓
+ChanAI Pulse CIR/CTF
+```
+
+本仓库不复制QuaDRiGa核心，也不修改其文件。未来若决定直接分发上游源码，必须重新进行许可和发布审阅。

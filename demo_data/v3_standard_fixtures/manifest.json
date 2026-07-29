@@ -1,0 +1,137 @@
+{
+  "schema_version": "v3.0-standard-fixtures.1",
+  "data_contract_version": "v3.0-data-contract.1",
+  "generated_utc": "2026-07-29T00:00:00Z",
+  "deterministic": true,
+  "sample_semantics": "ordered_route",
+  "heatmap_is_additional": true,
+  "entries": [
+    {
+      "id": "narrowband_static_siso",
+      "display_name_zh": "窄带静态 SISO",
+      "seed": 2101,
+      "cir_file": "narrowband_static_siso_cir.h5",
+      "ctf_file": "narrowband_static_siso_ctf.h5",
+      "cir_shape": [
+        1,
+        1,
+        1,
+        1,
+        32
+      ],
+      "ctf_shape": [
+        1,
+        1,
+        1,
+        1,
+        32
+      ],
+      "classification": "narrowband_static_siso",
+      "standard_plots": [
+        "power"
+      ],
+      "standard_plot_count": 1,
+      "delay_sample_heatmap": false,
+      "heatmap_is_additional": true
+    },
+    {
+      "id": "wideband_static_siso",
+      "display_name_zh": "宽带静态 SISO",
+      "seed": 2202,
+      "cir_file": "wideband_static_siso_cir.h5",
+      "ctf_file": "wideband_static_siso_ctf.h5",
+      "cir_shape": [
+        1,
+        1,
+        4,
+        1,
+        32
+      ],
+      "ctf_shape": [
+        1,
+        1,
+        64,
+        1,
+        32
+      ],
+      "classification": "wideband_static_siso",
+      "standard_plots": [
+        "pdp",
+        "frequency_autocorrelation",
+        "delay_spread_cdf"
+      ],
+      "standard_plot_count": 3,
+      "delay_sample_heatmap": true,
+      "heatmap_is_additional": true
+    },
+    {
+      "id": "wideband_static_mimo",
+      "display_name_zh": "宽带静态 MIMO",
+      "seed": 2303,
+      "cir_file": "wideband_static_mimo_cir.h5",
+      "ctf_file": "wideband_static_mimo_ctf.h5",
+      "cir_shape": [
+        2,
+        4,
+        6,
+        1,
+        32
+      ],
+      "ctf_shape": [
+        2,
+        4,
+        64,
+        1,
+        32
+      ],
+      "classification": "wideband_static_mimo",
+      "standard_plots": [
+        "pdp",
+        "frequency_autocorrelation",
+        "delay_spread_cdf",
+        "angular_power_spectrum",
+        "spatial_correlation",
+        "angular_spread_cdf"
+      ],
+      "standard_plot_count": 6,
+      "delay_sample_heatmap": true,
+      "heatmap_is_additional": true
+    },
+    {
+      "id": "wideband_dynamic_mimo",
+      "display_name_zh": "宽带动态 MIMO",
+      "seed": 2404,
+      "cir_file": "wideband_dynamic_mimo_cir.h5",
+      "ctf_file": "wideband_dynamic_mimo_ctf.h5",
+      "cir_shape": [
+        2,
+        4,
+        6,
+        16,
+        32
+      ],
+      "ctf_shape": [
+        2,
+        4,
+        64,
+        16,
+        32
+      ],
+      "classification": "wideband_dynamic_mimo",
+      "standard_plots": [
+        "pdp",
+        "frequency_autocorrelation",
+        "delay_spread_cdf",
+        "angular_power_spectrum",
+        "spatial_correlation",
+        "angular_spread_cdf",
+        "doppler_power_spectrum",
+        "time_autocorrelation",
+        "doppler_spread_cdf"
+      ],
+      "standard_plot_count": 9,
+      "delay_sample_heatmap": true,
+      "heatmap_is_additional": true
+    }
+  ]
+}

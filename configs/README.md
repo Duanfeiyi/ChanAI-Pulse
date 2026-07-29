@@ -2,5 +2,9 @@
 
 This folder is reserved for public ChanAI Pulse configuration files.
 
-Future releases may add shared JSON configuration examples for MATLAB, benchmark, and migration workflows.
+Current v3.0 configuration:
+
+- `v3_standard_scenarios.json`: the four Step 2 deterministic CIR/CTF
+  fixture scenarios, including dimensions, seeds, radio axes, route
+  semantics and expected 1/3/6/9 plot counts.
 

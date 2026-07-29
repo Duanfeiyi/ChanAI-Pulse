@@ -96,6 +96,14 @@ GitHub：
   已于 2026-07-28 合并到 `main`。
 - Step 1 Issue 已关闭，总 Roadmap 已勾选 Step 1。
 
+## 3.2 Step 2 Issue
+
+- [Step 2 Issue #27](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/27)
+- 工作分支：`codex/v3-step-2-standard-datasets`
+- 目标：制作四套确定性CIR/CTF标准数据、MATLAB/Python交叉验证、1/3/6/9能力分级和可选QuaDRiGa外围适配示例。
+- 当前状态：实现与自动测试完成，等待项目负责人完成PR前可视化审阅。
+- PR：项目负责人批准后创建。
+
 ## 4. 后续 Issue 创建规则
 
 不一次性创建大量没有立即行动的 Issue。
@@ -119,6 +127,7 @@ GitHub：
 - 已创建 Roadmap Issue #21；
 - 已创建 Step 0 Issue #22；
 - 已创建并关闭 Step 1 Issue #24；
+- 已创建 Step 2 Issue #27，并指派给 `Duanfeiyi`、关联 Milestone；
 - Step 1 PR #25 已合并；
 - 两个 Issue 已指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
