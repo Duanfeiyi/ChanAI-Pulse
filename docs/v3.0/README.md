@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～3 已完成并合并；下一阶段先确认 Step 4 模块一输入流程规则
+> 状态：Step 0～3 已完成并合并；Step 4 核心、转换器、独立 Demo 和审阅材料已完成，等待人工审阅
 >
 > 决策日期：2026-07-28
 >
@@ -45,6 +45,12 @@
 - [Step 3 PR 前可视化审阅](STEP_3_VISUAL_REVIEW.md)
 - [Step 3 自动验证记录](STEP_3_VALIDATION.md)
 - [Step 3 验收清单](STEP_3_ACCEPTANCE.md)
+- [Step 4 整理版数据审计](STEP_4_SOURCE_DATA_AUDIT.md)
+- [Step 4 输入流水线接口指南](STEP_4_INTERFACE_GUIDE.md)
+- [Step 4 自动验证记录](STEP_4_VALIDATION.md)
+- [Step 4 人工与可视化审阅](STEP_4_VISUAL_REVIEW.md)
+- [Step 4 验收清单](STEP_4_ACCEPTANCE.md)
+- [v3.0 后续 UI 待办](UI_DEFERRED_TODOS.md)
 
 ## 变更规则
 

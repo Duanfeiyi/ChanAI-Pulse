@@ -6,10 +6,10 @@
 
 | ID | 正式需求 | 模块 | 计划 Step | 验收方式 | 当前状态 |
 |---|---|---|---:|---|---|
-| V3-REQ-001 | 任务类型只能明确选择内插或外推 | 模块一 | 1、4 | `tests/test_v3_data_contract.m` 合法/非法任务测试 | 进行中 |
+| V3-REQ-001 | 任务类型只能明确选择内插或外推 | 模块一 | 1、4 | `tests/test_v3_data_contract.m`、`tests/test_step4_input_pipeline.m` 的手动与80/20合法/非法任务测试 | 进行中 |
 | V3-REQ-002 | 规定内插和外推的数据输入格式 | 模块一 | 1 | `DATA_CONTRACT.md`、HDF5 往返和跨语言样例 | 已验证 |
-| V3-REQ-003 | 明确区分 `N_sample/Tx/Rx/Nt/Nf/Npath` | 模块一 | 1、4 | `tests/test_v3_standard_fixtures.m` 四类五维数据；Step 4继续接入上传流程 | 进行中 |
-| V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、12 | Step 2四类标准数据与能力分级已验证；正式特性引擎和UI待Step 5/12 | 进行中 |
+| V3-REQ-003 | 明确区分 `N_sample/Tx/Rx/Nt/Nf/Npath` | 模块一 | 1、4 | Step 2四类数据；Step 4标准导入；真实SAGE `1×16×683×1×337` 与WiFo `16×4×8×1×1000` 技术验证 | 进行中 |
+| V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、12 | Step 4输入结果返回能力表与原因；正式特性引擎和UI待Step 5/12 | 进行中 |
 | V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、12 | 同一 CIR 的跨模块一致性测试 | 待实现 |
 | V3-REQ-006 | 信道生成模块通过 Adapter 接入 6GPCM | 模块二 | 3、6 | `tests/test_full_6gpcm_external_smoke.m` 已验证最小无界面调用；正式 Adapter 留待 Step 6 | 进行中 |
 | V3-REQ-007 | 完整版 6GPCM 核心代码保持不变 | 模块二、三 | 0、3、6、11 | `hash_full_6gpcm_tree.m` 在真实调用前后核对 587 个文件总哈希 | 已验证 |
@@ -20,7 +20,7 @@
 | V3-REQ-012 | 预测器输出可供 6GPCM 使用的目标参数 | 模块三 | 9、10 | 参数字段、范围、单位测试 | 待实现 |
 | V3-REQ-013 | 预测参数必须通过 6GPCM 转换为预测 CIR | 模块三 | 11 | 参数到 CIR 端到端测试 | 待实现 |
 | V3-REQ-014 | MATLAB 或 Python 均可实现算法 | 全部 | 1、6、10 | 双语言最小接口示例 | 已冻结 |
-| V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、10、14 | `DATA_INTERFACE_GUIDE.md` 和后续 API 文档检查 | 进行中 |
+| V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、10、14 | `DATA_INTERFACE_GUIDE.md`、`STEP_4_INTERFACE_GUIDE.md` 和 MATLAB/Python 调用验证 | 进行中 |
 | V3-REQ-016 | 模块三不显示准确度、Ground Truth 或误差图 | 模块三 | 12 | GUI 人工验收 | 已冻结 |
 | V3-REQ-017 | 准确度验证放在软件外部 Benchmark | 外部测试 | 13 | 独立执行和数据隔离测试 | 待实现 |
 | V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、10、11 | Step 2 fixture 已保存 schema/source/seed/config/manifest；Step 3 探针报告新增 6GPCM 版本、包哈希、配置、种子和来源，正式运行清单待 Adapter | 进行中 |

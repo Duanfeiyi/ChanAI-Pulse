@@ -20,11 +20,14 @@ This roadmap distinguishes code currently present on `main` from research direct
 - Documentation synchronization and clearer separation of the legacy baseline from v2.0 research plans.
 - Scientific review of legacy evaluation and generation boundaries, including DS CDF and delay-axis consistency.
 - ChanAI Pulse v3.0 requirement, data-contract and interface work. The frozen v3.0 requirements are planning baselines and are not claims of completed functionality.
+- Step 4 module-one v3 HDF5 ingestion, task setup, legacy SAGE/WiFo conversion, and isolated review-demo work.
 
 ## Next
 
-- Build the v3 module-one channel-data ingestion, validation and task-setup pipeline.
 - Build capability-aware visualization shared by the input and prediction modules.
+- In the Step 12 formal UI, translate user-facing zero-based sample labels and
+  physical position/time/frequency ranges into MATLAB one-based task indices
+  automatically; track this as `UI-TODO-001`.
 - Add real Grid Search and simulated annealing behind optimizer interfaces.
 - Predict target-region channel parameters and convert them to predicted complex CIR through 6GPCM.
 - Keep prediction-accuracy evaluation in a standalone benchmark outside the platform UI.
