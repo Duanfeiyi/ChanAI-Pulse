@@ -70,6 +70,6 @@
 - [x] MATLAB Code Analyzer
 - [x] Demo 截图和初学者阅读说明
 - [x] 项目负责人人工审阅
-- [ ] 人工审阅通过后 commit/push/Draft PR
-- [ ] PR 自审
+- [x] 人工审阅通过后 commit/push/Draft PR
+- [x] PR 自审
 - [ ] 项目负责人最终决定合并

@@ -134,7 +134,8 @@ GitHub：
   共享绘图器和模拟正式第一页的独立功能 Demo。
 - 科学规则、计算引擎、1/3/6/9标准数据、降级路径和第一页 Demo
   已完成本地实现、自动验证和项目负责人人工审阅。
-- 本分支通过 Step 5 Draft PR 提交审阅；合并前总 Roadmap 保持 Step 5 未勾选。
+- 本分支通过 [Step 5 Draft PR #36](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/36)
+  提交并完成PR自审；合并前总 Roadmap 保持 Step 5 未勾选。
 
 ## 4. 后续 Issue 创建规则
 
@@ -163,7 +164,7 @@ GitHub：
 - Step 3 Issue #29 已关闭，PR #30 已合并；
 - Step 3 收尾 PR #31 已合并；
 - Step 4 Issue #32 已关闭，PR #33 已合并；
-- Step 5 Issue #35 已创建并关联 v3.0.0 Milestone，通过独立分支和 Draft PR 交付；
+- Step 5 Issue #35 已创建并关联 v3.0.0 Milestone，Draft PR #36 已创建并自审；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
