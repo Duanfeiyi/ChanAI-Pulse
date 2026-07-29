@@ -45,7 +45,7 @@ GitHub：
 - [x] Step 1：定义统一 CIR/CTF 数据标准
 - [x] Step 2：制作四类标准测试数据
 - [x] Step 3：验证完整版 6GPCM 最小无界面调用
-- [ ] Step 4：完成模块一信道数据输入流程
+- [x] Step 4：完成模块一信道数据输入流程
 - [ ] Step 5：建立统一信道特性引擎
 - [ ] Step 6：完成 Generator Adapter
 - [ ] Step 7：实现真正 Grid Search
@@ -122,9 +122,9 @@ GitHub：
 - 当前状态：核心实现、Step 1～4 回归、Python 读取、真实 SAGE/WiFo 技术验证、项目负责人人工审阅、提交和 PR 自审均已完成。
 - 人工审阅确认的正式 UI 自动编号/坐标换算已登记为 `UI-TODO-001`，计划在 Step 12 实现，不阻塞 Step 4。
 - PR #31 已合并；Step 4 分支已快进同步到对应的最新 `main`。
-- [Draft PR #33](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/33)
-  已创建并完成自审，等待项目负责人最终决定是否合并。
-- Step 4 总 Roadmap 在 PR #33 合并前保持未勾选。
+- [PR #33](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/33)
+  已于 2026-07-29 合并到 `main`。
+- Step 4 Issue #32 已关闭，GitHub 总 Roadmap 已勾选 Step 4。
 
 ## 4. 后续 Issue 创建规则
 
@@ -152,12 +152,11 @@ GitHub：
 - Step 2 Issue #27 已关闭，PR #28 已合并；
 - Step 3 Issue #29 已关闭，PR #30 已合并；
 - Step 3 收尾 PR #31 已合并；
-- 已创建 Step 4 Issue #32，并指派给 `Duanfeiyi`、关联 v3.0.0 Milestone；
-- Step 4 分支已推送，Draft PR #33 已创建并完成自审；
+- Step 4 Issue #32 已关闭，PR #33 已合并；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
-- GitHub 连接器更新 Roadmap 返回 `403`，本次通过已认证 GitHub CLI 同步 Step 2、Step 3；
+- GitHub 连接器更新 Roadmap 返回 `403`，本次通过已认证 GitHub CLI 同步 Step 2、Step 3、Step 4；
 - 本次通过已认证的 GitHub 网页会话完成创建；
 - 后续如希望完全使用 GitHub 连接器自动管理 Issue，仍需要补充 Issues 写权限；
 - 远程对象必须以 GitHub 页面上的实际结果为准，不能因为已经准备了正文就宣称创建成功。

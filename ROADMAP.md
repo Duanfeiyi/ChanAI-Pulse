@@ -13,6 +13,8 @@ This roadmap distinguishes code currently present on `main` from research direct
 - ChanAI Pulse v3 CIR/CTF and interpolation/extrapolation task contracts.
 - Four deterministic v3 CIR/CTF standard fixture families and capability baselines.
 - A read-only, fixed-seed, headless full-6GPCM technical probe with canonical CIR conversion and core-integrity verification.
+- Step 4 module-one v3 HDF5 ingestion, task setup, legacy SAGE/WiFo
+  conversion, isolated review Demo, tests, and interface documentation.
 - v1.1.0 release tag for the legacy baseline and v2.0 planning documents.
 
 ## In progress
@@ -20,7 +22,6 @@ This roadmap distinguishes code currently present on `main` from research direct
 - Documentation synchronization and clearer separation of the legacy baseline from v2.0 research plans.
 - Scientific review of legacy evaluation and generation boundaries, including DS CDF and delay-axis consistency.
 - ChanAI Pulse v3.0 requirement, data-contract and interface work. The frozen v3.0 requirements are planning baselines and are not claims of completed functionality.
-- Step 4 module-one v3 HDF5 ingestion, task setup, legacy SAGE/WiFo conversion, and isolated review-demo work.
 
 ## Next
 
