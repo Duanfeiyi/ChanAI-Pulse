@@ -110,8 +110,8 @@ GitHub：
 - [Step 3 Issue #29](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/29)
 - 工作分支：`codex/v3-step-3-full-6gpcm-spike`
 - 目标：登记完整版 6GPCM 资产和哈希，在不修改核心的前提下验证最小无界面调用、固定种子复现性，并把原始输出转换成 v3 统一 CIR。
-- 当前状态：实现、自动测试和 PR 前人工审阅完成；项目负责人已批准提交、推送并创建 PR。
-- PR：正在创建。
+- 当前状态：实现、自动测试、PR 前人工审阅、提交、推送、Draft PR 创建和 PR 自审完成，等待项目负责人决定是否转为 Ready 并合并。
+- [Draft PR #30](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/30)
 
 ## 4. 后续 Issue 创建规则
 
