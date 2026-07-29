@@ -119,10 +119,12 @@ GitHub：
 - [Step 4 Issue #32](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/32)
 - 工作分支：`codex/v3-step-4-input-pipeline`
 - 目标：完成模块一单文件 v3 HDF5 输入、PASS/WARNING/FAIL、内插/外推任务、SAGE/WiFo 专用转换器和与正式平台隔离的体验 Demo。
-- 当前状态：核心实现、Step 1～4 回归、Python 读取、真实 SAGE/WiFo 技术验证和项目负责人人工审阅均已完成，正在准备提交和 Draft PR。
+- 当前状态：核心实现、Step 1～4 回归、Python 读取、真实 SAGE/WiFo 技术验证、项目负责人人工审阅、提交和 PR 自审均已完成。
 - 人工审阅确认的正式 UI 自动编号/坐标换算已登记为 `UI-TODO-001`，计划在 Step 12 实现，不阻塞 Step 4。
 - PR #31 已合并；Step 4 分支已快进同步到对应的最新 `main`。
-- Step 4 尚未提交、推送或创建 PR，总 Roadmap 保持未勾选。
+- [Draft PR #33](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/33)
+  已创建并完成自审，等待项目负责人最终决定是否合并。
+- Step 4 总 Roadmap 在 PR #33 合并前保持未勾选。
 
 ## 4. 后续 Issue 创建规则
 
@@ -151,7 +153,7 @@ GitHub：
 - Step 3 Issue #29 已关闭，PR #30 已合并；
 - Step 3 收尾 PR #31 已合并；
 - 已创建 Step 4 Issue #32，并指派给 `Duanfeiyi`、关联 v3.0.0 Milestone；
-- 已创建 Step 4 本地独立分支，尚未推送；
+- Step 4 分支已推送，Draft PR #33 已创建并完成自审；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；

@@ -118,7 +118,18 @@ PASS: Step 1-4 post-main-sync regression suite.
 PASS: Step 4 post-main-sync demo smoke test.
 ```
 
-## 10. 尚未完成
+## 10. Draft PR 自审
 
-- commit、push、Draft PR 与 PR 自审；
+- PR：[Draft PR #33](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/33)
+- 基线：`main`
+- 状态：`OPEN / DRAFT / MERGEABLE`
+- 差异：18 个文件，2332 行新增，6 行删除
+- MATLAB Code Analyzer：`CHECKCODE_MESSAGES=0`
+- 本机绝对路径扫描：未发现
+- 私有测量数据和人工审阅 HDF5：未进入 Git
+- GitHub 自动检查：仓库未为该分支报告 checks，不是测试失败
+- 自审结论：未发现阻止合并的问题
+
+## 11. 尚未完成
+
 - 项目负责人最终批准合并。

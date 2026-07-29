@@ -1,6 +1,6 @@
 # Step 4 验收清单
 
-> 当前状态：核心输入流水线、SAGE/WiFo Adapter、独立 Demo、回归测试和人工审阅均已完成。后续 UI 自动编号换算已登记，正在准备提交、推送和创建 PR。
+> 当前状态：核心输入流水线、SAGE/WiFo Adapter、独立 Demo、回归测试、人工审阅、提交和 PR 自审均已完成。后续 UI 自动编号换算已登记，等待项目负责人决定是否合并 PR #33。
 
 ## GitHub
 
@@ -85,7 +85,7 @@
 - [x] 生成人工审阅 HDF5 包（不进入 Git）
 - [x] 项目负责人人工审阅
 - [x] 将正式 UI 自动编号/坐标换算登记为 [UI-TODO-001](UI_DEFERRED_TODOS.md#ui-todo-001任务区间编号与真实坐标自动换算)
-- [ ] 人工审阅通过后提交和 push
-- [ ] 创建 Draft PR
-- [ ] PR 自审
+- [x] 人工审阅通过后提交和 push
+- [x] 创建 [Draft PR #33](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/33)
+- [x] PR 自审
 - [ ] 项目负责人最终决定合并
