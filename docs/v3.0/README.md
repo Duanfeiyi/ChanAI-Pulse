@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～4 已完成并合并；下一步是 Step 5 统一信道特性引擎
+> 状态：Step 0～4 已完成并合并；Step 5 实现与人工审阅已完成，等待 PR 合并
 >
 > 决策日期：2026-07-28
 >
@@ -51,6 +51,11 @@
 - [Step 4 人工与可视化审阅](STEP_4_VISUAL_REVIEW.md)
 - [Step 4 验收清单](STEP_4_ACCEPTANCE.md)
 - [v3.0 后续 UI 待办](UI_DEFERRED_TODOS.md)
+- [Step 5 科学计算规则](STEP_5_SCIENTIFIC_RULES.md)
+- [Step 5 接口指南](STEP_5_INTERFACE_GUIDE.md)
+- [Step 5 验收清单](STEP_5_ACCEPTANCE.md)
+- [Step 5 验证记录](STEP_5_VALIDATION.md)
+- [Step 5 Demo 与图表人工审阅](STEP_5_VISUAL_REVIEW.md)
 
 ## 变更规则
 
