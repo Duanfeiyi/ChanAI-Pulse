@@ -85,7 +85,17 @@ CHECKCODE_MESSAGES=0
 失败。Step 1～5 MATLAB 跨格式回归已经通过。本记录不把未执行的 Python
 测试标记为通过。
 
-## 8. 当前结论
+## 8. PR 交付
 
-自动验收通过，可以进入项目负责人人工审阅。人工审阅通过前，不提交、
-不 push，也不创建 Step 6 PR。
+- 分支：`codex/v3-step-6-generator-adapter`
+- 实现提交：`101c954 feat(v3): add Step 6 generator adapter`
+- Draft PR：[PR #39](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/39)
+- 目标分支：`main`
+- PR 自审：23个预期文件，GitHub 判定 `MERGEABLE`
+- 仓库没有为该分支报告远程自动检查；本记录中的本地 MATLAB 回归、
+  真实 Full 6GPCM 完整性测试和静态检查作为自动验证依据。
+
+## 9. 当前结论
+
+自动验收和项目负责人人工审阅均已通过，Draft PR 已创建并完成自审。
+当前仅等待项目负责人最终决定是否合并。

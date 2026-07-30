@@ -1,14 +1,15 @@
 # Step 6 验收清单
 
-> 当前状态：实现、自动测试和审阅材料已完成；等待项目负责人人工审阅。人工审阅通过前不提交、push 或创建 Step 6 PR。
+> 当前状态：实现、自动测试、项目负责人人工审阅、提交、Draft PR 和 PR 自审均已完成；等待项目负责人最终决定是否合并。
 
 ## GitHub
 
 - [x] 创建 [Step 6 Issue #38](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/38)
 - [x] 创建独立分支 `codex/v3-step-6-generator-adapter`
-- [ ] 项目负责人人工审阅
-- [ ] 人工审阅通过后 commit/push/Draft PR
-- [ ] PR 自审
+- [x] 项目负责人人工审阅
+- [x] 人工审阅通过后 commit/push/Draft PR
+- [x] [Draft PR #39](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/39)
+- [x] PR 自审：23个预期文件、目标 `main`、GitHub 判定 `MERGEABLE`
 - [ ] 项目负责人最终决定合并
 
 ## 统一契约
