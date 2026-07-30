@@ -1,0 +1,253 @@
+{
+  "schema_version": "v3.0-predictor-model-registry.1",
+  "created_utc": "2026-07-30T16:31:02.855326+00:00",
+  "selection_policy": {
+    "ordinary_user": "auto",
+    "metric": "validation_normalized_rmse",
+    "candidate_models": [
+      "gru",
+      "lstm",
+      "tcn"
+    ],
+    "target_ground_truth_used_at_prediction_time": false,
+    "selected_model_type": "tcn",
+    "explanation": "The choice was frozen from the validation partition during offline training; prediction-time target values are not read."
+  },
+  "compatibility": {
+    "task_type": "interpolation",
+    "context_layout": "left_and_right_context_predict_middle",
+    "parameter_names": [
+      "DS_mu",
+      "KF_mu"
+    ],
+    "context_length": 16,
+    "target_length": 4,
+    "parameter_count": 2
+  },
+  "preprocessing": {
+    "method": "zscore_train_only",
+    "normalization_mean": [
+      -7.959999999999999,
+      -0.48
+    ],
+    "normalization_std": [
+      0.04924298726592232,
+      0.42161228999748473
+    ],
+    "parameter_bounds": [
+      [
+        -9.0,
+        -7.0
+      ],
+      [
+        -10.0,
+        20.0
+      ]
+    ]
+  },
+  "entries": [
+    {
+      "model_type": "gru",
+      "checkpoint": "interpolation_gru_seed20260730.pt",
+      "manifest": "interpolation_gru_seed20260730.json",
+      "compatibility": {
+        "task_type": "interpolation",
+        "context_layout": "left_and_right_context_predict_middle",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 2
+      },
+      "validation_metrics": {
+        "normalized_rmse": 0.23635603427544605,
+        "per_parameter_normalized_rmse": [
+          0.20986863445795553,
+          0.26016053918222243
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.010334558494129507,
+          "KF_mu": 0.10968688069159716
+        },
+        "example_count": 9
+      },
+      "test_metrics": {
+        "normalized_rmse": 0.5162697447326312,
+        "per_parameter_normalized_rmse": [
+          0.5041942699034202,
+          0.5280691591535616
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.024828032012405236,
+          "KF_mu": 0.2226404474677793
+        },
+        "example_count": 18
+      },
+      "checkpoint_sha256": "e083689b3653033efc577198c800cf6682763d55965dedd39377155bb2f3a4bf"
+    },
+    {
+      "model_type": "lstm",
+      "checkpoint": "interpolation_lstm_seed20260730.pt",
+      "manifest": "interpolation_lstm_seed20260730.json",
+      "compatibility": {
+        "task_type": "interpolation",
+        "context_layout": "left_and_right_context_predict_middle",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 2
+      },
+      "validation_metrics": {
+        "normalized_rmse": 0.3578238476630024,
+        "per_parameter_normalized_rmse": [
+          0.2799798832248954,
+          0.4215294496261028
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.013787045824357892,
+          "KF_mu": 0.17772199655824056
+        },
+        "example_count": 9
+      },
+      "test_metrics": {
+        "normalized_rmse": 0.728533832896672,
+        "per_parameter_normalized_rmse": [
+          0.5717042660964013,
+          0.8571332005455202
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.028152425895258643,
+          "KF_mu": 0.3613778915148701
+        },
+        "example_count": 18
+      },
+      "checkpoint_sha256": "b17b8280bad2710363ec35a08954c363960427245167d18c5bda1216e4b77877"
+    },
+    {
+      "model_type": "tcn",
+      "checkpoint": "interpolation_tcn_seed20260730.pt",
+      "manifest": "interpolation_tcn_seed20260730.json",
+      "compatibility": {
+        "task_type": "interpolation",
+        "context_layout": "left_and_right_context_predict_middle",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 2
+      },
+      "validation_metrics": {
+        "normalized_rmse": 0.10409879770524122,
+        "per_parameter_normalized_rmse": [
+          0.05818348740433348,
+          0.13523239686119312
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.0028651287293385776,
+          "KF_mu": 0.05701564052249631
+        },
+        "example_count": 9
+      },
+      "test_metrics": {
+        "normalized_rmse": 0.3445079793559743,
+        "per_parameter_normalized_rmse": [
+          0.15040658523225542,
+          0.4634105682854516
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.007406469561302788,
+          "KF_mu": 0.195379590903865
+        },
+        "example_count": 18
+      },
+      "checkpoint_sha256": "5fb333900a585479ae6b683b7c021e4da37c487f0494630dc8c778bde8331410"
+    },
+    {
+      "model_type": "persistence",
+      "checkpoint": null,
+      "manifest": null,
+      "compatibility": {
+        "task_type": "interpolation",
+        "context_layout": "left_and_right_context_predict_middle",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 2
+      },
+      "validation_metrics": {
+        "normalized_rmse": 0.26650452633764216,
+        "per_parameter_normalized_rmse": [
+          0.24495236792313793,
+          0.2864396316254956
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.012062186334396572,
+          "KF_mu": 0.12076646903566116
+        },
+        "example_count": 9
+      },
+      "test_metrics": {
+        "normalized_rmse": 0.26492153781959343,
+        "per_parameter_normalized_rmse": [
+          0.24495237366188077,
+          0.2834875253671789
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.012062186616989453,
+          "KF_mu": 0.11952182475577633
+        },
+        "example_count": 18
+      }
+    },
+    {
+      "model_type": "linear",
+      "checkpoint": null,
+      "manifest": null,
+      "compatibility": {
+        "task_type": "interpolation",
+        "context_layout": "left_and_right_context_predict_middle",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 2
+      },
+      "validation_metrics": {
+        "normalized_rmse": 0.5082073362476265,
+        "per_parameter_normalized_rmse": [
+          0.4685884510288154,
+          0.5449534446117683
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.02307469512697014,
+          "KF_mu": 0.22975906972478508
+        },
+        "example_count": 9
+      },
+      "test_metrics": {
+        "normalized_rmse": 0.5188823105084694,
+        "per_parameter_normalized_rmse": [
+          0.46858845220174444,
+          0.5647145887794903
+        ],
+        "raw_rmse": {
+          "DS_mu": 0.02307469518472883,
+          "KF_mu": 0.23809061097030879
+        },
+        "example_count": 18
+      }
+    }
+  ]
+}

@@ -52,6 +52,8 @@ legacy/
 !demo_data/README.md
 !demo_data/chanais_demo/data/
 !demo_data/chanais_demo/data/**
+!demo_data/v3_step10/
+!demo_data/v3_step10/**
 
 # Experiment and runtime outputs
 experiments/exp_*/

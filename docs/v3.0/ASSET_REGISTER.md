@@ -40,6 +40,9 @@
 | Step 9 参数序列/HDF5契约 | 项目自有新实现 | A | `DS_mu/KF_mu` 标准预测数据、内插/外推、分组切分、训练集归一化 | 人工审阅通过后上传 | Step 10 Predictor Adapter 对接 |
 | Step 9 确定性参数 fixture | 项目自有数据 | A | MATLAB/Python形状、索引、切分与Demo审阅 | 可以上传，明确非测量数据和非精度证据 | 无 |
 | 整理版早期 GRU/DPSD 实验 | 历史研究代码 | C | Step 10 模型与实验流程参考 | 不直接并入正式契约 | 硬编码、随机切分和目标语义需重做 |
+| Step 10 GRU/LSTM/TCN 实现 | 项目自有新实现 | A | `DS_mu/KF_mu` 内插/外推预测、统一 Predictor Adapter | 可以上传 | PyTorch 代码、MATLAB 封装、固定种子与泄漏测试 |
+| Step 10 小型参考权重与 ModelRegistry | 项目自有派生资产 | A | 公开 fixture 的接口、Demo 和回归验证 | 可以上传；明确不是实测精度或科学结论 | Manifest 记录数据 SHA256、运行环境、验证指标和权重 SHA256 |
+| Step 10 无真值 prediction request | 项目自有数据 | A | 正式产品接口演示，不包含目标参数答案 | 可以上传 | `contains_target_ground_truth=false`，与外部 Benchmark 严格分离 |
 | 论文与第三方测试报告 | 研究资料 | C | 需求来源和 Benchmark 指标参考 | 不上传未获授权的全文 | 引用信息 |
 
 ## 3. 完整版 6GPCM 特别规则
