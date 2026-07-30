@@ -120,16 +120,20 @@ PASS: Step 5 unified characteristics, registry, and renderer.
 PASS: Step 1-5 regression suite.
 ```
 
-## 13. 尚未完成
+## 13. 完成状态
 
-- 项目负责人最终决定是否合并。
+- 项目负责人人工审阅通过；
+- PR #36 已合并到 `main`；
+- Step 5 Issue #35 已关闭；
+- Step 5 已完成，可以进入 Step 6。
 
 ## 14. PR 交付
 
 - 分支：`codex/v3-step-5-characteristics-engine`
 - 提交：`c1c2fc8 Implement Step 5 channel characteristics engine`
 - Draft PR：[PR #36](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/36)
-- PR目标为 `main`，创建后状态为 mergeable；
+- PR 目标为 `main`，已由项目负责人合并；
+- 合并提交：`4bc50d02c9843ab8f0066a1f21e6ace304189045`；
 - PR精确包含26个预期文件，不包含本地 `outputs/step5_review` 实测转换数据；
 - 仓库当前没有为该分支报告远程自动检查，本地 MATLAB 回归和静态检查作为
   本 Step 的自动验证依据。
