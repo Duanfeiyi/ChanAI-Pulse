@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～6 已完成并合并；下一阶段为 Step 7 真正的 Grid Search
+> 状态：Step 0～6 已完成并合并；Step 7 真正的 Grid Search 正在本地实现与审阅
 >
 > 决策日期：2026-07-28
 >
@@ -60,6 +60,11 @@
 - [Step 6 验收清单](STEP_6_ACCEPTANCE.md)
 - [Step 6 自动验证记录](STEP_6_VALIDATION.md)
 - [Step 6 Demo 与人工审阅](STEP_6_VISUAL_REVIEW.md)
+- [Step 7 Grid Search 科学规则](STEP_7_SCIENTIFIC_RULES.md)
+- [Step 7 Grid Search 接口指南](STEP_7_INTERFACE_GUIDE.md)
+- [Step 7 验收清单](STEP_7_ACCEPTANCE.md)
+- [Step 7 自动验证记录](STEP_7_VALIDATION.md)
+- [Step 7 Demo 与人工审阅](STEP_7_VISUAL_REVIEW.md)
 
 ## 变更规则
 
