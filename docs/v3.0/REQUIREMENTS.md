@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 正式需求
 
-> 基线版本：v3.0-requirements.2
+> 基线版本：v3.0-requirements.3
 >
 > 状态：Step 0 冻结基线
 >
@@ -143,3 +143,21 @@ Predictor Adapter
 3. 说明影响的模块和接口；
 4. 增加或更新验收测试；
 5. 通过 PR 由 `Duanfeiyi` 批准。
+
+## 7. Step 9 补充冻结的预测数据要求
+
+项目负责人于 2026-07-30 确认：
+
+1. 参数契约支持 Step 8 的全部 8 个参数，第一版标准预测档为
+   `DS_mu`、`KF_mu`；
+2. 沿 `N_sample` 使用局部信道窗口形成参数序列，默认窗口 16、步长 4；
+3. 参数序列顺序为 `[N_parameter_sample,P]`，模型输入顺序为
+   `[N_example,N_context,P]`；
+4. 外推为历史 16 预测未来 4；内插为左 8 与右 8 预测中间 4；
+5. 内插与外推共用数据契约和未来 Predictor Adapter，但第一版使用不同模型文件；
+6. 标签必须区分 `generator_truth`、`grid_fitted`、`sa_fitted` 并保存拟合质量；
+7. 训练、验证、测试按路线、场景或独立信道实现分组切分，禁止相邻滑窗泄漏；
+8. Z-score 只由训练分区计算并保存 Manifest；
+9. 公开仓库只放确定性合成小样例，真实和大型派生数据默认留在本地；
+10. Step 9 只定义 `pretrain/auto/off/force` 及微调候选元数据，泛用模型训练、
+    微调实验和阈值属于 Step 10。
