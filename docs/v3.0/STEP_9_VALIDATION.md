@@ -101,17 +101,18 @@ CHECKCODE_MESSAGES=0
 Step 9 的核心契约、局部拟合标签、任务样本、分组切分、训练集归一化、
 MATLAB/Python HDF5、公开小样例、Demo、完整回归和静态检查均已通过。
 
-项目负责人人工审阅已通过，并已明确允许 commit、push 和创建 PR。
+项目负责人人工审阅已通过，PR #48 已合并到 `main`，Step 9 正式完成。
 
 ## 7. PR 交付
 
 - 分支：`codex/v3-step-9-predictor-data`；
 - 实现提交：`ad4c382 feat(v3): define Step 9 predictor data contract`；
-- PR：[Draft PR #48](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/48)；
+- PR：[PR #48](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/48)；
 - 目标分支：`main`；
 - 变更范围：41个预期文件；
 - `Closes #47` 已正确写入 PR 正文；
-- GitHub 判定：`MERGEABLE`；
-- `mergeStateStatus=BLOCKED` 是因为 PR 仍为 Draft；
+- 项目负责人已批准并于 2026-07-30 合并；
+- 合并提交：`e39ee6af999ff16e2d70a7e28cad014c8fcdcffa`；
+- Step 9 Issue #47 已自动关闭；
 - 仓库没有为该分支报告远程自动检查，以上完整 MATLAB/Python 回归和静态检查
   作为当前验证依据。

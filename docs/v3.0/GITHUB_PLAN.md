@@ -50,7 +50,7 @@ GitHub：
 - [x] Step 6：完成 Generator Adapter
 - [x] Step 7：实现真正 Grid Search
 - [x] Step 8：整理随机局部搜索、实现 SA 与 Grid/SA 自动策略决策器
-- [ ] Step 9：确定正式预测参数与训练数据
+- [x] Step 9：确定正式预测参数与训练数据
 - [ ] Step 10：完成 Predictor Adapter
 - [ ] Step 11：打通预测参数到 6GPCM CIR
 - [ ] Step 12：接入冻结的三页 UI
@@ -209,10 +209,12 @@ GitHub：
 - Step 9 只登记 `pretrain/auto/off/force` 和资格元数据，Step 10 再训练泛用模型、
   实现每次上传后的可控微调并通过实验确定阈值；
 - 公开仓库只保存确定性合成小样例，不上传真实测量数据、第三方权重或大型派生数据；
-- 当前状态：Issue和分支已建立，核心契约、自动测试、跨语言fixture、独立Demo、
-  审阅图、完整回归和项目负责人人工审阅均已完成；实现提交 `ad4c382` 已推送，
-  [Draft PR #48](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/48) 已创建并完成自审，
-  GitHub 判定 `MERGEABLE`，等待项目负责人决定是否转为 Ready 并合并。
+- 当前状态：核心契约、自动测试、跨语言 fixture、独立 Demo、审阅图、完整回归和
+  项目负责人人工审阅均已完成；实现提交 `ad4c382` 已推送；
+- [PR #48](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/48) 已于 2026-07-30
+  合并到 `main`，合并提交为 `e39ee6af999ff16e2d70a7e28cad014c8fcdcffa`；
+- Step 9 Issue #47 已关闭；Step 9 已完成，下一阶段为 Step 10 基础预测模型与
+  Predictor Adapter。
 
 ## 3.10 Step 12 对应 UI 计划
 
@@ -260,9 +262,8 @@ GitHub：
 - Step 7 小型收尾 PR #43 已合并；
 - Step 8 Issue #44 已关闭，PR #45 已合并；
 - Step 8 小型收尾 PR #46 已合并；
-- Step 9 Issue #47 已创建并指派给 `Duanfeiyi`，当前工作分支为
-  `codex/v3-step-9-predictor-data`；
-- GitHub 总 Roadmap 已勾选 Step 0～8；
+- Step 9 Issue #47 已关闭，PR #48 已合并；
+- GitHub 总 Roadmap 已勾选 Step 0～9；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
