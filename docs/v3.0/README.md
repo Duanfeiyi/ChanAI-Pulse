@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～4 已完成并合并；Step 5 实现与人工审阅已完成，等待 PR 合并
+> 状态：Step 0～5 已完成并合并；下一阶段为 Step 6 Generator Adapter
 >
 > 决策日期：2026-07-28
 >

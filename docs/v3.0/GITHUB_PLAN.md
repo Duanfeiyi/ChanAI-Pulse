@@ -46,7 +46,7 @@ GitHub：
 - [x] Step 2：制作四类标准测试数据
 - [x] Step 3：验证完整版 6GPCM 最小无界面调用
 - [x] Step 4：完成模块一信道数据输入流程
-- [ ] Step 5：建立统一信道特性引擎
+- [x] Step 5：建立统一信道特性引擎
 - [ ] Step 6：完成 Generator Adapter
 - [ ] Step 7：实现真正 Grid Search
 - [ ] Step 8：整理随机局部搜索并实现 SA
@@ -135,7 +135,11 @@ GitHub：
 - 科学规则、计算引擎、1/3/6/9标准数据、降级路径和第一页 Demo
   已完成本地实现、自动验证和项目负责人人工审阅。
 - 本分支通过 [Step 5 Draft PR #36](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/36)
-  提交并完成PR自审；合并前总 Roadmap 保持 Step 5 未勾选。
+  提交并完成 PR 自审；
+- PR #36 已合并到 `main`，合并提交为
+  `4bc50d02c9843ab8f0066a1f21e6ace304189045`；
+- Step 5 Issue #35 已关闭；
+- Step 5 已完成，下一阶段为 Step 6 Generator Adapter。
 
 ## 4. 后续 Issue 创建规则
 
@@ -164,7 +168,7 @@ GitHub：
 - Step 3 Issue #29 已关闭，PR #30 已合并；
 - Step 3 收尾 PR #31 已合并；
 - Step 4 Issue #32 已关闭，PR #33 已合并；
-- Step 5 Issue #35 已创建并关联 v3.0.0 Milestone，Draft PR #36 已创建并自审；
+- Step 5 Issue #35 已关闭，PR #36 已合并；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
