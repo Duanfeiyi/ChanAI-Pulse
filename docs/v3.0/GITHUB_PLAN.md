@@ -48,7 +48,7 @@ GitHub：
 - [x] Step 4：完成模块一信道数据输入流程
 - [x] Step 5：建立统一信道特性引擎
 - [x] Step 6：完成 Generator Adapter
-- [ ] Step 7：实现真正 Grid Search
+- [x] Step 7：实现真正 Grid Search
 - [ ] Step 8：整理随机局部搜索、实现 SA 与 Grid/SA 自动策略决策器
 - [ ] Step 9：确定正式预测参数与训练数据
 - [ ] Step 10：完成 Predictor Adapter
@@ -166,8 +166,10 @@ GitHub：
   单候选失败继续、默认最多500个候选、只保留Top 5完整CIR。
 - 当前状态：Issue、独立分支、核心实现、Mock/Lite/真实Full专项测试、Demo、
   审阅图、Step 1～7完整回归、接口文档和项目负责人人工审阅均已完成；
-  [Draft PR #42](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/42) 已创建并完成自审，
-  GitHub 判定 `MERGEABLE`，等待项目负责人最终决定是否合并。
+  [PR #42](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/42) 已合并到 `main`；
+  合并提交为 `c9492f52122d451ed736014a0b85a674431a94af`。
+- Step 7 Issue #41 已关闭，GitHub 总 Roadmap 已勾选 Step 7；
+- Step 7 已完成，下一阶段为 Step 8。
 
 ## 3.8 Step 8 计划
 
@@ -222,8 +224,8 @@ GitHub：
 - Step 5 收尾 PR #37 已合并；
 - Step 6 Issue #38 已关闭，PR #39 已合并；
 - Step 6 收尾 PR #40 已合并；
-- Step 7 Issue #41 已创建，Draft PR #42 已创建并关联 `Closes #41`；
-- GitHub 总 Roadmap 已勾选 Step 0～6；
+- Step 7 Issue #41 已关闭，PR #42 已合并；
+- GitHub 总 Roadmap 已勾选 Step 0～7；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；

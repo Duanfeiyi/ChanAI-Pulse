@@ -1,6 +1,6 @@
 # Step 7 验收清单
 
-> 当前状态：本地实现与自动验证进行中，等待项目负责人人工审阅；尚未提交或创建 PR。
+> 当前状态：项目负责人已合并 PR #42，Step 7 正式完成。
 
 ## GitHub
 
@@ -10,8 +10,10 @@
 - [x] 人工审阅通过后 commit/push/Draft PR
 - [x] [Draft PR #42](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/42)
 - [x] PR 自审：26个预期文件、目标 `main`、关联关闭 Issue #41、GitHub 判定 `MERGEABLE`
-- [ ] 项目负责人最终决定合并
-- [ ] 关闭 Step 7 Issue 并更新 Roadmap
+- [x] 项目负责人最终决定合并
+- [x] PR #42 已合并到 `main`
+- [x] Step 7 Issue #41 已关闭
+- [x] GitHub Roadmap 已勾选 Step 7
 
 ## 搜索契约
 
