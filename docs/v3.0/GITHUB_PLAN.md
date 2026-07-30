@@ -216,7 +216,21 @@ GitHub：
 - Step 9 Issue #47 已关闭；Step 9 已完成，下一阶段为 Step 10 基础预测模型与
   Predictor Adapter。
 
-## 3.10 Step 12 对应 UI 计划
+## 3.10 Step 10 计划
+
+- [Step 10 Issue #50](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/50)
+- 工作分支：`codex/v3-step-10-predictor-adapter`
+- 第一版参数：`DS_mu/KF_mu`，统一 `[N,16,2] -> [N,4,2]`
+- 模型族：Persistence、Linear、GRU、LSTM、TCN
+- 普通用户从离线 ModelRegistry 自动选择，高级用户手选兼容神经网络
+- 内插和外推模型、Manifest、registry 分开保存
+- 产品 prediction request 不含目标 Ground Truth
+- 安全适配使用独立已知区标签，只更新输出头，并具有阈值、早停、超时和回滚
+- Step 10 Demo 使用正式模块三页面骨架，但 CIR/CTF 和 1/3/6/9 图等待 Step 11
+- 当前状态：Issue/分支、实现、参考模型、测试、文档和审阅图已完成；等待项目负责人 PR 前人工审阅
+- 当前未提交、未 push、未创建 PR；任何 PR 仍由 `Duanfeiyi` 手动合并
+
+## 3.12 Step 12 对应 UI 计划
 
 - 普通模式默认“自动选择（推荐）”，模块二继续主要在后台运行；
 - 运行前后显示实际选择的 Grid 或 SA 及简短理由；
