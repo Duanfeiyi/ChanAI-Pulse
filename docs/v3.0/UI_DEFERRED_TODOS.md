@@ -69,7 +69,8 @@ target_indices = 32:40
 - 对应需求：`V3-REQ-021`
 - 后台规则阶段：Step 8
 - 正式界面阶段：Step 12
-- 当前状态：需求已冻结；等待 Step 8 实现 SA 和策略决策器
+- 当前状态：Step 8 后台 SA 和策略决策器已实现并通过专项测试，等待人工审阅；
+  正式界面仍待 Step 12
 
 ### 默认交互
 
@@ -95,7 +96,8 @@ target_indices = 32:40
 1. 离散候选明确、完整笛卡尔积较小且符合计算预算时，优先 Grid Search；
 2. 参数较多、连续范围较大、组合数超限或生成后端单次成本较高时，优先 SA；
 3. 自动决策不能只看上传数据的维度，还要考虑搜索参数、候选规模、生成后端和预算；
-4. Step 8 冻结各后端的实际阈值和时间预算，不在 Step 7 提前写死未经测试的数字；
+4. Step 8 已冻结第一版自动 Grid 组合数上限：Mock 500、Lite 125、Full 16；
+   统一手动 Grid 硬上限 500；这些是可配置并写入 Manifest 的工程安全预算；
 5. 保存 `requested_strategy`、`selected_strategy`、`selection_source` 和
    `selection_reason`，保证结果可以复查。
 
