@@ -56,6 +56,10 @@
 - [Step 5 验收清单](STEP_5_ACCEPTANCE.md)
 - [Step 5 验证记录](STEP_5_VALIDATION.md)
 - [Step 5 Demo 与图表人工审阅](STEP_5_VISUAL_REVIEW.md)
+- [Step 6 Generator Adapter 接口指南](STEP_6_INTERFACE_GUIDE.md)
+- [Step 6 验收清单](STEP_6_ACCEPTANCE.md)
+- [Step 6 自动验证记录](STEP_6_VALIDATION.md)
+- [Step 6 Demo 与人工审阅](STEP_6_VISUAL_REVIEW.md)
 
 ## 变更规则
 
