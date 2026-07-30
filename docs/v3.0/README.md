@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～8 已完成并合并；Step 9 正在独立分支实现和审阅
+> 状态：Step 0～9 已完成并合并；下一阶段为 Step 10 Predictor Adapter
 >
 > 决策日期：2026-07-28
 >
