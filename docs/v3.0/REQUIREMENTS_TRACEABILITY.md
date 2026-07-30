@@ -13,7 +13,7 @@
 | V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、12 | `test_step5_characteristics_engine.m` 验证同一 CIR 在 input/prediction 角色输出一致；正式UI待Step 12 | 进行中 |
 | V3-REQ-006 | 信道生成模块通过 Adapter 接入 6GPCM | 模块二 | 3、6 | Mock/Lite/Full 统一 `GeneratorConfig -> GenerationResult` 已通过契约测试、真实外置 Full 冒烟、人工验收并合并到 `main` | 已验证 |
 | V3-REQ-007 | 完整版 6GPCM 核心代码保持不变 | 模块二、三 | 0、3、6、11 | `hash_full_6gpcm_tree.m` 在真实调用前后核对 587 个文件总哈希 | 已验证 |
-| V3-REQ-008 | 实现真正的参数笛卡尔积 Grid Search | 模块二 | 7 | 固定参数空间枚举测试 | 待实现 |
+| V3-REQ-008 | 实现真正的参数笛卡尔积 Grid Search | 模块二 | 7 | 2×3精确枚举、Mock已知答案、known区域隔离、Lite搜索、真实Full两候选及失败/取消测试已通过；等待人工审阅和PR | 进行中 |
 | V3-REQ-009 | 保留并正确命名现有随机局部搜索基线 | 模块二 | 8 | 固定随机种子回归测试 | 待实现 |
 | V3-REQ-010 | 接入 SA 模拟退火算法 | 模块二 | 8 | 收敛、边界和可重复性测试 | 待实现 |
 | V3-REQ-011 | 模块二生成复数 CIR 及对应 delay | 模块二 | 3、6 | 三种 Adapter 的 v3 复数 CIR/delay 与明确频率轴 CTF 已通过自动和人工验收并合并到 `main` | 已验证 |
@@ -23,9 +23,10 @@
 | V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、10、14 | `DATA_INTERFACE_GUIDE.md`、`STEP_4_INTERFACE_GUIDE.md`、`STEP_6_INTERFACE_GUIDE.md` 和 MATLAB/Python 调用验证 | 进行中 |
 | V3-REQ-016 | 模块三不显示准确度、Ground Truth 或误差图 | 模块三 | 12 | GUI 人工验收 | 已冻结 |
 | V3-REQ-017 | 准确度验证放在软件外部 Benchmark | 外部测试 | 13 | 独立执行和数据隔离测试 | 待实现 |
-| V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、10、11 | Step 6 `GenerationManifest` 的 Adapter、后端、公开配置、种子、尺寸、运行时间、核心哈希和路径脱敏已合并；后续 Predictor/重建输出仍待 Step 10～11 | 进行中 |
+| V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、7、10、11 | Step 6 `GenerationManifest` 已合并；Step 7 新增搜索版本、公开配置、候选统计、固定种子来源、最佳分数、运行时间和路径脱敏 Manifest，等待人工审阅和PR；Predictor/重建输出仍待 Step 10～11 | 进行中 |
 | V3-REQ-019 | 三页面整体结构以冻结的 v3.0 设计为基线 | GUI | 12 | 布局和交互人工验收 | 已冻结 |
 | V3-REQ-020 | 仓库保持公开，通过短分支和 PR 修改 `main` | 工程 | 0、14 | 仓库设置和 PR 记录 | 已冻结 |
+| V3-REQ-021 | 参数优化默认自动选择 Grid/SA，允许高级用户覆盖并记录选择理由；不适用时不得静默切换 | 模块二、GUI | 8、12 | Step 8策略决策表与边界测试；Step 12自动/手动选择和理由展示人工验收 | 已冻结 |
 
 ## 状态含义
 

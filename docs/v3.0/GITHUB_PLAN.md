@@ -49,7 +49,7 @@ GitHub：
 - [x] Step 5：建立统一信道特性引擎
 - [x] Step 6：完成 Generator Adapter
 - [ ] Step 7：实现真正 Grid Search
-- [ ] Step 8：整理随机局部搜索并实现 SA
+- [ ] Step 8：整理随机局部搜索、实现 SA 与 Grid/SA 自动策略决策器
 - [ ] Step 9：确定正式预测参数与训练数据
 - [ ] Step 10：完成 Predictor Adapter
 - [ ] Step 11：打通预测参数到 6GPCM CIR
@@ -155,6 +155,41 @@ GitHub：
 - Step 6 Issue #38 已关闭；
 - Step 6 已完成，下一阶段为 Step 7 真正的 Grid Search。
 
+## 3.7 Step 7 Issue
+
+- [Step 7 Issue #41](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/41)
+- 工作分支：`codex/v3-step-7-grid-search`
+- 目标：实现模块二真正的参数笛卡尔积 Grid Search；只用任务 known 区域建立目标，
+  通过 Step 6 Adapter 生成候选 CIR，再用 Step 5 特性引擎按 PDP 与 RMS 时延扩展
+  分布评分和排名。
+- 已冻结规则：Mock/Lite/Full 三后端、8个可搜索参数、固定随机种子、串行可取消、
+  单候选失败继续、默认最多500个候选、只保留Top 5完整CIR。
+- 当前状态：Issue、独立分支、核心实现、Mock/Lite/真实Full专项测试、Demo、
+  审阅图、Step 1～7完整回归、接口文档和项目负责人人工审阅均已完成；
+  已获准提交、push并创建PR。
+
+## 3.8 Step 8 计划
+
+- 整理并正确命名现有随机局部搜索，保留为对照基线；
+- 实现可复现、可取消、具有明确参数边界的 SA；
+- Grid、随机局部搜索和 SA 复用 Step 7 的 known 目标、Step 6 候选生成、
+  Step 5 评分、失败记录和 Manifest，不各写一套科学逻辑；
+- 新增策略决策器，支持 `auto`、`grid`、`sa`；
+- `auto` 综合离散/连续参数、笛卡尔积规模、生成后端成本和计算预算选择算法；
+- 自动结果记录算法、选择来源和人类可读理由；
+- 用户手动指定的方法不适用时明确拒绝，不得静默切换；
+- 使用小型已知答案、固定随机种子、收敛/边界/失败/取消测试比较 Grid 与 SA；
+- 具体自动阈值在 Step 8 根据 Mock/Lite/Full 实测后冻结，不在 Step 7 主观写死。
+
+## 3.9 Step 12 对应 UI 计划
+
+- 普通模式默认“自动选择（推荐）”，模块二继续主要在后台运行；
+- 运行前后显示实际选择的 Grid 或 SA 及简短理由；
+- 高级设置允许用户手动指定 Grid 或 SA；
+- 手动指定不适用时给出修改范围或更换算法的建议；
+- 界面显示与运行 Manifest 必须一致；
+- 详细条目登记在 `UI_DEFERRED_TODOS.md` 的 `UI-TODO-002`。
+
 ## 4. 后续 Issue 创建规则
 
 不一次性创建大量没有立即行动的 Issue。
@@ -185,6 +220,8 @@ GitHub：
 - Step 5 Issue #35 已关闭，PR #36 已合并；
 - Step 5 收尾 PR #37 已合并；
 - Step 6 Issue #38 已关闭，PR #39 已合并；
+- Step 6 收尾 PR #40 已合并；
+- Step 7 Issue #41 已创建，独立分支正在本地实现，尚未创建 PR；
 - GitHub 总 Roadmap 已勾选 Step 0～6；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
