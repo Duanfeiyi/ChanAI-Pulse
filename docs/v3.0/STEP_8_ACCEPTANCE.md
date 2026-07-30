@@ -1,18 +1,19 @@
 # Step 8 验收清单
 
-> 当前状态：本地实现、完整回归和项目负责人人工审阅均已完成，允许提交、
-> push 并创建 PR。
+> 当前状态：PR #45 已合并到 `main`，Step 8 正式完成。
 
 ## GitHub
 
 - [x] 创建 [Step 8 Issue #44](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/44)
 - [x] 创建独立分支 `codex/v3-step-8-sa-optimizer`
 - [x] 项目负责人人工审阅
-- [ ] 人工审阅通过后 commit、push、创建 PR
-- [ ] PR 自审
-- [ ] 项目负责人最终决定合并
-- [ ] Step 8 Issue 关闭
-- [ ] Roadmap 勾选 Step 8
+- [x] 人工审阅通过后 commit、push、创建 PR
+- [x] [Draft PR #45](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/45)
+- [x] PR 自审：28个预期文件、关联 Issue #44、GitHub 判定 `MERGEABLE`
+- [x] 项目负责人最终决定合并
+- [x] PR #45 已合并到 `main`
+- [x] Step 8 Issue #44 已关闭
+- [x] Roadmap 勾选 Step 8
 
 ## 算法与接口
 
