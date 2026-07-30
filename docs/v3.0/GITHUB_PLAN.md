@@ -166,7 +166,8 @@ GitHub：
   单候选失败继续、默认最多500个候选、只保留Top 5完整CIR。
 - 当前状态：Issue、独立分支、核心实现、Mock/Lite/真实Full专项测试、Demo、
   审阅图、Step 1～7完整回归、接口文档和项目负责人人工审阅均已完成；
-  已获准提交、push并创建PR。
+  [Draft PR #42](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/42) 已创建并完成自审，
+  GitHub 判定 `MERGEABLE`，等待项目负责人最终决定是否合并。
 
 ## 3.8 Step 8 计划
 
@@ -221,7 +222,7 @@ GitHub：
 - Step 5 收尾 PR #37 已合并；
 - Step 6 Issue #38 已关闭，PR #39 已合并；
 - Step 6 收尾 PR #40 已合并；
-- Step 7 Issue #41 已创建，独立分支正在本地实现，尚未创建 PR；
+- Step 7 Issue #41 已创建，Draft PR #42 已创建并关联 `Closes #41`；
 - GitHub 总 Roadmap 已勾选 Step 0～6；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；

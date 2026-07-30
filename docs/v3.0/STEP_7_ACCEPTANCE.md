@@ -7,8 +7,9 @@
 - [x] 创建 [Step 7 Issue #41](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/41)
 - [x] 创建独立分支 `codex/v3-step-7-grid-search`
 - [x] 项目负责人人工审阅
-- [ ] 人工审阅通过后 commit/push/Draft PR
-- [ ] PR 自审
+- [x] 人工审阅通过后 commit/push/Draft PR
+- [x] [Draft PR #42](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/42)
+- [x] PR 自审：26个预期文件、目标 `main`、关联关闭 Issue #41、GitHub 判定 `MERGEABLE`
 - [ ] 项目负责人最终决定合并
 - [ ] 关闭 Step 7 Issue 并更新 Roadmap
 
