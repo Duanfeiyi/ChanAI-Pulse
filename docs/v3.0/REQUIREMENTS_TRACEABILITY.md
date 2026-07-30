@@ -11,19 +11,19 @@
 | V3-REQ-003 | 明确区分 `N_sample/Tx/Rx/Nt/Nf/Npath` | 模块一 | 1、4 | Step 2四类数据；Step 4标准导入；真实SAGE `1×16×683×1×337` 与WiFo `16×4×8×1×1000` 技术验证 | 已验证 |
 | V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、12 | Step 5 CIR/CTF标准数据精确开放1/3/6/9及合法热力图；SISO角度、单次观测空间相关反例；road1/WiFo按能力降级3/6；正式UI待Step 12 | 进行中 |
 | V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、12 | `test_step5_characteristics_engine.m` 验证同一 CIR 在 input/prediction 角色输出一致；正式UI待Step 12 | 进行中 |
-| V3-REQ-006 | 信道生成模块通过 Adapter 接入 6GPCM | 模块二 | 3、6 | `tests/test_full_6gpcm_external_smoke.m` 已验证最小无界面调用；正式 Adapter 留待 Step 6 | 进行中 |
+| V3-REQ-006 | 信道生成模块通过 Adapter 接入 6GPCM | 模块二 | 3、6 | Mock/Lite/Full 统一 `GeneratorConfig -> GenerationResult` 已通过契约测试和真实外置 Full 冒烟；待项目负责人人工验收 | 进行中 |
 | V3-REQ-007 | 完整版 6GPCM 核心代码保持不变 | 模块二、三 | 0、3、6、11 | `hash_full_6gpcm_tree.m` 在真实调用前后核对 587 个文件总哈希 | 已验证 |
 | V3-REQ-008 | 实现真正的参数笛卡尔积 Grid Search | 模块二 | 7 | 固定参数空间枚举测试 | 待实现 |
 | V3-REQ-009 | 保留并正确命名现有随机局部搜索基线 | 模块二 | 8 | 固定随机种子回归测试 | 待实现 |
 | V3-REQ-010 | 接入 SA 模拟退火算法 | 模块二 | 8 | 收敛、边界和可重复性测试 | 待实现 |
-| V3-REQ-011 | 模块二生成复数 CIR 及对应 delay | 模块二 | 3、6 | Step 3 已验证真实复数 `H_all`、非负秒 `delay_all` 及统一 CIR 转换；正式模块接口留待 Step 6 | 进行中 |
+| V3-REQ-011 | 模块二生成复数 CIR 及对应 delay | 模块二 | 3、6 | 三种 Adapter 的 v3 复数 CIR/delay 与明确频率轴 CTF 已通过自动验收；待项目负责人人工验收 | 进行中 |
 | V3-REQ-012 | 预测器输出可供 6GPCM 使用的目标参数 | 模块三 | 9、10 | 参数字段、范围、单位测试 | 待实现 |
 | V3-REQ-013 | 预测参数必须通过 6GPCM 转换为预测 CIR | 模块三 | 11 | 参数到 CIR 端到端测试 | 待实现 |
 | V3-REQ-014 | MATLAB 或 Python 均可实现算法 | 全部 | 1、6、10 | 双语言最小接口示例 | 已冻结 |
-| V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、10、14 | `DATA_INTERFACE_GUIDE.md`、`STEP_4_INTERFACE_GUIDE.md` 和 MATLAB/Python 调用验证 | 进行中 |
+| V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、10、14 | `DATA_INTERFACE_GUIDE.md`、`STEP_4_INTERFACE_GUIDE.md`、`STEP_6_INTERFACE_GUIDE.md` 和 MATLAB/Python 调用验证 | 进行中 |
 | V3-REQ-016 | 模块三不显示准确度、Ground Truth 或误差图 | 模块三 | 12 | GUI 人工验收 | 已冻结 |
 | V3-REQ-017 | 准确度验证放在软件外部 Benchmark | 外部测试 | 13 | 独立执行和数据隔离测试 | 待实现 |
-| V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、10、11 | Step 2 fixture 已保存 schema/source/seed/config/manifest；Step 3 探针报告新增 6GPCM 版本、包哈希、配置、种子和来源，正式运行清单待 Adapter | 进行中 |
+| V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、10、11 | Step 6 `GenerationManifest` 的 Adapter、后端、公开配置、种子、尺寸、运行时间、核心哈希和路径脱敏已通过自动验收；待项目负责人人工验收 | 进行中 |
 | V3-REQ-019 | 三页面整体结构以冻结的 v3.0 设计为基线 | GUI | 12 | 布局和交互人工验收 | 已冻结 |
 | V3-REQ-020 | 仓库保持公开，通过短分支和 PR 修改 `main` | 工程 | 0、14 | 仓库设置和 PR 记录 | 已冻结 |
 

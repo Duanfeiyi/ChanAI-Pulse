@@ -7,7 +7,7 @@ arguments
     engineRoot (1, 1) string
 end
 
-engineRoot = string(engineRoot);
+engineRoot = canonicalPath(engineRoot);
 if strlength(strtrim(engineRoot)) == 0 || ~isfolder(engineRoot)
     error("hash_full_6gpcm_tree:MissingRoot", ...
         "The full 6GPCM engine root does not exist: %s", engineRoot);
@@ -27,7 +27,8 @@ if ~endsWith(rootPrefix, filesep)
     rootPrefix = [rootPrefix, filesep];
 end
 for index = 1:numel(items)
-    fullPaths(index) = string(fullfile(items(index).folder, items(index).name));
+    fullPaths(index) = canonicalPath( ...
+        fullfile(items(index).folder, items(index).name));
     fullPathChar = char(fullPaths(index));
     if ~startsWith(lower(fullPathChar), lower(rootPrefix))
         error("hash_full_6gpcm_tree:PathEscape", ...
@@ -61,6 +62,11 @@ manifest = struct( ...
     "aggregate_sha256", sha256Bytes( ...
         unicode2native(char(manifestText), "UTF-8")), ...
     "entries", entries);
+end
+
+function value = canonicalPath(value)
+fileObject = javaObject("java.io.File", char(string(value)));
+value = string(fileObject.getCanonicalPath());
 end
 
 function fileHash = sha256File(filePath)
