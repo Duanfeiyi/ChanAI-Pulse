@@ -189,7 +189,12 @@ GitHub：
 - 已冻结第一版自动 Grid 上限：Mock 500、Lite 125、Full 16，统一硬上限 500；
 - 当前状态：统一配置/结果、共享评估器、Random Greedy、SA、自动策略、缓存、
   Mock/Lite/真实Full测试、独立Demo、审阅图、完整回归、静态检查和项目负责人
-  人工审阅均已完成；已获准提交、push 和创建 PR。
+  人工审阅均已完成；
+- [PR #45](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/45)
+  已于 2026-07-30 合并到 `main`；
+- 合并提交：`d04bc276e346c8f9c93dfaece14f8d64abdb461d`；
+- Step 8 Issue #44 已关闭，GitHub 总 Roadmap 已勾选 Step 8；
+- Step 8 已完成，下一阶段为 Step 9 正式预测参数与训练数据契约。
 
 ## 3.9 Step 12 对应 UI 计划
 
@@ -233,8 +238,8 @@ GitHub：
 - Step 6 收尾 PR #40 已合并；
 - Step 7 Issue #41 已关闭，PR #42 已合并；
 - Step 7 小型收尾 PR #43 已合并；
-- Step 8 Issue #44 已创建并关联 Milestone 1，独立分支正在本地实现；
-- GitHub 总 Roadmap 已勾选 Step 0～7；
+- Step 8 Issue #44 已关闭，PR #45 已合并；
+- GitHub 总 Roadmap 已勾选 Step 0～8；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；

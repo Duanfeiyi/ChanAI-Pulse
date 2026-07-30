@@ -64,4 +64,24 @@ CHECKCODE_MESSAGES=0
 ## 4. 当前结论
 
 核心实现、专项测试、真实 Full 只读验证、Step 1～8 完整回归、静态检查、
-可视化导出和项目负责人人工审阅均已通过。已获准 commit、push 和创建 PR。
+可视化导出和项目负责人人工审阅均已通过。
+
+## 5. PR 交付
+
+- 分支：`codex/v3-step-8-sa-optimizer`
+- 实现提交：`06ae155 feat(v3): implement Step 8 simulated annealing`
+- PR：[PR #45](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/45)
+- 目标分支：`main`
+- 变更范围：28个预期文件，3172行新增、12行删除；
+- GitHub 判定：`MERGEABLE`；
+- `Closes #44` 已正确关联 Step 8 Issue；
+- 仓库没有为该 PR 报告远程自动检查，本记录中的完整 MATLAB 回归、真实 Full
+  只读验证和静态检查作为当前验证依据；
+- 项目负责人已于 2026-07-30 合并 PR #45；
+- 合并提交：`d04bc276e346c8f9c93dfaece14f8d64abdb461d`；
+- Step 8 Issue #44 已自动关闭，Roadmap 已勾选 Step 8。
+
+## 6. 最终结论
+
+Step 8 的实现、测试、文档、人工审阅、PR 自审和合并均已完成。
+下一阶段为 Step 9：确定正式预测参数与训练数据契约。
