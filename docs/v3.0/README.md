@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～7 已完成并合并；下一阶段为 Step 8 随机局部搜索、SA 与自动策略选择
+> 状态：Step 0～7 已完成并合并；Step 8 随机贪心、SA 与自动策略选择正在独立分支等待人工审阅
 >
 > 决策日期：2026-07-28
 >
@@ -65,6 +65,11 @@
 - [Step 7 验收清单](STEP_7_ACCEPTANCE.md)
 - [Step 7 自动验证记录](STEP_7_VALIDATION.md)
 - [Step 7 Demo 与人工审阅](STEP_7_VISUAL_REVIEW.md)
+- [Step 8 随机贪心、SA 与自动策略科学规则](STEP_8_SCIENTIFIC_RULES.md)
+- [Step 8 参数优化接口指南](STEP_8_INTERFACE_GUIDE.md)
+- [Step 8 自动验证记录](STEP_8_VALIDATION.md)
+- [Step 8 Demo 与人工审阅](STEP_8_VISUAL_REVIEW.md)
+- [Step 8 验收清单](STEP_8_ACCEPTANCE.md)
 
 ## 变更规则
 

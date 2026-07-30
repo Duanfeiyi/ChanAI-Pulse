@@ -173,7 +173,11 @@ GitHub：
 
 ## 3.8 Step 8 计划
 
-- 整理并正确命名现有随机局部搜索，保留为对照基线；
+- [Step 8 Issue #44](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/44)
+- 工作分支：`codex/v3-step-8-sa-optimizer`
+- 经仓库、整理版和可用工作目录复查，没有找到可直接复用的旧随机局部搜索、
+  Grid 或 SA 实现；因此新增项目自有 `random_greedy` 对照基线，并明确它不进入
+  正式 `auto` 选择；
 - 实现可复现、可取消、具有明确参数边界的 SA；
 - Grid、随机局部搜索和 SA 复用 Step 7 的 known 目标、Step 6 候选生成、
   Step 5 评分、失败记录和 Manifest，不各写一套科学逻辑；
@@ -182,7 +186,10 @@ GitHub：
 - 自动结果记录算法、选择来源和人类可读理由；
 - 用户手动指定的方法不适用时明确拒绝，不得静默切换；
 - 使用小型已知答案、固定随机种子、收敛/边界/失败/取消测试比较 Grid 与 SA；
-- 具体自动阈值在 Step 8 根据 Mock/Lite/Full 实测后冻结，不在 Step 7 主观写死。
+- 已冻结第一版自动 Grid 上限：Mock 500、Lite 125、Full 16，统一硬上限 500；
+- 当前状态：统一配置/结果、共享评估器、Random Greedy、SA、自动策略、缓存、
+  Mock/Lite/真实Full测试、独立Demo、审阅图、完整回归、静态检查和项目负责人
+  人工审阅均已完成；已获准提交、push 和创建 PR。
 
 ## 3.9 Step 12 对应 UI 计划
 
@@ -225,6 +232,8 @@ GitHub：
 - Step 6 Issue #38 已关闭，PR #39 已合并；
 - Step 6 收尾 PR #40 已合并；
 - Step 7 Issue #41 已关闭，PR #42 已合并；
+- Step 7 小型收尾 PR #43 已合并；
+- Step 8 Issue #44 已创建并关联 Milestone 1，独立分支正在本地实现；
 - GitHub 总 Roadmap 已勾选 Step 0～7；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
