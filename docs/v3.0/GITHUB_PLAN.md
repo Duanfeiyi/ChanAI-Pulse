@@ -49,7 +49,7 @@ GitHub：
 - [x] Step 5：建立统一信道特性引擎
 - [x] Step 6：完成 Generator Adapter
 - [x] Step 7：实现真正 Grid Search
-- [ ] Step 8：整理随机局部搜索、实现 SA 与 Grid/SA 自动策略决策器
+- [x] Step 8：整理随机局部搜索、实现 SA 与 Grid/SA 自动策略决策器
 - [ ] Step 9：确定正式预测参数与训练数据
 - [ ] Step 10：完成 Predictor Adapter
 - [ ] Step 11：打通预测参数到 6GPCM CIR
@@ -196,14 +196,32 @@ GitHub：
 - Step 8 Issue #44 已关闭，GitHub 总 Roadmap 已勾选 Step 8；
 - Step 8 已完成，下一阶段为 Step 9 正式预测参数与训练数据契约。
 
-## 3.9 Step 12 对应 UI 计划
+## 3.9 Step 9 计划
+
+- [Step 9 Issue #47](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/47)
+- 工作分支：`codex/v3-step-9-predictor-data`
+- 目标：在训练泛用模型之前，固定参数序列、内插/外推模型张量、标签来源、
+  路线级切分、训练集归一化和 MATLAB/Python HDF5；
+- 标准档先使用 `DS_mu/KF_mu`，契约保留 Step 8 全部 8 个参数；
+- 生成器真值用于预训练，Grid/SA 局部拟合标签主要作为上传数据微调候选；
+- 外推默认 16→4，内插默认左8+右8→中4；
+- 同一路线或场景不能泄漏到不同分区；
+- Step 9 只登记 `pretrain/auto/off/force` 和资格元数据，Step 10 再训练泛用模型、
+  实现每次上传后的可控微调并通过实验确定阈值；
+- 公开仓库只保存确定性合成小样例，不上传真实测量数据、第三方权重或大型派生数据；
+- 当前状态：Issue和分支已建立，核心契约、自动测试、跨语言fixture、独立Demo、
+  审阅图、完整回归和项目负责人人工审阅均已完成；已获准提交、push并创建PR。
+
+## 3.10 Step 12 对应 UI 计划
 
 - 普通模式默认“自动选择（推荐）”，模块二继续主要在后台运行；
 - 运行前后显示实际选择的 Grid 或 SA 及简短理由；
 - 高级设置允许用户手动指定 Grid 或 SA；
 - 手动指定不适用时给出修改范围或更换算法的建议；
 - 界面显示与运行 Manifest 必须一致；
-- 详细条目登记在 `UI_DEFERRED_TODOS.md` 的 `UI-TODO-002`。
+- 模块三普通模式默认泛用模型与自动微调判断，高级模式支持
+  `auto/off/force`，详细条目登记在 `UI_DEFERRED_TODOS.md` 的
+  `UI-TODO-002` 和 `UI-TODO-003`。
 
 ## 4. 后续 Issue 创建规则
 
@@ -239,6 +257,9 @@ GitHub：
 - Step 7 Issue #41 已关闭，PR #42 已合并；
 - Step 7 小型收尾 PR #43 已合并；
 - Step 8 Issue #44 已关闭，PR #45 已合并；
+- Step 8 小型收尾 PR #46 已合并；
+- Step 9 Issue #47 已创建并指派给 `Duanfeiyi`，当前工作分支为
+  `codex/v3-step-9-predictor-data`；
 - GitHub 总 Roadmap 已勾选 Step 0～8；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；

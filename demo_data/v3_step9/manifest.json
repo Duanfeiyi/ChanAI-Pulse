@@ -1,0 +1,48 @@
+{
+  "schema_version": "v3.0-step9-standard-fixture.1",
+  "generated_utc": "deterministic-no-runtime-timestamp",
+  "scientific_evidence": false,
+  "parameter_names": [
+    "DS_mu",
+    "KF_mu"
+  ],
+  "parameter_sequence_shape": [
+    280,
+    2
+  ],
+  "tasks": [
+    {
+      "task_type": "extrapolation",
+      "file": "step9_extrapolation_standard.h5",
+      "input_shape": [
+        90,
+        16,
+        2
+      ],
+      "target_shape": [
+        90,
+        4,
+        2
+      ]
+    },
+    {
+      "task_type": "interpolation",
+      "file": "step9_interpolation_standard.h5",
+      "input_shape": [
+        90,
+        16,
+        2
+      ],
+      "target_shape": [
+        90,
+        4,
+        2
+      ]
+    }
+  ],
+  "notes": [
+    "Deterministic synthetic contract fixture.",
+    "Not measured data and not prediction-accuracy evidence.",
+    "MATLAB arrays use column-major flattening in HDF5."
+  ]
+}

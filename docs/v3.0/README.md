@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～8 已完成并合并；下一阶段为 Step 9 正式预测参数与训练数据契约
+> 状态：Step 0～8 已完成并合并；Step 9 正在独立分支实现和审阅
 >
 > 决策日期：2026-07-28
 >
@@ -70,6 +70,12 @@
 - [Step 8 自动验证记录](STEP_8_VALIDATION.md)
 - [Step 8 Demo 与人工审阅](STEP_8_VISUAL_REVIEW.md)
 - [Step 8 验收清单](STEP_8_ACCEPTANCE.md)
+- [Step 9 预测参数与训练数据接口指南](STEP_9_INTERFACE_GUIDE.md)
+- [Step 9 科学与数据隔离规则](STEP_9_SCIENTIFIC_RULES.md)
+- [Step 9 历史预测资产复查](STEP_9_ASSET_AUDIT.md)
+- [Step 9 Demo 与人工审阅](STEP_9_VISUAL_REVIEW.md)
+- [Step 9 自动验证记录](STEP_9_VALIDATION.md)
+- [Step 9 验收清单](STEP_9_ACCEPTANCE.md)
 
 ## 变更规则
 
