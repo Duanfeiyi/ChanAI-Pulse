@@ -1,14 +1,15 @@
 # Step 9 验收清单
 
-> 当前状态：核心实现、自动验证和项目负责人人工审阅均已通过，已获准提交、push 并创建 PR。
+> 当前状态：Draft PR #48 已创建并完成自审，等待项目负责人最终决定是否合并。
 
 ## GitHub
 
 - [x] 创建 [Step 9 Issue #47](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/47)
 - [x] 创建独立分支 `codex/v3-step-9-predictor-data`
 - [x] 项目负责人人工审阅
-- [ ] 人工审阅通过后 commit、push、创建 PR
-- [ ] PR 自审
+- [x] 实现提交 `ad4c382` 已 push
+- [x] [Draft PR #48](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/48)
+- [x] PR 自审：41个预期文件、`Closes #47`、GitHub 判定 `MERGEABLE`
 - [ ] 项目负责人最终决定是否合并
 
 ## 数据契约
