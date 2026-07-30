@@ -1,6 +1,6 @@
 # Step 6 验收清单
 
-> 当前状态：实现、自动测试、项目负责人人工审阅、提交、Draft PR 和 PR 自审均已完成；等待项目负责人最终决定是否合并。
+> 当前状态：项目负责人已合并 PR #39，Step 6 正式完成。
 
 ## GitHub
 
@@ -10,7 +10,9 @@
 - [x] 人工审阅通过后 commit/push/Draft PR
 - [x] [Draft PR #39](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/39)
 - [x] PR 自审：23个预期文件、目标 `main`、GitHub 判定 `MERGEABLE`
-- [ ] 项目负责人最终决定合并
+- [x] 项目负责人最终决定合并
+- [x] PR #39 已合并到 `main`
+- [x] Step 6 Issue #38 已关闭
 
 ## 统一契约
 

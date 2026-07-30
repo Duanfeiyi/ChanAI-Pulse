@@ -15,6 +15,10 @@ This roadmap distinguishes code currently present on `main` from research direct
 - A read-only, fixed-seed, headless full-6GPCM technical probe with canonical CIR conversion and core-integrity verification.
 - Step 4 module-one v3 HDF5 ingestion, task setup, legacy SAGE/WiFo
   conversion, isolated review Demo, tests, and interface documentation.
+- Step 5 capability-aware channel-characteristics engine shared by input and
+  prediction roles, including strict 1/3/6/9 chart gating.
+- Step 6 shared Generator Adapter with Mock, 6GPCM-lite and read-only external
+  Full 6GPCM backends, canonical complex CIR/CTF output and integrity checks.
 - v1.1.0 release tag for the legacy baseline and v2.0 planning documents.
 
 ## In progress
@@ -25,7 +29,8 @@ This roadmap distinguishes code currently present on `main` from research direct
 
 ## Next
 
-- Build capability-aware visualization shared by the input and prediction modules.
+- Implement true Cartesian-product Grid Search through the shared Generator
+  Adapter and a documented objective/scoring contract.
 - In the Step 12 formal UI, translate user-facing zero-based sample labels and
   physical position/time/frequency ranges into MATLAB one-based task indices
   automatically; track this as `UI-TODO-001`.

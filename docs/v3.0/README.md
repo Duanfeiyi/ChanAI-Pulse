@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～5 已完成并合并；下一阶段为 Step 6 Generator Adapter
+> 状态：Step 0～6 已完成并合并；下一阶段为 Step 7 真正的 Grid Search
 >
 > 决策日期：2026-07-28
 >
