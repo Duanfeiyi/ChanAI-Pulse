@@ -47,7 +47,7 @@ GitHub：
 - [x] Step 3：验证完整版 6GPCM 最小无界面调用
 - [x] Step 4：完成模块一信道数据输入流程
 - [x] Step 5：建立统一信道特性引擎
-- [ ] Step 6：完成 Generator Adapter
+- [x] Step 6：完成 Generator Adapter
 - [ ] Step 7：实现真正 Grid Search
 - [ ] Step 8：整理随机局部搜索并实现 SA
 - [ ] Step 9：确定正式预测参数与训练数据
@@ -141,6 +141,20 @@ GitHub：
 - Step 5 Issue #35 已关闭；
 - Step 5 已完成，下一阶段为 Step 6 Generator Adapter。
 
+## 3.6 Step 6 Issue
+
+- [Step 6 Issue #38](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/38)
+- 工作分支：`codex/v3-step-6-generator-adapter`
+- 目标：建立模块二/三共享的 `GeneratorConfig -> GenerationResult`
+  接口，接入 Mock、6GPCM-lite 和只读外置 Full 6GPCM，并输出统一复数
+  CIR/delay 与可选 CTF。
+- 自动回归、真实 Full 核心完整性、独立 Demo 和项目负责人人工审阅均已通过。
+- [PR #39](https://github.com/Duanfeiyi/ChanAI-Pulse/pull/39)
+  已合并到 `main`；
+- 合并提交：`94da784d94ea5dc1a1af897253ba93f748fee593`；
+- Step 6 Issue #38 已关闭；
+- Step 6 已完成，下一阶段为 Step 7 真正的 Grid Search。
+
 ## 4. 后续 Issue 创建规则
 
 不一次性创建大量没有立即行动的 Issue。
@@ -157,7 +171,7 @@ GitHub：
 
 ## 5. 当前远程执行状态
 
-2026-07-29 检查结果：
+2026-07-30 检查结果：
 
 - 仓库存在且当前浏览器会话可以看到仓库设置；
 - 已创建 `ChanAI Pulse v3.0.0` Milestone（编号 1）；
@@ -169,6 +183,9 @@ GitHub：
 - Step 3 收尾 PR #31 已合并；
 - Step 4 Issue #32 已关闭，PR #33 已合并；
 - Step 5 Issue #35 已关闭，PR #36 已合并；
+- Step 5 收尾 PR #37 已合并；
+- Step 6 Issue #38 已关闭，PR #39 已合并；
+- GitHub 总 Roadmap 已勾选 Step 0～6；
 - Step 1 PR #25 已合并；
 - 当前各 Step Issue 按计划指派给 `Duanfeiyi` 并关联 Milestone；
 - GitHub 连接器创建 Issue 返回 `403 Resource not accessible by integration`；
