@@ -24,14 +24,15 @@ if any(~isfinite(real(sequences(:)))) || ...
 end
 
 lengthValue = size(sequences, 1);
-denominator = mean(abs(sequences(:)).^2);
 values = complex(zeros(lengthValue, 1));
-if denominator <= 0
-    values(:) = NaN;
-else
-    for lag = 0:lengthValue - 1
-        left = sequences(1:lengthValue-lag, :);
-        right = sequences(1+lag:lengthValue, :);
+for lag = 0:lengthValue - 1
+    left = sequences(1:lengthValue-lag, :);
+    right = sequences(1+lag:lengthValue, :);
+    denominator = sqrt(mean(abs(left(:)).^2) * ...
+        mean(abs(right(:)).^2));
+    if denominator <= 0
+        values(lag + 1) = NaN;
+    else
         values(lag + 1) = mean(left(:) .* conj(right(:))) / denominator;
     end
 end
@@ -42,5 +43,6 @@ correlation = struct( ...
     "complex", values, ...
     "magnitude", abs(values), ...
     "phase_rad", angle(values), ...
-    "normalization", "R(k)/R(0)");
+    "normalization", ...
+        "Lag-wise complex correlation normalized by geometric-mean power");
 end

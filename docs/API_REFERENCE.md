@@ -32,6 +32,19 @@ This is the maintained reference for public MATLAB interfaces in the current rep
 | `default_6gpcm_lite_config()`<br>`core/generation/default_6gpcm_lite_config.m` | Returns a configuration struct with bandwidth, delay-grid, cluster/ray, K-factor, Doppler, snapshot and seed defaults. | App generation callback; generation test. |
 | `generate_6gpcm_lite(config)`<br>`core/generation/generate_6gpcm_lite.m` | Returns `result` containing complex `cir` shaped `[1 x 1 x snapshots x delayBins]`, delay axis, configuration, DS samples and cluster information. | App generation callback; `test_generation_6gpcm_lite`. Implemented lightweight synthetic generator. |
 | `generation_result_to_dpsd(result)`<br>`core/generation/generation_result_to_dpsd.m` | Converts `result.cir` to legacy `dpsdDbm` `[delay bins x snapshots]`. | Send-to-AI callback; generation test. |
+| `default_generator_config(backend)`<br>`core/generation/default_generator_config.m` | Returns the shared Mock/Lite/Full `GeneratorConfig`. CIR dimensions keep `Nt` and `N_sample` separate. | Step 6–11 adapters and tests. |
+| `run_generator_adapter(config, options)`<br>`core/generation/run_generator_adapter.m` | Runs exactly the requested Mock/Lite/Full backend and returns `GenerationResult`, canonical complex CIR, optional CTF, validation and manifest. Never silently changes backend. | Module-two optimization and Step 11 prediction generation. |
+
+## Prediction parameter to CIR
+
+| Function / path | Contract, inputs and outputs | Called by / tests / status |
+| --- | --- | --- |
+| `default_prediction_generation_config(backend)`<br>`core/prediction_generation/default_prediction_generation_config.m` | Returns Step 11 orchestration defaults, explicit dimensions/frequency axis, parameter-source policy, master seed and runtime policy. Formal mode is reserved for Full. | Step 11 service, Demo and tests. |
+| `create_prediction_generation_request(prediction, config)`<br>`core/prediction_generation/create_prediction_generation_request.m` | Selects one Step 10 batch example and creates a target-free four-target request containing named parameters, target indices, dimensions, source policy and manifests. | Module-three Demo and tests. |
+| `validate_prediction_generation_request(request)`<br>`core/prediction_generation/validate_prediction_generation_request.m` | Validates schema, task/backend/mode, finite prediction matrix, target alignment, dimensions, frequency axis, seed and timeout policy. Returns a report instead of silently correcting data. | Step 11 service and tests. |
+| `resolve_prediction_generator_parameters(request, targetNumber)`<br>`core/prediction_generation/resolve_prediction_generator_parameters.m` | Resolves predicted values first and other parameters from calibrated → scenario → versioned defaults. Returns complete model struct plus per-parameter provenance. | Step 11 per-target loop. |
+| `run_prediction_generation(request, options)`<br>`core/prediction_generation/run_prediction_generation.m` | Generates each target separately through the shared Generator Adapter, verifies actual dimensions/formal eligibility, combines only after all targets succeed, derives optional CTF, applies continuity limits, and returns a service result containing canonical `PredictionResult`. | `test_step11_prediction_generation`, real Full test, module-three Demo. |
+| `export_prediction_result_bundle(result, outputDirectory)`<br>`core/prediction_generation/export_prediction_result_bundle.m` | Writes complex CIR and optional CTF to separate HDF5 files plus compact PredictionResult, Generator and Predictor JSON manifests. Refuses overwrite. | Step 11 Demo and export test. |
 
 ## Preprocessing
 

@@ -9,21 +9,21 @@
 | V3-REQ-001 | 任务类型只能明确选择内插或外推 | 模块一 | 1、4 | `tests/test_v3_data_contract.m`、`tests/test_step4_input_pipeline.m` 的手动与80/20合法/非法任务测试 | 已验证 |
 | V3-REQ-002 | 规定内插和外推的数据输入格式 | 模块一 | 1 | `DATA_CONTRACT.md`、HDF5 往返和跨语言样例 | 已验证 |
 | V3-REQ-003 | 明确区分 `N_sample/Tx/Rx/Nt/Nf/Npath` | 模块一 | 1、4 | Step 2四类数据；Step 4标准导入；真实SAGE `1×16×683×1×337` 与WiFo `16×4×8×1×1000` 技术验证 | 已验证 |
-| V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、12 | Step 5 CIR/CTF标准数据精确开放1/3/6/9及合法热力图；SISO角度、单次观测空间相关反例；road1/WiFo按能力降级3/6；正式UI待Step 12 | 进行中 |
-| V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、12 | `test_step5_characteristics_engine.m` 验证同一 CIR 在 input/prediction 角色输出一致；正式UI待Step 12 | 进行中 |
+| V3-REQ-004 | 根据数据能力决定展示 1、3、6、9 类特性图 | 模块一、三 | 4、5、11、12 | Step 5 标准数据精确开放1/3/6/9；Step 11 模块三真实 CIR 复用注册表并按独立目标连续性禁用非法图；正式三页UI待Step 12 | 进行中 |
+| V3-REQ-005 | 模块一和模块三共享同一特性计算及图表注册规则 | 模块一、三 | 5、11、12 | Step 11 `PredictionResult.analysis` 直接调用 `analyze_channel_characteristics` 与 `select_channel_plot_entries`；正式三页UI待Step 12 | 进行中 |
 | V3-REQ-006 | 信道生成模块通过 Adapter 接入 6GPCM | 模块二 | 3、6 | Mock/Lite/Full 统一 `GeneratorConfig -> GenerationResult` 已通过契约测试、真实外置 Full 冒烟、人工验收并合并到 `main` | 已验证 |
 | V3-REQ-007 | 完整版 6GPCM 核心代码保持不变 | 模块二、三 | 0、3、6、11 | `hash_full_6gpcm_tree.m` 在真实调用前后核对 587 个文件总哈希 | 已验证 |
 | V3-REQ-008 | 实现真正的参数笛卡尔积 Grid Search | 模块二 | 7 | 2×3精确枚举、Mock已知答案、known区域隔离、Lite搜索、真实Full两候选及失败/取消测试通过；PR #42 已合并 | 已验证 |
 | V3-REQ-009 | 建立并正确命名随机局部搜索对照基线；现有资料无可复用旧实现 | 模块二 | 8 | 项目自有 `random_greedy` 与 SA 共用提案/评分；固定种子测试确认从不接受较差移动；PR #45 已合并 | 已验证 |
 | V3-REQ-010 | 接入 SA 模拟退火算法 | 模块二 | 8 | Metropolis、边界/初值投影、缓存、停止、取消、Mock/Lite/真实Full、可重复性和人工审阅通过；PR #45 已合并 | 已验证 |
 | V3-REQ-011 | 模块二生成复数 CIR 及对应 delay | 模块二 | 3、6 | 三种 Adapter 的 v3 复数 CIR/delay 与明确频率轴 CTF 已通过自动和人工验收并合并到 `main` | 已验证 |
-| V3-REQ-012 | 预测器输出可供 6GPCM 使用的目标参数 | 模块三 | 9、10 | Step 10 已输出带名称、单位、位置和范围投影的 `DS_mu/KF_mu`；Python/MATLAB Adapter 与无真值 request 测试通过，参数到 CIR 端到端仍待 Step 11 | 进行中 |
-| V3-REQ-013 | 预测参数必须通过 6GPCM 转换为预测 CIR | 模块三 | 11 | 参数到 CIR 端到端测试 | 待实现 |
+| V3-REQ-012 | 预测器输出可供 6GPCM 使用的目标参数 | 模块三 | 9、10、11 | `DS_mu/KF_mu` 按四目标传入统一 Generator Adapter；其余参数来源逐项追踪；Mock/Lite/真实Full端到端通过 | 已验证 |
+| V3-REQ-013 | 预测参数必须通过 6GPCM 转换为预测 CIR | 模块三 | 11 | `test_step11_prediction_generation.m` 与真实 `test_step11_full_6gpcm_external.m` 验证 CIR `[2,2,240,2,4]` 和 CTF `[2,2,16,2,4]` | 已验证 |
 | V3-REQ-014 | MATLAB 或 Python 均可实现算法 | 全部 | 1、6、10 | Step 10 PyTorch Predictor、MATLAB Adapter 和跨语言预测一致性测试通过 | 已验证 |
-| V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、9、10、14 | 新增 `STEP_10_INTERFACE_GUIDE.md`、CLI JSON 错误/输出、模型/registry/request/adaptation 版本契约；发布总审计仍待 Step 14 | 进行中 |
-| V3-REQ-016 | 模块三不显示准确度、Ground Truth 或误差图 | 模块三 | 10、12 | Step 10 可复用模块三 Demo 只显示已知/预测参数；准确度仅在独立外部审阅图；正式 UI 仍待 Step 12 | 进行中 |
+| V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、9、10、11、14 | Step 11 新增 Request/Result、参数来源、导出和失败规则接口指南；发布总审计仍待 Step 14 | 进行中 |
+| V3-REQ-016 | 模块三不显示准确度、Ground Truth 或误差图 | 模块三 | 10、11、12 | Step 11 正式风格 Demo 只显示已知/预测参数与预测 CIR 特性；无 Ground Truth/RMSE/准确率；正式三页UI待Step 12 | 进行中 |
 | V3-REQ-017 | 准确度验证放在软件外部 Benchmark | 外部测试 | 13 | 独立执行和数据隔离测试 | 待实现 |
-| V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、7、8、9、10、11 | Step 9 新增标签来源、拟合质量、分组切分和训练集归一化 Manifest；Predictor/重建运行记录仍待 Step 10～11 | 进行中 |
+| V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、7、8、9、10、11 | `PredictionResult` 保存 Predictor/Generator Manifest、逐目标种子、参数来源、维度、连续性、缓存键和 HDF5/JSON 导出 | 已验证 |
 | V3-REQ-019 | 三页面整体结构以冻结的 v3.0 设计为基线 | GUI | 12 | 布局和交互人工验收 | 已冻结 |
 | V3-REQ-020 | 仓库保持公开，通过短分支和 PR 修改 `main` | 工程 | 0、14 | 仓库设置和 PR 记录 | 已冻结 |
 | V3-REQ-021 | 参数优化默认自动选择 Grid/SA，允许高级用户覆盖并记录选择理由；不适用时不得静默切换 | 模块二、GUI | 8、12 | Step 8后台决策器和边界测试已通过，冻结Mock/Lite/Full自动Grid上限500/125/16；正式UI仍待Step 12 | 进行中 |

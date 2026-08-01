@@ -43,6 +43,8 @@
 | Step 10 GRU/LSTM/TCN 实现 | 项目自有新实现 | A | `DS_mu/KF_mu` 内插/外推预测、统一 Predictor Adapter | 可以上传 | PyTorch 代码、MATLAB 封装、固定种子与泄漏测试 |
 | Step 10 小型参考权重与 ModelRegistry | 项目自有派生资产 | A | 公开 fixture 的接口、Demo 和回归验证 | 可以上传；明确不是实测精度或科学结论 | Manifest 记录数据 SHA256、运行环境、验证指标和权重 SHA256 |
 | Step 10 无真值 prediction request | 项目自有数据 | A | 正式产品接口演示，不包含目标参数答案 | 可以上传 | `contains_target_ground_truth=false`，与外部 Benchmark 严格分离 |
+| Step 11 Prediction Generation Service | 项目自有新实现 | A | 将四目标预测参数逐点接入共用 Generator Adapter，合并为 CIR/CTF | 可以上传 | 参数来源、种子、维度、连续性和 all-or-nothing 已测试 |
+| Step 11 模块三 Demo | 项目自有新实现 | A | 正式页面风格展示预测参数、真实生成 CIR 与合法信道特性 | 可以上传 | 不包含准确度/Ground Truth；Lite 明确标为预览 |
 | 论文与第三方测试报告 | 研究资料 | C | 需求来源和 Benchmark 指标参考 | 不上传未获授权的全文 | 引用信息 |
 
 ## 3. 完整版 6GPCM 特别规则
@@ -74,6 +76,17 @@
 - Step 3 真实调用前后文件数、总字节数和文件树哈希完全相同。
 
 机器可读登记见 `manifests/full_6gpcm_step3_asset.json`。
+
+### Step 11 真实链路复核
+
+- 2026-07-31 从原压缩包只读解压到隔离临时目录；
+- 重新核对压缩包 SHA-256 与 Step 3 登记完全一致；
+- 真实调用 `generate_channel_v1.m` 四次，对应四个预测目标；
+- 合并 CIR 为 `[2,2,240,2,4]`，CTF 为 `[2,2,16,2,4]`；
+- 每次调用均完成核心树调用前后哈希核对且保持不变；
+- 历史入口不接受目标坐标，Step 11 明确记录
+  `target_position_injected=false`，不宣称四点为连续路线；
+- 完整版核心仍不进入仓库，本 PR 只包含项目自有外围封装、测试和文档。
 
 ## 4. 待补信息
 
