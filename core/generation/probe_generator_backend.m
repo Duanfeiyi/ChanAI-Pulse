@@ -38,23 +38,52 @@ switch config.backend
         end
     case "full_6gpcm"
         root = string(config.engine_root);
+        interface = lower(string(config.backend_options.full_interface));
         if strlength(strtrim(root)) == 0
             report.errors(end + 1, 1) = ...
                 "Full 6GPCM engine_root is not configured.";
         elseif ~isfolder(root)
             report.errors(end + 1, 1) = ...
                 "The configured Full 6GPCM engine_root does not exist.";
-        elseif ~isfile(fullfile(root, "generate_channel_v1.m"))
+        elseif interface == "fixed_entrypoint" && ...
+                ~isfile(fullfile(root, "generate_channel_v1.m"))
             report.errors(end + 1, 1) = ...
                 "generate_channel_v1.m is missing under the configured engine_root.";
+        elseif interface == "public_api"
+            required = [ ...
+                "@simulation_parameters/simulation_parameters.m", ...
+                "@antenna_array/antenna_array.m", ...
+                "@track/track.m", ...
+                "@channel_model/channel_model.m", ...
+                "+mf/result2H.m"];
+            missing = strings(0, 1);
+            for relativePath = required
+                nativePath = replace(relativePath, "/", filesep);
+                if ~isfile(fullfile(root, nativePath))
+                    missing(end + 1, 1) = relativePath; %#ok<AGROW>
+                end
+            end
+            if isempty(missing)
+                report.available = true;
+            else
+                report.errors(end + 1, 1) = ...
+                    "Full 6GPCM public API files are missing: " + ...
+                    strjoin(missing, ", ");
+            end
         else
             report.available = true;
         end
         report.supports_progress = true;
         report.supports_cancel_between_samples = false;
         report.supports_mid_core_cancel = false;
-        report.limitations(end + 1, 1) = ...
-            "The external full 6GPCM core is unmodified; cancellation is checked only before and after its monolithic call.";
+        if interface == "public_api"
+            report.supports_cancel_between_samples = true;
+            report.limitations(end + 1, 1) = ...
+                "The external Full 6GPCM core remains read-only; cancellation is checked between generated samples.";
+        else
+            report.limitations(end + 1, 1) = ...
+                "The external full 6GPCM core is unmodified; cancellation is checked only before and after its monolithic call.";
+        end
 end
 
 if ~isempty(report.errors)

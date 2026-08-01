@@ -8,6 +8,11 @@ arguments
     hooks (1, 1) struct
 end
 
+if lower(string(config.backend_options.full_interface)) == "public_api"
+    payload = run_full_6gpcm_public_api_adapter(config, hooks);
+    return;
+end
+
 if hooks.is_cancelled()
     error("run_full_6gpcm_adapter:Cancelled", ...
         "Full 6GPCM generation was cancelled before the external call.");

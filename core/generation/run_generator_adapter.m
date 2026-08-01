@@ -80,6 +80,15 @@ try
                 "Unsupported backend: %s", normalized.backend);
     end
 
+    if normalized.backend_options.output_profile == "narrowband"
+        payload.dataset = collapse_cir_to_narrowband(payload.dataset);
+        payload.backend_manifest.output_profile = "narrowband";
+        payload.warnings(end + 1, 1) = ...
+            "Generated multipath CIR was converted to one unresolved narrowband tap at the reference frequency.";
+    else
+        payload.backend_manifest.output_profile = "native";
+    end
+
     if isCancelled()
         result = cancelledResult(result, ...
             "Generation completed, but cancellation discarded the result.");
