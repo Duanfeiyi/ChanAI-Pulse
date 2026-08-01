@@ -51,7 +51,7 @@ GitHub：
 - [x] Step 7：实现真正 Grid Search
 - [x] Step 8：整理随机局部搜索、实现 SA 与 Grid/SA 自动策略决策器
 - [x] Step 9：确定正式预测参数与训练数据
-- [ ] Step 10：完成 Predictor Adapter
+- [x] Step 10：完成 Predictor Adapter
 - [ ] Step 11：打通预测参数到 6GPCM CIR
 - [ ] Step 12：接入冻结的三页 UI
 - [ ] Step 13：建立软件外部 Benchmark
@@ -227,7 +227,22 @@ GitHub：
 - 产品 prediction request 不含目标 Ground Truth
 - 安全适配使用独立已知区标签，只更新输出头，并具有阈值、早停、超时和回滚
 - Step 10 Demo 使用正式模块三页面骨架，但 CIR/CTF 和 1/3/6/9 图等待 Step 11
-- 当前状态：Issue/分支、实现、参考模型、测试、文档和审阅图已完成；等待项目负责人 PR 前人工审阅
+- 当前状态：PR #51 已于 2026-07-31 由 `Duanfeiyi` 手动合并到 `main`
+- 合并提交：`b29fa4cb5d0e1cf70b2835ca67ef77b2ed87bd16`
+
+## 3.11 Step 11 计划
+
+- [Step 11 Issue #52](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/52)
+- 工作分支：`codex/v3-step-11-predicted-cir`
+- 本轮范围：Step 11.1～11.8；Step 11A/B/C 留待后续精度阶段
+- 首版直接预测 `DS_mu/KF_mu`，其余生成参数按“模块二标定 → 场景 → 版本默认值”补齐并记录来源
+- 四个目标各派生一个确定性种子、分别调用同一 Generator Adapter、全部成功后按目标顺序合并
+- Mock 用于已知答案测试，Lite 用于预览集成，Full 是唯一正式后端；禁止静默降级
+- 输出统一 `PredictionResult`、复数 CIR/delay、可选 CTF、维度、能力、预测与生成 Manifest
+- 独立目标标为 `independent_targets`，禁用多普勒、时间相关和路线热力图
+- 模块三 Demo 复用模块一 1/3/6/9 图表规则，不显示准确度或 Ground Truth
+- 当前状态：实现、Mock/Lite/Full 测试、真实外置 Full 四目标调用、Demo 截图和文档已完成；
+  等待项目负责人 PR 前人工审阅
 - 当前未提交、未 push、未创建 PR；任何 PR 仍由 `Duanfeiyi` 手动合并
 
 ## 3.12 Step 12 对应 UI 计划

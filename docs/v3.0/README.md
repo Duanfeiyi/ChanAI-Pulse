@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～9 已完成并合并；下一阶段为 Step 10 Predictor Adapter
+> 状态：Step 0～10 已完成并合并；Step 11 正在独立分支实现
 >
 > 决策日期：2026-07-28
 >
@@ -81,6 +81,11 @@
 - [Step 10 Demo 与人工审阅](STEP_10_VISUAL_REVIEW.md)
 - [Step 10 自动验证记录](STEP_10_VALIDATION.md)
 - [Step 10 验收清单](STEP_10_ACCEPTANCE.md)
+- [Step 11 预测参数生成 CIR 接口指南](STEP_11_INTERFACE_GUIDE.md)
+- [Step 11 科学与展示规则](STEP_11_SCIENTIFIC_RULES.md)
+- [Step 11 Demo 与人工审阅](STEP_11_VISUAL_REVIEW.md)
+- [Step 11 自动验证记录](STEP_11_VALIDATION.md)
+- [Step 11 验收清单](STEP_11_ACCEPTANCE.md)
 - [v3.0 后续工作 Steps](../v3.0后续工作Steps.md)
 
 ## 变更规则
