@@ -20,13 +20,11 @@ for name = required
     end
 end
 
-if requestedBackend == "auto"
-    backends = ["lite_6gpcm", "full_6gpcm"];
-    source = "automatic";
-else
-    backends = requestedBackend;
-    source = "manual";
-end
+% Full 6GPCM exposes two *interfaces*, not two different generators.
+% Prefer its configurable public API for every legal Full request.  The
+% historical fixed entry point is only retained as a safe fallback for its
+% exact legacy shape if a source package does not expose the public API.
+[backends, variants, source] = candidatePlan(requestedBackend, dimensions);
 
 emptyCandidate = struct( ...
     "backend", "", "compatible", false, "available", false, ...
@@ -42,7 +40,7 @@ for index = 1:numel(backends)
     candidate.backend = backend;
     [candidate.compatible, candidate.adapter_variant, ...
         candidate.reason_code, candidate.reason] = ...
-        checkDimensions(backend, dimensions);
+        checkDimensions(backend, dimensions, variants(index));
 
     config = default_generator_config(backend);
     config.dimensions.Tx = double(dimensions.Tx);
@@ -103,7 +101,32 @@ else
 end
 end
 
-function [compatible, variant, code, reason] = checkDimensions(backend, dimensions)
+function [backends, variants, source] = candidatePlan(requestedBackend, dimensions)
+if requestedBackend == "auto"
+    backends = ["lite_6gpcm", "full_6gpcm"];
+    variants = ["lite_native", "public_api"];
+    source = "automatic";
+elseif requestedBackend == "full_6gpcm"
+    backends = "full_6gpcm";
+    variants = "public_api";
+    source = "manual";
+else
+    backends = requestedBackend;
+    variants = "lite_native";
+    source = "manual";
+end
+
+% This fallback is deliberately last: it can never mask a usable public
+% API, but still supports an unchanged legacy Full package exactly where
+% its published example entry point is valid.
+if any(backends == "full_6gpcm") && dimensions.Tx == 2 && ...
+        dimensions.Rx == 2 && dimensions.Nt == 2
+    backends(end + 1) = "full_6gpcm"; %#ok<AGROW>
+    variants(end + 1) = "fixed_entrypoint"; %#ok<AGROW>
+end
+end
+
+function [compatible, variant, code, reason] = checkDimensions(backend, dimensions, requestedVariant)
 switch backend
     case "lite_6gpcm"
         variant = "lite_native";
@@ -112,20 +135,23 @@ switch backend
         reason = "Lite requires Tx=1 and Rx=1; requested Tx=" + ...
             dimensions.Tx + ", Rx=" + dimensions.Rx + ".";
     case "full_6gpcm"
-        if dimensions.Tx == 2 && dimensions.Rx == 2 && dimensions.Nt == 2
-            variant = "fixed_entrypoint";
-        else
-            variant = "public_api";
-        end
+        variant = string(requestedVariant);
         defaults = default_generator_config("full_6gpcm");
         options = defaults.backend_options;
-        compatible = dimensions.Tx * dimensions.Rx <= ...
-            options.full_max_antenna_pairs && ...
-            dimensions.Nt <= options.full_max_nt && ...
-            dimensions.Tx * dimensions.Rx * dimensions.Nt <= ...
-            options.full_max_tensor_slices;
-        code = "full_resource_limit_exceeded";
-        reason = "Requested Tx/Rx/Nt exceeds the configured Full 6GPCM resource budget.";
+        if variant == "fixed_entrypoint"
+            compatible = dimensions.Tx == 2 && dimensions.Rx == 2 && ...
+                dimensions.Nt == 2;
+            code = "full_fixed_entrypoint_dimensions";
+            reason = "The historical Full entry point only supports Tx=2, Rx=2, Nt=2.";
+        else
+            compatible = dimensions.Tx * dimensions.Rx <= ...
+                options.full_max_antenna_pairs && ...
+                dimensions.Nt <= options.full_max_nt && ...
+                dimensions.Tx * dimensions.Rx * dimensions.Nt <= ...
+                options.full_max_tensor_slices;
+            code = "full_resource_limit_exceeded";
+            reason = "Requested Tx/Rx/Nt exceeds the configured Full 6GPCM resource budget.";
+        end
     otherwise
         variant = "";
         compatible = false;

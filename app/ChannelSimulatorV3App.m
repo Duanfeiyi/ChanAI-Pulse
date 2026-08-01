@@ -17,6 +17,13 @@ classdef ChannelSimulatorV3App < handle
         LanguageDropDown matlab.ui.control.DropDown
         ModeDropDown matlab.ui.control.DropDown
         GlobalStatusLabel matlab.ui.control.Label
+        ProgressOverlay matlab.ui.container.Panel
+        ProgressTitleLabel matlab.ui.control.Label
+        ProgressPercentLabel matlab.ui.control.Label
+        ProgressGauge matlab.ui.control.LinearGauge
+        ProgressDetailArea matlab.ui.control.TextArea
+        ProgressElapsedLabel matlab.ui.control.Label
+        ProgressDismissButton matlab.ui.control.Button
 
         FileLabel matlab.ui.control.Label
         TaskModeDropDown matlab.ui.control.DropDown
@@ -78,6 +85,8 @@ classdef ChannelSimulatorV3App < handle
         CancellationRequested logical = false
         IsRunning logical = false
         CurrentLanguage string = "zh"
+        ProgressStartedAt uint64 = uint64(0)
+        ProgressVisible logical = false
     end
 
     methods
@@ -130,6 +139,20 @@ classdef ChannelSimulatorV3App < handle
             app.startWorkflow();
         end
 
+        function setLanguage(app, language)
+            %SETLANGUAGE Programmatic equivalent of the header selector.
+            language = lower(strtrim(string(language)));
+            if any(language == ["en", "english", "en-us"])
+                app.LanguageDropDown.Value = "English";
+            elseif any(language == ["zh", "chinese", "zh-cn", "中文"])
+                app.LanguageDropDown.Value = "中文";
+            else
+                error("ChannelSimulatorV3App:UnsupportedLanguage", ...
+                    "Supported UI languages are zh and en.");
+            end
+            app.switchLanguage();
+        end
+
         function state = getReviewState(app)
             %GETREVIEWSTATE Return a read-only, compact UI/service snapshot.
             state = struct( ...
@@ -141,6 +164,8 @@ classdef ChannelSimulatorV3App < handle
                 "prediction_dimensions", struct(), ...
                 "prediction_standard_plot_count", 0, ...
                 "prediction_additional_plot_count", 0, ...
+                "language", app.CurrentLanguage, ...
+                "progress_visible", app.ProgressVisible, ...
                 "module_two_status", string(app.ModuleTwoStatusArea.Value(:)), ...
                 "module_three_status", string(app.ModuleThreeStatusArea.Value(:)), ...
                 "calibration_errors", strings(0, 1));
@@ -194,6 +219,7 @@ classdef ChannelSimulatorV3App < handle
                 "Position", [30, 30, 1540, 920], ...
                 "Color", [0.96, 0.97, 0.985], ...
                 "Visible", "off", ...
+                "SizeChangedFcn", @(~, ~) app.layoutProgressOverlay(), ...
                 "CloseRequestFcn", @(~, ~) delete(app));
             root = uigridlayout(app.UIFigure, [2, 1], ...
                 "RowHeight", {62, "1x"}, "Padding", [10, 8, 10, 8]);
@@ -213,12 +239,12 @@ classdef ChannelSimulatorV3App < handle
                 "HorizontalAlignment", "right", "FontColor", muted);
             app.ModeDropDown = uidropdown(headerGrid, ...
                 "Items", ["普通模式", "高级模式"], ...
-                "Value", "普通模式", ...
+                "ItemsData", ["normal", "advanced"], ...
+                "Value", "normal", ...
                 "ValueChangedFcn", @(~, ~) app.applyUserMode());
             app.LanguageDropDown = uidropdown(headerGrid, ...
                 "Items", ["中文", "English"], "Value", "中文", ...
-                "Enable", "off", ...
-                "Tooltip", "v3.0 正式版先固定中文；完整英文翻译不在本次交付中。", ...
+                "Tooltip", "切换界面、状态提示和图表说明的显示语言。", ...
                 "ValueChangedFcn", @(~, ~) app.switchLanguage());
 
             app.TabGroup = uitabgroup(root);
@@ -228,6 +254,9 @@ classdef ChannelSimulatorV3App < handle
             app.createModuleOne(blue, border, muted);
             app.createModuleTwo(blue, border, muted);
             app.createModuleThree(blue, border, muted);
+            app.createProgressOverlay(blue, border, muted);
+            app.layoutProgressOverlay();
+            app.localizeCurrentView();
         end
 
         function createModuleOne(app, blue, border, muted)
@@ -348,6 +377,59 @@ classdef ChannelSimulatorV3App < handle
                 "• 热力图单独放在附加可视化。"; ...
                 "• 不支持的图不会生成伪造曲线。"], ...
                 "BackgroundColor", [0.97, 0.98, 1], "FontColor", muted);
+        end
+
+        function createProgressOverlay(app, blue, border, muted)
+            % A deliberately large, persistent progress card.  Full 6GPCM
+            % calls can take tens of seconds, so a thin background gauge is
+            % not sufficient feedback for a person operating the platform.
+            app.ProgressOverlay = uipanel(app.UIFigure, ...
+                "Title", "运行进度", "FontWeight", "bold", ...
+                "FontSize", 15, "BackgroundColor", "white", ...
+                "BorderColor", blue, ...
+                "Position", [410, 275, 720, 312], "Visible", "off");
+            grid = uigridlayout(app.ProgressOverlay, [6, 1], ...
+                "RowHeight", {26, 40, 32, 92, 22, 28}, ...
+                "Padding", [22, 12, 22, 10], "RowSpacing", 5);
+            app.ProgressTitleLabel = uilabel(grid, "Text", "等待运行", ...
+                "FontSize", 16, "FontWeight", "bold", "FontColor", blue);
+            app.ProgressPercentLabel = uilabel(grid, "Text", "0%", ...
+                "FontSize", 26, "FontWeight", "bold", ...
+                "HorizontalAlignment", "center", "FontColor", blue);
+            app.ProgressGauge = uigauge(grid, "linear", ...
+                "Limits", [0, 1], "Value", 0, ...
+                "MajorTicks", [0, 0.25, 0.5, 0.75, 1], ...
+                "MajorTickLabels", ["0%", "25%", "50%", "75%", "100%"], ...
+                "FontSize", 12);
+            app.ProgressDetailArea = uitextarea(grid, "Editable", "off", ...
+                "Value", ["当前阶段：等待开始"; "详细信息将在运行时显示。"], ...
+                "FontSize", 12, "BackgroundColor", [0.97, 0.985, 1]);
+            app.ProgressElapsedLabel = uilabel(grid, "Text", "已用时间：0 秒", ...
+                "FontColor", muted, "FontSize", 12);
+            app.ProgressDismissButton = uibutton(grid, "push", ...
+                "Text", "收起进度面板", "Enable", "off", ...
+                "ButtonPushedFcn", @(~, ~) app.dismissProgress());
+        end
+
+        function layoutProgressOverlay(app)
+            % Keep the large progress card fully inside the application
+            % window.  It is a direct UIFigure child and therefore needs
+            % explicit positioning when the window is resized.
+            if isempty(app.UIFigure) || ~isvalid(app.UIFigure) || ...
+                    isempty(app.ProgressOverlay) || ~isvalid(app.ProgressOverlay)
+                return;
+            end
+            figurePosition = app.UIFigure.Position;
+            figureWidth = figurePosition(3);
+            figureHeight = figurePosition(4);
+            margin = 28;
+            cardWidth = min(760, max(480, figureWidth - 2 * margin));
+            cardHeight = min(312, max(286, figureHeight - 170));
+            cardWidth = min(cardWidth, max(260, figureWidth - 2 * margin));
+            cardHeight = min(cardHeight, max(230, figureHeight - 2 * margin));
+            cardX = max(margin, floor((figureWidth - cardWidth) / 2));
+            cardY = max(margin, floor((figureHeight - cardHeight) / 2));
+            app.ProgressOverlay.Position = [cardX, cardY, cardWidth, cardHeight];
         end
 
         function createModuleTwo(app, blue, border, muted)
@@ -566,6 +648,7 @@ classdef ChannelSimulatorV3App < handle
                     "任务设置已改变，请重新点击“加载、验证并分析”", ...
                     "FontSize", 10, "FontWeight", "normal");
             end
+            app.localizeCurrentView();
         end
 
         function loadAndAnalyze(app)
@@ -574,11 +657,17 @@ classdef ChannelSimulatorV3App < handle
                 return;
             end
             app.setBusy(true, "正在加载、验证并分析输入信道…");
+            app.beginProgress("正在分析输入信道", ...
+                "正在读取文件、验证数据合同并判断可视化能力。");
+            app.updateProgress(0.03, "输入验证", ...
+                "正在加载 HDF5 信道数据。", 0, 0, "");
             try
                 options = app.buildImportOptions();
                 app.ImportResult = import_channel_dataset(app.SelectedFile, options);
                 if ~app.ImportResult.validation.is_valid
                     app.renderInputFailure(app.ImportResult.validation);
+                    app.finishProgress(false, strjoin( ...
+                        string(app.ImportResult.validation.errors(:)), newline));
                     app.setBusy(false, "");
                     app.restoreWindowFocus();
                     return;
@@ -594,6 +683,10 @@ classdef ChannelSimulatorV3App < handle
                 app.renderDimensionCards();
                 app.renderTaskRange();
                 app.renderAnalysisTabs(app.InputAnalysis, "input");
+                app.updateProgress(0.15, "输入分析完成", ...
+                    "数据、任务和图表能力已经验证。", 0, 0, "");
+                app.finishProgress(true, ...
+                    "输入数据已就绪。点击“开始预测”可继续完整流程。");
                 app.ModuleTwoStatusArea.Value = [ ...
                     "模块一验证通过。"; ...
                     "用户可从模块一点击“开始预测”；模块二将自动开始标定。"];
@@ -601,6 +694,7 @@ classdef ChannelSimulatorV3App < handle
             catch exception
                 app.renderInputFailure(struct("errors", string(exception.message), ...
                     "warnings", strings(0, 1), "status", "FAIL"));
+                app.finishProgress(false, string(exception.message));
             end
             app.setBusy(false, "");
             app.refreshBackendCompatibility();
@@ -777,12 +871,12 @@ classdef ChannelSimulatorV3App < handle
             app.TaskRangeAxes.XTick = tickPositions;
             app.TaskRangeAxes.XTickLabel = ...
                 compose("%g", axisValues(tickPositions));
-            xlabel(app.TaskRangeAxes, string(task.axis) + ...
-                "（绿色：已知，橙色：目标，灰色：未使用）");
-            title(app.TaskRangeAxes, sprintf( ...
+            xlabel(app.TaskRangeAxes, app.tr(string(task.axis) + ...
+                "（绿色：已知，橙色：目标，灰色：未使用）"));
+            title(app.TaskRangeAxes, app.tr(sprintf( ...
                 "%s：已知 %d，目标 %d", ...
                 app.taskModeDisplay(task.mode), ...
-                numel(task.known_indices), numel(task.target_indices)), ...
+                numel(task.known_indices), numel(task.target_indices))), ...
                 "FontSize", 10, "FontWeight", "bold");
             app.TaskPreviewLabel.Value = [ ...
                 "原始轴已知区: " + app.formatAxisValues( ...
@@ -796,26 +890,26 @@ classdef ChannelSimulatorV3App < handle
                 "任务验证: PASS"];
         end
 
-        function text = classificationDisplay(~, classification)
+        function text = classificationDisplay(app, classification)
             switch string(classification)
                 case "narrowband_static_siso"
-                    text = "窄带静态 SISO";
+                    text = app.tr("窄带静态 SISO");
                 case "wideband_static_siso"
-                    text = "宽带静态 SISO";
+                    text = app.tr("宽带静态 SISO");
                 case "wideband_static_mimo"
-                    text = "宽带静态 MIMO";
+                    text = app.tr("宽带静态 MIMO");
                 case "wideband_dynamic_mimo"
-                    text = "宽带动态 MIMO";
+                    text = app.tr("宽带动态 MIMO");
                 otherwise
                     text = replace(string(classification), "_", " ");
             end
         end
 
-        function text = taskModeDisplay(~, mode)
+        function text = taskModeDisplay(app, mode)
             if string(mode) == "interpolation"
-                text = "内插";
+                text = app.tr("内插");
             else
-                text = "外推";
+                text = app.tr("外推");
             end
         end
 
@@ -854,6 +948,10 @@ classdef ChannelSimulatorV3App < handle
             end
             app.CancellationRequested = false;
             app.setBusy(true, "模块二正在标定生成器参数…");
+            app.beginProgress("正在准备预测任务", ...
+                "模块二将只使用已知区域进行标定。目标区域真值不会被读取。");
+            app.updateProgress(0.03, "模块二：准备数据", ...
+                "正在提取已知区域的参考特性。", 0, 0, "");
             app.ModuleTwoCancelButton.Enable = "on";
             app.ModuleTwoProgressGauge.Value = 0.02;
             app.ModuleTwoStatusArea.Value = [ ...
@@ -866,6 +964,9 @@ classdef ChannelSimulatorV3App < handle
                 end
                 app.BackendSelection = selection;
                 backend = selection.selected_backend;
+                app.updateProgress(0.08, "模块二：选择生成器", ...
+                    "已选择 " + app.backendDisplayName(backend) + "。", ...
+                    0, 0, backend);
                 config = default_optimization_config(backend);
                 config.requested_strategy = string(app.OptimizerDropDown.Value);
                 config.target.task = app.ImportResult.task;
@@ -907,6 +1008,8 @@ classdef ChannelSimulatorV3App < handle
                 end
                 app.renderCalibrationResult();
                 if app.CalibrationResult.success
+                    app.updateProgress(0.55, "模块二：标定完成", ...
+                        "正在交给模块三预测并生成目标 CIR。", 0, 0, backend);
                     app.ModuleThreeStatusArea.Value = [ ...
                         "模块二标定完成。"; ...
                         "下一步：构造只包含已知区域参数的预测请求。"; ...
@@ -920,12 +1023,15 @@ classdef ChannelSimulatorV3App < handle
                     app.runPredictionGeneration();
                 elseif app.CalibrationResult.cancelled
                     app.setGlobalStatus("模块二已取消", "neutral");
+                    app.finishProgress(false, "用户请求取消，当前运行已停止。");
                 else
                     app.setGlobalStatus("模块二标定失败", "error");
+                    app.finishProgress(false, strjoin(string(app.CalibrationResult.errors(:)), newline));
                 end
             catch exception
                 app.ModuleTwoStatusArea.Value = ["标定失败："; string(exception.message)];
                 app.setGlobalStatus("模块二标定失败", "error");
+                app.finishProgress(false, string(exception.message));
             end
             app.ModuleTwoCancelButton.Enable = "off";
             app.setBusy(false, "");
@@ -950,6 +1056,8 @@ classdef ChannelSimulatorV3App < handle
                 "进度: " + sprintf("%.0f%%", ...
                     100 * app.ModuleTwoProgressGauge.Value); ...
                 message];
+            app.updateProgress(0.10 + 0.45 * app.ModuleTwoProgressGauge.Value, ...
+                "模块二：" + phase, message, 0, 0, "");
             drawnow limitrate;
         end
 
@@ -983,6 +1091,8 @@ classdef ChannelSimulatorV3App < handle
 
             app.CancellationRequested = false;
             app.setBusy(true, "模块三正在根据已知区域标定结果生成预测 CIR…");
+            app.beginProgress("正在生成预测 CIR", ...
+                "模块三会将预测参数交给兼容的正式生成器。");
             app.RunPredictionButton.Enable = "off";
             try
                 selection = app.resolveBackendSelection();
@@ -992,6 +1102,9 @@ classdef ChannelSimulatorV3App < handle
                 end
                 app.BackendSelection = selection;
                 backend = selection.selected_backend;
+                app.updateProgress(0.58, "模块三：构造预测请求", ...
+                    "使用 " + app.backendDisplayName(backend) + " 生成目标 CIR。", ...
+                    0, 0, backend);
                 prediction = create_calibrated_persistence_prediction( ...
                     app.CalibrationResult, app.ImportResult.task, backend);
                 prediction.selection.generator_backend = selection;
@@ -1029,12 +1142,14 @@ classdef ChannelSimulatorV3App < handle
                     "可导出：CIR / CTF / Prediction Manifest"; ...
                     "说明：本页不显示准确度；准确度由软件外部 Benchmark 验证。"];
                 app.setGlobalStatus("预测 CIR 已生成，可查看特性图或导出", "success");
+                app.finishProgress(true, "预测 CIR、可选 CTF 和特性图均已生成。");
             catch exception
                 app.ExportButton.Enable = "off";
                 app.showWaitingParameterAxes("预测未完成");
                 app.ModuleThreeStatusArea.Value = [ ...
                     "预测或生成失败。不会发布部分 CIR。"; string(exception.message)];
                 app.setGlobalStatus("模块三未生成结果", "error");
+                app.finishProgress(false, string(exception.message));
             end
             app.setBusy(false, "");
             if ~isempty(fieldnames(app.CalibrationResult)) && ...
@@ -1094,6 +1209,12 @@ classdef ChannelSimulatorV3App < handle
             app.ModuleThreeStatusArea.Value = [ ...
                 "模块三运行中：" + string(event.message); ...
                 sprintf("目标 %d / %d", event.target_number, event.target_count)];
+            progress = 0.58;
+            if isfield(event, "progress")
+                progress = 0.58 + 0.40 * max(0, min(1, double(event.progress)));
+            end
+            app.updateProgress(progress, "模块三：生成目标 CIR", ...
+                string(event.message), event.target_number, event.target_count, "");
             drawnow limitrate;
         end
 
@@ -1170,7 +1291,8 @@ classdef ChannelSimulatorV3App < handle
                 "Padding", [7, 7, 7, 7], "RowSpacing", 7, "ColumnSpacing", 7);
             for index = 1:numel(selected)
                 axesHandle = uiaxes(grid);
-                render_channel_characteristic(axesHandle, analysis, selected(index).id);
+                render_channel_characteristic(axesHandle, analysis, selected(index).id, ...
+                    "Language", app.CurrentLanguage);
             end
         end
 
@@ -1181,17 +1303,17 @@ classdef ChannelSimulatorV3App < handle
             timeCount = sum(categories == "时间与多普勒");
             additionalCount = sum(categories == "附加");
             if role == "input"
-                app.InputOverviewTab.Title = "全部概览（" + numel(entries) + "）";
-                app.InputDelayTab.Title = "时延 / 频率（" + delayCount + "）";
-                app.InputSpatialTab.Title = "空间 / 角度（" + spatialCount + "）";
-                app.InputTimeTab.Title = "时间 / 多普勒（" + timeCount + "）";
-                app.InputAdditionalTab.Title = "附加可视化（" + additionalCount + "）";
+                app.InputOverviewTab.Title = app.tabTitle("全部概览", numel(entries));
+                app.InputDelayTab.Title = app.tabTitle("时延 / 频率", delayCount);
+                app.InputSpatialTab.Title = app.tabTitle("空间 / 角度", spatialCount);
+                app.InputTimeTab.Title = app.tabTitle("时间 / 多普勒", timeCount);
+                app.InputAdditionalTab.Title = app.tabTitle("附加可视化", additionalCount);
             else
-                app.OutputOverviewTab.Title = "全部概览（" + numel(entries) + "）";
-                app.OutputDelayTab.Title = "时延 / 频率（" + delayCount + "）";
-                app.OutputSpatialTab.Title = "空间 / 角度（" + spatialCount + "）";
-                app.OutputTimeTab.Title = "时间 / 多普勒（" + timeCount + "）";
-                app.OutputAdditionalTab.Title = "附加可视化（" + additionalCount + "）";
+                app.OutputOverviewTab.Title = app.tabTitle("全部概览", numel(entries));
+                app.OutputDelayTab.Title = app.tabTitle("时延 / 频率", delayCount);
+                app.OutputSpatialTab.Title = app.tabTitle("空间 / 角度", spatialCount);
+                app.OutputTimeTab.Title = app.tabTitle("时间 / 多普勒", timeCount);
+                app.OutputAdditionalTab.Title = app.tabTitle("附加可视化", additionalCount);
             end
         end
 
@@ -1227,29 +1349,45 @@ classdef ChannelSimulatorV3App < handle
                 else
                     kind = "标准特性图";
                 end
-                card = uipanel(grid, "Title", string(entry.title_zh), ...
+                card = uipanel(grid, "Title", app.tr(string(entry.title_zh)), ...
                     "FontWeight", "bold", "BackgroundColor", color);
                 cardGrid = uigridlayout(card, [3, 1], ...
                     "RowHeight", {24, 22, "1x"}, "Padding", [8, 5, 8, 7]);
-                uilabel(cardGrid, "Text", state + " · " + kind, ...
+                uilabel(cardGrid, "Text", app.tr(state + " · " + kind), ...
                     "FontWeight", "bold");
-                uilabel(cardGrid, "Text", "类别：" + string(entry.category), ...
+                uilabel(cardGrid, "Text", app.tr("类别：" + string(entry.category)), ...
                     "FontColor", [0.35, 0.40, 0.46]);
-                uilabel(cardGrid, "Text", reason, "WordWrap", "on", ...
+                uilabel(cardGrid, "Text", app.tr(reason), "WordWrap", "on", ...
                     "FontColor", [0.35, 0.40, 0.46]);
             end
         end
 
-        function showWaitingPlots(~, tab, message)
+        function showWaitingPlots(app, tab, message)
             delete(tab.Children);
             grid = uigridlayout(tab, [1, 1]);
-            uilabel(grid, "Text", message, "HorizontalAlignment", "center", ...
+            uilabel(grid, "Text", app.tr(message), "HorizontalAlignment", "center", ...
                 "FontWeight", "bold", "FontColor", [0.35, 0.40, 0.46]);
+        end
+
+        function titleText = tabTitle(app, base, count)
+            titleText = app.tr(base) + " (" + string(count) + ")";
+            if app.CurrentLanguage == "zh"
+                titleText = app.tr(base) + "（" + string(count) + "）";
+            end
+        end
+
+        function localizeAxes(app, axesHandle)
+            try
+                axesHandle.Title.String = app.tr(axesHandle.Title.String);
+                axesHandle.XLabel.String = app.tr(axesHandle.XLabel.String);
+                axesHandle.YLabel.String = app.tr(axesHandle.YLabel.String);
+            catch
+            end
         end
 
         function updateModelControls(app)
             isManual = app.ModelModeDropDown.Value == "manual";
-            if isManual && app.ModeDropDown.Value == "高级模式"
+            if isManual && app.ModeDropDown.Value == "advanced"
                 app.ManualModelDropDown.Enable = "on";
             else
                 app.ManualModelDropDown.Enable = "off";
@@ -1257,7 +1395,7 @@ classdef ChannelSimulatorV3App < handle
         end
 
         function applyUserMode(app)
-            isAdvanced = app.ModeDropDown.Value == "高级模式";
+            isAdvanced = app.ModeDropDown.Value == "advanced";
             if isAdvanced
                 app.AdvancedPanels.Visible = "on";
             else
@@ -1313,6 +1451,7 @@ classdef ChannelSimulatorV3App < handle
                     app.backendFailureLines(selection)];
                 app.setGlobalStatus("数据分析完成，但暂无兼容的 CIR 生成器", "error");
             end
+            app.localizeCurrentView();
         end
 
         function selection = resolveBackendSelection(app)
@@ -1405,11 +1544,11 @@ classdef ChannelSimulatorV3App < handle
             else
                 heading = "手动指定的生成器不可用；系统尊重选择，不会自动替换：";
             end
-            message = strjoin([ ...
+            message = app.tr(strjoin([ ...
                 heading; ...
                 app.backendFailureLines(selection); ...
                 "QuaDRiGa 尚未接入正式 Generator Adapter，因此本次不会用测试 Mock 或偷偷缩减天线维度。"], ...
-                newline);
+                newline));
         end
 
         function lines = backendFailureLines(app, selection)
@@ -1421,21 +1560,21 @@ classdef ChannelSimulatorV3App < handle
             end
         end
 
-        function reason = translateBackendReason(~, candidate)
+        function reason = translateBackendReason(app, candidate)
             switch candidate.reason_code
                 case "lite_requires_siso"
-                    reason = "不兼容；Lite 只支持 Tx=1、Rx=1。";
-                case "full_entrypoint_fixed_dimensions"
-                    reason = "不兼容；当前 Full 外部入口固定为 Tx=2、Rx=2、Nt=2。";
+                    reason = app.tr("不兼容；Lite 只支持 Tx=1、Rx=1。");
+                case "full_fixed_entrypoint_dimensions"
+                    reason = app.tr("不兼容；历史 Full 固定入口只支持 Tx=2、Rx=2、Nt=2。");
                 case "full_resource_limit_exceeded"
-                    reason = "格式兼容，但当前 Tx×Rx×Nt 超出配置的 Full 运行资源上限。";
+                    reason = app.tr("格式兼容，但当前 Tx×Rx×Nt 超出配置的 Full 运行资源上限。");
                 case "backend_unavailable"
-                    reason = "维度兼容，但后端文件或配置不可用。";
+                    reason = app.tr("维度兼容，但后端文件或配置不可用。");
                 otherwise
                     if candidate.available
-                        reason = "兼容且可用。";
+                        reason = app.tr("兼容且可用。");
                     else
-                        reason = string(candidate.reason);
+                        reason = app.tr(string(candidate.reason));
                     end
             end
         end
@@ -1459,17 +1598,91 @@ classdef ChannelSimulatorV3App < handle
         function switchLanguage(app)
             if app.LanguageDropDown.Value == "English"
                 app.CurrentLanguage = "en";
-                app.UIFigure.Name = "ChanAI Pulse v3.0";
-                app.ModuleOneTab.Title = "1. Data & Task";
-                app.ModuleTwoTab.Title = "2. Run Details";
-                app.ModuleThreeTab.Title = "3. Prediction Result";
             else
                 app.CurrentLanguage = "zh";
-                app.UIFigure.Name = "ChanAI Pulse v3.0";
-                app.ModuleOneTab.Title = "1. 数据与任务";
-                app.ModuleTwoTab.Title = "2. 运行详情";
-                app.ModuleThreeTab.Title = "3. 预测结果";
             end
+            % Rebuild plots after the language changes.  Axis titles and
+            % legends are created by the plotting layer, so translating only
+            % existing controls would leave stale Chinese graphics behind.
+            if ~isempty(fieldnames(app.InputAnalysis)) && ...
+                    isfield(app.InputAnalysis, "registry")
+                app.renderAnalysisTabs(app.InputAnalysis, "input");
+            end
+            if ~isempty(fieldnames(app.PredictionResult)) && ...
+                    isfield(app.PredictionResult, "analysis")
+                app.renderAnalysisTabs(app.PredictionResult.analysis, "prediction");
+            end
+            if ~isempty(fieldnames(app.ParameterPrediction))
+                app.renderParameterPrediction(app.ParameterPrediction);
+            end
+            app.localizeCurrentView();
+        end
+
+        function value = tr(app, value)
+            value = translate_channel_simulator_text(value, app.CurrentLanguage);
+        end
+
+        function values = trLines(app, values)
+            values = translate_channel_simulator_text(string(values(:)), ...
+                app.CurrentLanguage);
+        end
+
+        function localizeCurrentView(app)
+            % Translate current controls in-place, including output created
+            % before the language was changed.  Data fields themselves are
+            % intentionally left untouched; this is presentation only.
+            components = findall(app.UIFigure);
+            for index = 1:numel(components)
+                component = components(index);
+                try
+                    if isprop(component, "Text")
+                        component.Text = app.tr(component.Text);
+                    end
+                    if isprop(component, "Title")
+                        component.Title = app.tr(component.Title);
+                    end
+                    if isprop(component, "Tooltip") && ...
+                            strlength(string(component.Tooltip)) > 0
+                        component.Tooltip = app.tr(component.Tooltip);
+                    end
+                    if isprop(component, "Items")
+                        component.Items = app.tr(component.Items);
+                    end
+                    if isprop(component, "ColumnName")
+                        component.ColumnName = cellstr(app.tr( ...
+                            string(component.ColumnName)));
+                    end
+                    if isa(component, "matlab.ui.control.TextArea")
+                        component.Value = app.trLines(component.Value);
+                    end
+                    if isprop(component, "String") && ...
+                            ~isa(component, "matlab.ui.control.EditField")
+                        component.String = app.tr(component.String);
+                    end
+                catch
+                    % Some graphics handles expose read-only presentation
+                    % properties.  They are localized separately below.
+                end
+            end
+            axesHandles = findall(app.UIFigure, "Type", "axes");
+            for index = 1:numel(axesHandles)
+                axesHandle = axesHandles(index);
+                try
+                    axesHandle.Title.String = app.tr(axesHandle.Title.String);
+                    axesHandle.XLabel.String = app.tr(axesHandle.XLabel.String);
+                    axesHandle.YLabel.String = app.tr(axesHandle.YLabel.String);
+                catch
+                end
+            end
+            legendHandles = findall(app.UIFigure, "Type", "legend");
+            for index = 1:numel(legendHandles)
+                try
+                    legendHandles(index).String = cellstr(app.tr( ...
+                        string(legendHandles(index).String)));
+                catch
+                end
+            end
+            app.UIFigure.Name = "ChanAI Pulse v3.0";
         end
 
         function exportPrediction(app)
@@ -1511,7 +1724,89 @@ classdef ChannelSimulatorV3App < handle
                     app.RunPredictionButton.Enable = "on";
                 end
             end
+            if ~isBusy
+                app.localizeCurrentView();
+            end
             drawnow;
+        end
+
+        function beginProgress(app, titleText, detail)
+            % Keep one continuous card for the normal Module-2-to-Module-3
+            % workflow.  A later manual rerun starts a fresh card.
+            continueCurrentRun = app.ProgressVisible && ...
+                app.ProgressDismissButton.Enable == "off";
+            if ~continueCurrentRun
+                app.ProgressStartedAt = tic;
+                app.ProgressGauge.Value = 0;
+                app.ProgressPercentLabel.Text = "0%";
+                app.ProgressDismissButton.Enable = "off";
+                app.ProgressOverlay.Visible = "on";
+                app.ProgressVisible = true;
+            end
+            app.ProgressTitleLabel.Text = app.tr(titleText);
+            app.ProgressDetailArea.Value = app.trLines([ ...
+                "当前阶段：" + string(detail); ...
+                "请保持软件窗口打开；Full 6GPCM 的单个目标可能需要数十秒。"]);
+            app.updateProgressElapsed();
+            drawnow;
+        end
+
+        function updateProgress(app, fraction, phase, detail, targetNumber, targetCount, backend)
+            if ~app.ProgressVisible
+                app.beginProgress("正在运行", "正在准备任务。");
+            end
+            fraction = max(0, min(1, double(fraction)));
+            app.ProgressGauge.Value = fraction;
+            app.ProgressPercentLabel.Text = sprintf("%.0f%%", 100 * fraction);
+            lines = ["当前阶段：" + string(phase); string(detail)];
+            if targetCount > 0
+                lines(end + 1, 1) = sprintf("目标进度：%d / %d", ...
+                    targetNumber, targetCount); %#ok<AGROW>
+            end
+            if strlength(string(backend)) > 0
+                lines(end + 1, 1) = "生成后端：" + string(backend); %#ok<AGROW>
+            end
+            app.ProgressDetailArea.Value = app.trLines(lines);
+            app.updateProgressElapsed();
+            drawnow limitrate;
+        end
+
+        function finishProgress(app, success, detail)
+            if ~app.ProgressVisible
+                return;
+            end
+            if success
+                app.ProgressGauge.Value = 1;
+                app.ProgressPercentLabel.Text = "100%";
+                app.ProgressTitleLabel.Text = app.tr("运行完成");
+                app.ProgressDetailArea.Value = app.trLines([ ...
+                    "最终状态：成功"; string(detail); ...
+                    "可点击“收起进度面板”继续查看结果。"]);
+                app.ProgressTitleLabel.FontColor = [0.08, 0.50, 0.25];
+            else
+                app.ProgressTitleLabel.Text = app.tr("运行未完成");
+                app.ProgressDetailArea.Value = app.trLines([ ...
+                    "最终状态：未完成"; string(detail); ...
+                    "请根据上方信息修正任务后重新运行。"]);
+                app.ProgressTitleLabel.FontColor = [0.70, 0.12, 0.12];
+            end
+            app.ProgressDismissButton.Enable = "on";
+            app.updateProgressElapsed();
+            drawnow;
+        end
+
+        function dismissProgress(app)
+            app.ProgressOverlay.Visible = "off";
+            app.ProgressVisible = false;
+        end
+
+        function updateProgressElapsed(app)
+            elapsedSeconds = 0;
+            if app.ProgressStartedAt ~= uint64(0)
+                elapsedSeconds = toc(app.ProgressStartedAt);
+            end
+            app.ProgressElapsedLabel.Text = app.tr( ...
+                "已用时间：" + sprintf("%.0f", elapsedSeconds) + " 秒");
         end
 
         function setGlobalStatus(app, message, kind)
@@ -1520,7 +1815,7 @@ classdef ChannelSimulatorV3App < handle
                 "running", [0.68, 0.38, 0.05], ...
                 "success", [0.08, 0.50, 0.25], ...
                 "error", [0.70, 0.12, 0.12]);
-            app.GlobalStatusLabel.Text = string(message);
+            app.GlobalStatusLabel.Text = app.tr(string(message));
             app.GlobalStatusLabel.FontColor = colors.(char(kind));
         end
 
@@ -1604,12 +1899,12 @@ classdef ChannelSimulatorV3App < handle
                 names, values, "KF_mu", knownX, targetX, "dB");
         end
 
-        function renderOneParameter(~, axesHandle, names, values, ...
+        function renderOneParameter(app, axesHandle, names, values, ...
                 parameterName, knownX, targetX, unit)
             cla(axesHandle);
             parameterIndex = find(names == parameterName, 1);
             if isempty(parameterIndex)
-                text(axesHandle, 0.5, 0.5, parameterName + " 不在当前参数包中", ...
+                text(axesHandle, 0.5, 0.5, app.tr(parameterName + " 不在当前参数包中"), ...
                     "Units", "normalized", "HorizontalAlignment", "center");
                 return;
             end
@@ -1618,12 +1913,12 @@ classdef ChannelSimulatorV3App < handle
             plot(axesHandle, knownX, repmat(calibrated, size(knownX)), ...
                 "o", "Color", [0.08, 0.38, 0.72], ...
                 "MarkerFaceColor", [0.08, 0.38, 0.72], "MarkerSize", 3, ...
-                "DisplayName", "已知区标定值");
+                "DisplayName", app.tr("已知区标定值"));
             hold(axesHandle, "on");
             plot(axesHandle, targetX, predicted, "o-", ...
                 "Color", [0.93, 0.45, 0.10], "MarkerFaceColor", ...
                 [0.93, 0.45, 0.10], "LineWidth", 1.8, ...
-                "DisplayName", "目标区预测");
+                "DisplayName", app.tr("目标区预测"));
             hold(axesHandle, "off");
             grid(axesHandle, "on");
             axesHandle.XTickMode = "auto";
