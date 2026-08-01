@@ -85,10 +85,13 @@ end
 end
 
 function check = validateNoGroupLeakage(trainGroups, valGroups, testGroups)
-overlap = [ ...
-    intersect(trainGroups, valGroups); ...
-    intersect(trainGroups, testGroups); ...
-    intersect(valGroups, testGroups)];
+% INTERSECT can return differently shaped empty string arrays depending on
+% MATLAB release. Force every result to a column before concatenating so a
+% clean (no-leakage) split is itself always representable.
+trainValidation = intersect(trainGroups, valGroups);
+trainTest = intersect(trainGroups, testGroups);
+validationTest = intersect(valGroups, testGroups);
+overlap = [trainValidation(:); trainTest(:); validationTest(:)];
 check = struct( ...
     "passed", isempty(overlap), ...
     "overlapping_group_id", unique(overlap));
