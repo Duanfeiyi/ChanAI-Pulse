@@ -1,10 +1,11 @@
-function render_channel_characteristic(axesHandle, analysis, metricId)
+function render_channel_characteristic(axesHandle, analysis, metricId, options)
 %RENDER_CHANNEL_CHARACTERISTIC Render one Step 5 registered metric.
 
 arguments
     axesHandle (1, 1)
     analysis (1, 1) struct
     metricId (1, 1) string
+    options.Language (1, 1) string = "zh"
 end
 
 cla(axesHandle, "reset");
@@ -16,13 +17,13 @@ grid(axesHandle, "on");
 if ~isfield(analysis, "metrics") || ...
         ~isfield(analysis.metrics, metricId)
     renderUnavailable(axesHandle, metricId, ...
-        "图表未在 Step 5 注册表中登记。");
+        "图表未在 Step 5 注册表中登记。", options.Language);
     return;
 end
 
 metric = analysis.metrics.(metricId);
 if ~metric.available
-    renderUnavailable(axesHandle, metric.title_zh, metric.reason);
+    renderUnavailable(axesHandle, metric.title_zh, metric.reason, options.Language);
     return;
 end
 
@@ -38,7 +39,8 @@ switch metric.kind
         for index = 1:size(metric.y, 2)
             plot(axesHandle, metric.x, metric.y(:, index), ...
                 "LineWidth", 1.6, ...
-                "DisplayName", metric.series_labels(index));
+                "DisplayName", translate_channel_simulator_text( ...
+                    metric.series_labels(index), options.Language));
         end
         hold(axesHandle, "off");
         legend(axesHandle, "Location", "best");
@@ -48,7 +50,8 @@ switch metric.kind
         for index = 1:numel(series)
             stairs(axesHandle, series(index).x, series(index).y, ...
                 "LineWidth", 1.7, ...
-                "DisplayName", series(index).label);
+                "DisplayName", translate_channel_simulator_text( ...
+                    series(index).label, options.Language));
         end
         hold(axesHandle, "off");
         ylim(axesHandle, [0, 1]);
@@ -65,11 +68,12 @@ switch metric.kind
         clim(axesHandle, [-60, 0]);
     otherwise
         renderUnavailable(axesHandle, metric.title_zh, ...
-            "当前绘图器尚不支持该 metric.kind。");
+            "当前绘图器尚不支持该 metric.kind。", options.Language);
         return;
 end
 
-title(axesHandle, metric.title_zh, "FontWeight", "bold");
+title(axesHandle, metricTitle(metricId, metric.title_zh, options.Language), ...
+    "FontWeight", "bold");
 xlabel(axesHandle, axisLabel(metric.x_unit));
 ylabel(axesHandle, axisLabel(metric.y_unit));
 end
@@ -91,15 +95,41 @@ else
 end
 end
 
-function renderUnavailable(axesHandle, titleText, reason)
+function renderUnavailable(axesHandle, titleText, reason, language)
 axis(axesHandle, "off");
-title(axesHandle, titleText, "FontWeight", "bold");
-text(axesHandle, 0.5, 0.56, "当前数据不支持", ...
+title(axesHandle, translate_channel_simulator_text(titleText, language), ...
+    "FontWeight", "bold");
+text(axesHandle, 0.5, 0.56, translate_channel_simulator_text("当前数据不支持", language), ...
     "Units", "normalized", "HorizontalAlignment", "center", ...
     "FontWeight", "bold", "FontSize", 13, ...
     "Color", [0.55, 0.18, 0.12]);
-text(axesHandle, 0.5, 0.42, reason, ...
+text(axesHandle, 0.5, 0.42, translate_channel_simulator_text(reason, language), ...
     "Units", "normalized", "HorizontalAlignment", "center", ...
     "FontSize", 10, "Color", [0.35, 0.37, 0.40], ...
     "Interpreter", "none");
+end
+
+function titleText = metricTitle(metricId, fallback, language)
+if language ~= "en"
+    titleText = fallback;
+    return;
+end
+names = struct( ...
+    "power", "Power", ...
+    "pdp", "Power delay profile (PDP)", ...
+    "frequency_autocorrelation", "Frequency autocorrelation", ...
+    "delay_spread_cdf", "Delay-spread CDF", ...
+    "angular_power_spectrum", "Angular power spectrum", ...
+    "spatial_correlation", "Spatial correlation", ...
+    "angular_spread_cdf", "Angular-spread CDF", ...
+    "doppler_power_spectrum", "Doppler power spectrum", ...
+    "time_autocorrelation", "Time autocorrelation", ...
+    "doppler_spread_cdf", "Doppler-spread CDF", ...
+    "delay_sample_heatmap", "Delay–sample power heatmap");
+field = char(metricId);
+if isfield(names, field)
+    titleText = string(names.(field));
+else
+    titleText = translate_channel_simulator_text(fallback, language);
+end
 end
