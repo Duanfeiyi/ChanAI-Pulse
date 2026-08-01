@@ -46,6 +46,14 @@ This is the maintained reference for public MATLAB interfaces in the current rep
 | `run_prediction_generation(request, options)`<br>`core/prediction_generation/run_prediction_generation.m` | Generates each target separately through the shared Generator Adapter, verifies actual dimensions/formal eligibility, combines only after all targets succeed, derives optional CTF, applies continuity limits, and returns a service result containing canonical `PredictionResult`. | `test_step11_prediction_generation`, real Full test, module-three Demo. |
 | `export_prediction_result_bundle(result, outputDirectory)`<br>`core/prediction_generation/export_prediction_result_bundle.m` | Writes complex CIR and optional CTF to separate HDF5 files plus compact PredictionResult, Generator and Predictor JSON manifests. Refuses overwrite. | Step 11 Demo and export test. |
 
+## Step 11ABC offline selection
+
+| Function / path | Contract, inputs and outputs | Called by / tests / status |
+| --- | --- | --- |
+| `run_step11abc_end_to_end_validation(engineRoot, benchmarkRoot, outputDirectory, options)`<br>`core/step11abc/run_step11abc_end_to_end_validation.m` | In `validation` mode compares all P-bundles on validation routes and freezes the smallest eligible bundle. In `test` mode reads that frozen manifest and evaluates only the selected bundle. | Offline Full6GPCM validation; never product UI. |
+| `compute_step11abc_cir_features(dataset, delayEdges)`<br>`core/step11abc/compute_step11abc_cir_features.m` | Computes normalized PDP and RMS delay spread on one shared frozen delay grid; the final bin explicitly captures overflow power. | Step 11C scorer and corpus regression test. |
+| `read_step11abc_system_registry(registryPath, options)`<br>`core/step11abc/read_step11abc_system_registry.m` | Rejects test-leaking or incomplete system choices and verifies hashes of selected model registries. | Step 12 loader contract and offline tests. |
+
 ## Preprocessing
 
 | Function / path | Contract, inputs and outputs | Called by / tests / status |
