@@ -36,6 +36,16 @@ for fieldName = ["dimensions", "scenario", "model", "ctf", ...
         config.(fieldName) = defaults.(fieldName);
     end
 end
+if ~isfield(config.backend_options, "output_profile") || ...
+        ~isTextScalar(config.backend_options.output_profile) || ...
+        ~ismember(lower(string(config.backend_options.output_profile)), ...
+        ["native", "narrowband"])
+    report = addError(report, ...
+        "backend_options.output_profile must be native or narrowband.");
+else
+    config.backend_options.output_profile = ...
+        lower(string(config.backend_options.output_profile));
+end
 
 if ~isTextScalar(config.schema_version) || ...
         string(config.schema_version) ~= "v3.0-generator-config.1"
@@ -183,11 +193,31 @@ if isempty(report.errors)
             report = addWarning(report, ...
                 "6GPCM-lite is an internal engineering generator and does not claim full 6GPCM fidelity.");
         case "full_6gpcm"
-            report = validateFullFixedSettings(report, config);
+            report = validateFullSettings(report, config);
     end
 end
 
 report = finalize(report);
+end
+
+function report = validateFullSettings(report, config)
+if ~isfield(config.backend_options, "full_interface") || ...
+        ~isTextScalar(config.backend_options.full_interface)
+    report = addError(report, ...
+        "backend_options.full_interface must be fixed_entrypoint or public_api.");
+    return;
+end
+interface = lower(strtrim(string(config.backend_options.full_interface)));
+if ~ismember(interface, ["fixed_entrypoint", "public_api"])
+    report = addError(report, ...
+        "backend_options.full_interface must be fixed_entrypoint or public_api.");
+    return;
+end
+if interface == "fixed_entrypoint"
+    report = validateFullFixedSettings(report, config);
+else
+    report = validateFullPublicApiSettings(report, config);
+end
 end
 
 function report = validateFullFixedSettings(report, config)
@@ -217,8 +247,42 @@ end
 if config.dimensions.Npath ~= 0
     report = addWarning(report, ...
         "Full 6GPCM derives Npath from the generated result; dimensions.Npath is ignored.");
-    config.dimensions.Npath = 0;
 end
+end
+
+function report = validateFullPublicApiSettings(report, config)
+options = config.backend_options;
+positiveFields = ["full_track_speed_mps", "full_max_antenna_pairs", ...
+    "full_max_nt", "full_max_tensor_slices"];
+for fieldName = positiveFields
+    if ~isfield(options, fieldName) || ~isPositiveFinite(options.(fieldName))
+        report = addError(report, ...
+            "backend_options." + fieldName + " must be positive and finite.");
+    end
+end
+if ~isempty(report.errors)
+    return;
+end
+if config.dimensions.Tx * config.dimensions.Rx > ...
+        options.full_max_antenna_pairs
+    report = addError(report, ...
+        "Requested Tx*Rx exceeds the configured Full 6GPCM resource limit.");
+end
+if config.dimensions.Nt > options.full_max_nt
+    report = addError(report, ...
+        "Requested Nt exceeds the configured Full 6GPCM resource limit.");
+end
+if config.dimensions.Tx * config.dimensions.Rx * config.dimensions.Nt > ...
+        options.full_max_tensor_slices
+    report = addError(report, ...
+        "Requested Tx*Rx*Nt exceeds the configured Full 6GPCM tensor limit.");
+end
+if config.dimensions.Npath ~= 0
+    report = addWarning(report, ...
+        "Full 6GPCM derives Npath from the generated result; dimensions.Npath is ignored.");
+end
+report = addWarning(report, ...
+    "Full 6GPCM public_api mode uses a project-owned wrapper while keeping the external core read-only.");
 end
 
 function output = mergeStruct(defaults, supplied)

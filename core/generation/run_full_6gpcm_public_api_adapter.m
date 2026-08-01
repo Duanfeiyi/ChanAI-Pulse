@@ -1,0 +1,159 @@
+function payload = run_full_6gpcm_public_api_adapter(config, hooks)
+%RUN_FULL_6GPCM_PUBLIC_API_ADAPTER Configurable read-only Full 6GPCM wrapper.
+%   Uses the external package's public classes instead of its historical
+%   fixed generate_channel_v1 entry point. The external tree is hashed
+%   before and after execution and is never edited or copied.
+
+arguments
+    config (1, 1) struct
+    hooks (1, 1) struct
+end
+
+if hooks.is_cancelled()
+    error("run_full_6gpcm_public_api_adapter:Cancelled", ...
+        "Full 6GPCM generation was cancelled before the external call.");
+end
+root = string(config.engine_root);
+before = hash_full_6gpcm_tree(root);
+expected = strtrim(string(config.engine.expected_tree_sha256));
+if strlength(expected) > 0 && before.aggregate_sha256 ~= expected
+    error("run_full_6gpcm_public_api_adapter:UnexpectedCoreHash", ...
+        "Full 6GPCM tree hash does not match the versioned expected hash.");
+end
+
+oldPath = path;
+oldRng = rng;
+cleanup = onCleanup(@() restoreState(oldPath, oldRng)); %#ok<NASGU>
+addpath(genpath(root));
+
+dims = config.dimensions;
+sampleCount = double(dims.N_sample);
+hAll = cell(sampleCount, 1);
+delayAll = cell(sampleCount, 1);
+for sample = 1:sampleCount
+    if hooks.is_cancelled()
+        error("run_full_6gpcm_public_api_adapter:Cancelled", ...
+            "Full 6GPCM generation was cancelled between samples.");
+    end
+    progress = 0.15 + 0.65 * (sample - 1) / max(sampleCount, 1);
+    hooks.emit("external_public_api", progress, ...
+        "Generating configurable Full 6GPCM sample " + sample + ...
+        " of " + sampleCount);
+    rng(double(config.random_seed) + sample - 1, "twister");
+    [hAll{sample}, delayAll{sample}] = generateOne(config);
+end
+
+metadata = struct( ...
+    "source", "full_6gpcm_public_api_adapter", ...
+    "sample_semantics", "independent", ...
+    "generator", string(config.engine.id), ...
+    "generator_version", string(config.engine.version), ...
+    "scenario_id", string(config.scenario.id), ...
+    "center_frequency_hz", double(config.scenario.center_frequency_hz), ...
+    "bandwidth_hz", double(config.scenario.bandwidth_hz), ...
+    "snapshot_interval_s", double(config.scenario.snapshot_interval_s), ...
+    "seed_rule", "base_seed_plus_sample_index_minus_one", ...
+    "full_interface", "public_api", ...
+    "config", sanitize_generator_config(config));
+wavelengthM = 299792458 / double(config.scenario.center_frequency_hz);
+arrayGeometry = struct( ...
+    "type", "ULA", ...
+    "element_spacing_m", 0.5 * wavelengthM, ...
+    "element_spacing_wavelength", 0.5, ...
+    "geometry_source", "Full 6GPCM public antenna_array API");
+metadata.tx_array = arrayGeometry;
+metadata.rx_array = arrayGeometry;
+dataset = convert_full_6gpcm_raw_to_cir(hAll, delayAll, metadata);
+validation = validate_channel_dataset(dataset);
+if ~validation.is_valid
+    error("run_full_6gpcm_public_api_adapter:InvalidDataset", ...
+        "Configurable Full 6GPCM output failed the v3 contract: %s", ...
+        strjoin(validation.errors, " | "));
+end
+
+after = hash_full_6gpcm_tree(root);
+if before.aggregate_sha256 ~= after.aggregate_sha256
+    error("run_full_6gpcm_public_api_adapter:CoreChanged", ...
+        "The external Full 6GPCM tree changed during generation.");
+end
+hooks.emit("canonicalize", 0.86, ...
+    "Validated configurable Full 6GPCM CIR dimensions");
+
+warnings = strings(0, 1);
+if logical(config.engine.test_only)
+    warnings(end + 1, 1) = ...
+        "The configured full_6gpcm backend is a test double, not the external full engine.";
+end
+payload = struct( ...
+    "dataset", dataset, ...
+    "warnings", warnings, ...
+    "backend_manifest", struct( ...
+        "adapter", "Full6GPCMPublicApiAdapter", ...
+        "adapter_version", "v3.0-step12-flex.1", ...
+        "interface", "public_api", ...
+        "test_only", logical(config.engine.test_only), ...
+        "core_unchanged", true, ...
+        "tree_file_count", before.file_count, ...
+        "tree_total_bytes", before.total_bytes, ...
+        "tree_sha256_before", before.aggregate_sha256, ...
+        "tree_sha256_after", after.aggregate_sha256, ...
+        "raw_dimension_order", ["Tx", "Rx", "Nt", "Npath"], ...
+        "requested_dimensions", config.dimensions, ...
+        "limitations", ...
+            "External public API is monolithic within each generated sample; cancellation is checked between samples."));
+end
+
+function [H, delayS] = generateOne(config)
+dims = config.dimensions;
+sps = simulation_parameters();
+sps.carrier_frequency = double(config.scenario.center_frequency_hz);
+sps.setScenario(char(string(config.scenario.id)));
+
+intervalS = double(config.scenario.snapshot_interval_s);
+sampleRateHz = 1 / intervalS;
+moveTimeS = max(0, (double(dims.Nt) - 1) * intervalS);
+speedMps = double(config.backend_options.full_track_speed_mps);
+txPosition = [3.2, 2.4, 2.6];
+rxPosition = [1.0, 3.0, 1.45];
+direction = [1, 0, 0];
+txTrack = track('static', moveTimeS, 0, 0, ...
+    txPosition, direction, sampleRateHz);
+if dims.Nt > 1
+    rxTrack = track('linear', moveTimeS, speedMps, 0, ...
+        rxPosition, direction, sampleRateHz);
+else
+    rxTrack = track('static', moveTimeS, 0, 0, ...
+        rxPosition, direction, sampleRateHz);
+end
+
+cm = channel_model(sps);
+cm.tx_array = antenna_array('linear', double(dims.Tx), ...
+    sps.carrier_frequency, 0.5, [], [], 0, 0, 0);
+cm.rx_array = antenna_array('linear', double(dims.Rx), ...
+    sps.carrier_frequency, 0.5, [], [], 0, 0, 0);
+cm.tx_track = txTrack;
+cm.rx_track = rxTrack;
+cm.clusters.num_clusters = double(config.model.num_clusters);
+cm.clusters.num_rays_each_cluster = double(config.model.num_rays);
+cm.sim_params.scen_para.DS_mu = double(config.model.DS_mu);
+cm.sim_params.scen_para.DS_sigma = double(config.model.DS_sigma);
+cm.sim_params.scen_para.r_DS = double(config.model.r_DS);
+cm.sim_params.scen_para.LNS_ksi = double(config.model.LNS_ksi);
+cm.sim_params.scen_para.KF_mu = double(config.model.KF_mu);
+cm.sim_params.scen_para.KF_sigma = double(config.model.KF_sigma);
+
+[result, delay] = cm.get_CIR([], '', []);
+[H, delayS] = mf.result2H(result(1, 1, :), delay(1, 1, :));
+actual = [size(H, 1), size(H, 2), size(H, 3)];
+expected = [double(dims.Tx), double(dims.Rx), double(dims.Nt)];
+if ~isequal(actual, expected)
+    error("run_full_6gpcm_public_api_adapter:DimensionMismatch", ...
+        "Full public API returned Tx/Rx/Nt [%s], expected [%s].", ...
+        strjoin(string(actual), " "), strjoin(string(expected), " "));
+end
+end
+
+function restoreState(oldPath, oldRng)
+path(oldPath);
+rng(oldRng);
+end
