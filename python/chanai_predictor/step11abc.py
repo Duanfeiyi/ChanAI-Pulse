@@ -1,15 +1,15 @@
-"""Step 11B multi-seed benchmark and conservative automatic selection.
+"""Step 11ABC model benchmarking and leakage-safe bundle finalization.
 
-This module deliberately leaves the Step 10 registry untouched.  It adds a
-review-oriented registry which can fall back to a simple baseline when no
-neural candidate passes the pre-agreed group-level safeguards.
+Model and bundle choices are made from validation routes only.  Test routes
+are exported only after the P-bundle choice has been frozen by MATLAB's
+Full-6GPCM validation stage.
 """
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
-import csv
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -17,24 +17,17 @@ from typing import Any, Callable
 import numpy as np
 
 from .contracts import SUPPORTED_NEURAL_MODELS, PredictorData, TrainingConfig
+from .data import load_predictor_data_hdf5
 from .models import linear_predict, persistence_predict
 from .registry import compatibility_signature
-from .training import (
-    evaluate_baseline,
-    load_checkpoint,
-    metric_bundle,
-    predict_model,
-    train_model,
-)
+from .training import load_checkpoint, metric_bundle, predict_model, train_model
 
 
-STEP11ABC_REGISTRY_SCHEMA = "v3.0-step11abc-model-registry.1"
+STEP11ABC_REGISTRY_SCHEMA = "v3.0-step11abc-model-registry.2"
+STEP11ABC_TEST_EXPORT_SCHEMA = "v3.0-step11abc-test-export.1"
 P8_PARAMETER_NAMES = (
     "DS_mu", "KF_mu", "DS_sigma", "KF_sigma", "r_DS", "LNS_ksi",
     "num_clusters", "num_rays",
-)
-P8_GENERATION_DEFAULTS = np.asarray(
-    [-7.925, -0.39, 0.060, 2.4, 2.8, 3.0, 12.0, 20.0], dtype=np.float64
 )
 
 
@@ -45,9 +38,8 @@ def _group_metrics(
     result: dict[str, float] = {}
     group_ids = np.asarray(data.example_group_ids, dtype=object)
     for group in sorted(set(group_ids[indices].tolist())):
-        local = indices[group_ids[indices] == group]
-        # Prediction rows match INDICES order, not absolute row number.
         positions = np.flatnonzero(group_ids[indices] == group)
+        local = indices[positions]
         result[str(group)] = float(
             metric_bundle(data, prediction[positions], local)["normalized_rmse"]
         )
@@ -58,29 +50,21 @@ def _baseline_entry(
     data: PredictorData, model_type: str, predictor: Callable[..., np.ndarray]
 ) -> dict[str, Any]:
     validation = data.partition_indices("validation")
-    test = data.partition_indices("test")
-    validation_prediction = predictor(data, data.inputs[validation])
-    test_prediction = predictor(data, data.inputs[test])
+    prediction = predictor(data, data.inputs[validation])
     return {
         "model_type": model_type,
         "kind": "baseline",
         "checkpoint": None,
         "manifest": None,
         "compatibility": compatibility_signature(data),
-        "validation_metrics": metric_bundle(data, validation_prediction, validation),
-        "test_metrics": metric_bundle(data, test_prediction, test),
-        "validation_group_nrmse": _group_metrics(data, validation_prediction, validation),
-        "test_group_nrmse": _group_metrics(data, test_prediction, test),
+        "validation_metrics": metric_bundle(data, prediction, validation),
+        "validation_group_nrmse": _group_metrics(data, prediction, validation),
     }
 
 
 def _aggregate_neural(entries: list[dict[str, Any]]) -> dict[str, Any]:
     validation_scores = np.asarray(
         [entry["validation_metrics"]["normalized_rmse"] for entry in entries],
-        dtype=np.float64,
-    )
-    test_scores = np.asarray(
-        [entry["test_metrics"]["normalized_rmse"] for entry in entries],
         dtype=np.float64,
     )
     groups = sorted(
@@ -103,10 +87,27 @@ def _aggregate_neural(entries: list[dict[str, Any]]) -> dict[str, Any]:
         "compatibility": entries[0]["compatibility"],
         "validation_normalized_rmse_mean": float(np.mean(validation_scores)),
         "validation_normalized_rmse_std": float(np.std(validation_scores, ddof=0)),
-        "test_normalized_rmse_mean": float(np.mean(test_scores)),
-        "test_normalized_rmse_std": float(np.std(test_scores, ddof=0)),
         "validation_group_nrmse_mean": group_mean,
     }
+
+
+def _predict_registry_choice(
+    data: PredictorData,
+    registry: dict[str, Any],
+    output_directory: Path,
+    partition: str,
+    device: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    indices = data.partition_indices(partition)
+    selected = registry["selected"]
+    if selected["kind"] == "baseline":
+        predictors = {"persistence": persistence_predict, "linear": linear_predict}
+        prediction = predictors[selected["model_type"]](data, data.inputs[indices])
+    else:
+        checkpoint = output_directory / selected["selected_checkpoint"]
+        model, _ = load_checkpoint(checkpoint, device=device)
+        prediction = predict_model(model, data.inputs[indices], device)
+    return indices, prediction
 
 
 def benchmark_model_family(
@@ -122,7 +123,7 @@ def benchmark_model_family(
     maximum_group_to_baseline_ratio: float = 2.0,
     reference_p8_data: PredictorData | None = None,
 ) -> tuple[Path, dict[str, Any]]:
-    """Train GRU/LSTM/TCN across seeds and freeze a conservative choice."""
+    """Train candidates and freeze one model using validation routes only."""
     if len(seeds) < 3:
         raise ValueError("Step 11ABC requires at least three random seeds.")
     output_directory = Path(output_directory).expanduser().resolve()
@@ -130,6 +131,7 @@ def benchmark_model_family(
     neural_runs: dict[str, list[dict[str, Any]]] = {
         model_type: [] for model_type in SUPPORTED_NEURAL_MODELS
     }
+    validation = data.partition_indices("validation")
     for model_type in SUPPORTED_NEURAL_MODELS:
         for seed in seeds:
             checkpoint, manifest_path, manifest = train_model(
@@ -143,12 +145,10 @@ def benchmark_model_family(
                     device=device,
                 ),
                 output_directory,
+                evaluate_test=False,
             )
-            validation = data.partition_indices("validation")
-            test = data.partition_indices("test")
             model, _ = load_checkpoint(checkpoint, device=device)
-            validation_prediction = predict_model(model, data.inputs[validation], device)
-            test_prediction = predict_model(model, data.inputs[test], device)
+            prediction = predict_model(model, data.inputs[validation], device)
             neural_runs[model_type].append(
                 {
                     "model_type": model_type,
@@ -159,11 +159,9 @@ def benchmark_model_family(
                     "checkpoint_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
                     "compatibility": compatibility_signature(data),
                     "validation_metrics": manifest["metrics"]["validation"],
-                    "test_metrics": manifest["metrics"]["test"],
                     "validation_group_nrmse": _group_metrics(
-                        data, validation_prediction, validation
+                        data, prediction, validation
                     ),
-                    "test_group_nrmse": _group_metrics(data, test_prediction, test),
                 }
             )
     baseline_entries = [
@@ -183,7 +181,10 @@ def benchmark_model_family(
             for group, score in group_scores.items()
         }
         win_rate = float(np.mean([ratio < 1.0 for ratio in ratios.values()]))
-        improvement = 1.0 - aggregate["validation_normalized_rmse_mean"] / max(1e-12, baseline_score)
+        improvement = (
+            1.0
+            - aggregate["validation_normalized_rmse_mean"] / max(1e-12, baseline_score)
+        )
         aggregate["qualification"] = {
             "baseline_model_type": baseline["model_type"],
             "relative_validation_nrmse_improvement": float(improvement),
@@ -204,31 +205,6 @@ def benchmark_model_family(
         selected = baseline
         selection_reason = "baseline_fallback_no_neural_candidate_passed_all_safeguards"
 
-    evaluation_prediction: np.ndarray
-    test_indices = data.partition_indices("test")
-    if selected["kind"] == "baseline":
-        predictor = persistence_predict if selected["model_type"] == "persistence" else linear_predict
-        evaluation_prediction = predictor(data, data.inputs[test_indices])
-    else:
-        checkpoint = output_directory / selected["selected_checkpoint"]
-        model, _ = load_checkpoint(checkpoint, device=device)
-        evaluation_prediction = predict_model(model, data.inputs[test_indices], device)
-    prediction_file = output_directory / f"{data.task_type}_step11abc_test_evaluation.npz"
-    np.savez_compressed(
-        prediction_file,
-        prediction_normalized=evaluation_prediction,
-        target_normalized=data.targets[test_indices],
-        target_raw=data.denormalize(data.targets[test_indices]),
-        prediction_raw=data.denormalize(evaluation_prediction),
-        example_group_id=np.asarray(data.example_group_ids, dtype=str)[test_indices],
-        target_parameter_sample_index=data.target_parameter_sample_index[test_indices],
-        parameter_names=np.asarray(data.parameter_names, dtype=str),
-    )
-    pair_file = None
-    if reference_p8_data is not None:
-        pair_file = write_end_to_end_pairs(
-            data, reference_p8_data, test_indices, evaluation_prediction, output_directory
-        )
     registry = {
         "schema_version": STEP11ABC_REGISTRY_SCHEMA,
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -239,7 +215,9 @@ def benchmark_model_family(
             "selected_model_type": selected["model_type"],
             "selection_reason": selection_reason,
             "targets_read_at_prediction_time": False,
-            "end_to_end_bundle_choice": "pending_step11c",
+            "selection_partition": "validation",
+            "test_partition_used": False,
+            "end_to_end_bundle_choice": "resolved_by_system_registry_after_validation",
         },
         "acceptance_rules": {
             "seed_count": len(seeds),
@@ -247,12 +225,44 @@ def benchmark_model_family(
             "minimum_validation_group_win_rate": minimum_group_win_rate,
             "maximum_group_to_baseline_ratio": maximum_group_to_baseline_ratio,
         },
+        "prediction_projection": {
+            "bounded_by_dataset_contract": True,
+            "integer_parameters": ["num_clusters", "num_rays"],
+            "integer_policy": "round_to_nearest_after_denormalization",
+        },
         "baseline_entries": baseline_entries,
         "neural_aggregates": aggregates,
         "selected": selected,
-        "evaluation_prediction_file": prediction_file.name,
-        "end_to_end_pair_file": None if pair_file is None else pair_file.name,
     }
+    validation_indices, validation_prediction = _predict_registry_choice(
+        data, registry, output_directory, "validation", device
+    )
+    prediction_file = output_directory / f"{data.task_type}_step11abc_validation_evaluation.npz"
+    np.savez_compressed(
+        prediction_file,
+        prediction_normalized=validation_prediction,
+        target_normalized=data.targets[validation_indices],
+        target_raw=data.denormalize(data.targets[validation_indices]),
+        prediction_raw=data.denormalize(validation_prediction),
+        example_group_id=np.asarray(data.example_group_ids, dtype=str)[validation_indices],
+        target_parameter_sample_index=data.target_parameter_sample_index[validation_indices],
+        parameter_names=np.asarray(data.parameter_names, dtype=str),
+        partition="validation",
+    )
+    pair_file = None
+    if reference_p8_data is not None:
+        pair_file = write_end_to_end_pairs(
+            data,
+            reference_p8_data,
+            validation_indices,
+            validation_prediction,
+            output_directory,
+            partition="validation",
+        )
+    registry["validation_prediction_file"] = prediction_file.name
+    registry["validation_end_to_end_pair_file"] = (
+        None if pair_file is None else pair_file.name
+    )
     registry_path = output_directory / f"{data.task_type}_step11abc_registry.json"
     registry_path.write_text(json.dumps(registry, indent=2, ensure_ascii=False), encoding="utf-8")
     return registry_path, registry
@@ -261,66 +271,168 @@ def benchmark_model_family(
 def write_end_to_end_pairs(
     data: PredictorData,
     reference_p8_data: PredictorData,
-    test_indices: np.ndarray,
+    indices: np.ndarray,
     prediction_normalized: np.ndarray,
     output_directory: Path,
+    *,
+    partition: str,
 ) -> Path:
-    """Export small, transparent generator inputs for MATLAB Full-6GPCM review.
-
-    Test truth is included only in this *offline evaluation artifact*.  The
-    generated columns use predictions for the currently trained bundle and
-    calibrated defaults for all other P8 fields; the product request path
-    never reads these truth columns.
-    """
+    """Export predicted columns only; MATLAB resolves every missing source."""
+    if partition not in {"validation", "test"}:
+        raise ValueError("End-to-end pairs support validation or test only.")
     if tuple(reference_p8_data.parameter_names) != P8_PARAMETER_NAMES:
         raise ValueError("The reference data must use the canonical P8 parameter order.")
-    reference_indices = reference_p8_data.partition_indices("test")
+    reference_indices = reference_p8_data.partition_indices(partition)
     if not np.array_equal(
-        data.target_parameter_sample_index[test_indices],
-        reference_p8_data.target_parameter_sample_index[reference_indices]
+        data.target_parameter_sample_index[indices],
+        reference_p8_data.target_parameter_sample_index[reference_indices],
     ):
-        raise ValueError("P-bundle and P8 test rows do not align by target sample index.")
-    if np.asarray(data.example_group_ids, dtype=str)[test_indices].tolist() != np.asarray(
+        raise ValueError("P-bundle and P8 rows do not align by target sample index.")
+    if np.asarray(data.example_group_ids, dtype=str)[indices].tolist() != np.asarray(
         reference_p8_data.example_group_ids, dtype=str
     )[reference_indices].tolist():
-        raise ValueError("P-bundle and P8 test rows do not align by group.")
+        raise ValueError("P-bundle and P8 rows do not align by group.")
     predicted = data.denormalize(prediction_normalized)
     truth = reference_p8_data.denormalize(reference_p8_data.targets[reference_indices])
-    generated = np.repeat(P8_GENERATION_DEFAULTS.reshape(1, 1, -1), len(test_indices), axis=0)
-    generated = np.repeat(generated, data.target_length, axis=1)
-    for column, name in enumerate(data.parameter_names):
-        generated[:, :, P8_PARAMETER_NAMES.index(name)] = predicted[:, :, column]
-    path = output_directory / f"{data.task_type}_step11abc_full_generator_pairs.csv"
-    fieldnames = ["example_index", "group_id", "target_step"]
+    for name in ("num_clusters", "num_rays"):
+        truth[:, :, P8_PARAMETER_NAMES.index(name)] = np.rint(
+            truth[:, :, P8_PARAMETER_NAMES.index(name)]
+        )
+        if name in data.parameter_names:
+            predicted[:, :, data.parameter_names.index(name)] = np.rint(
+                predicted[:, :, data.parameter_names.index(name)]
+            )
+    path = output_directory / f"{data.task_type}_step11abc_{partition}_generator_pairs.csv"
+    fieldnames = ["partition", "example_index", "group_id", "target_step"]
     fieldnames += [f"truth_{name}" for name in P8_PARAMETER_NAMES]
-    fieldnames += [f"generated_{name}" for name in P8_PARAMETER_NAMES]
+    fieldnames += [f"predicted_{name}" for name in data.parameter_names]
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         for local_example, (group, target_steps) in enumerate(
             zip(
-                np.asarray(data.example_group_ids, dtype=str)[test_indices],
-                data.target_parameter_sample_index[test_indices],
+                np.asarray(data.example_group_ids, dtype=str)[indices],
+                data.target_parameter_sample_index[indices],
                 strict=True,
             )
         ):
-            for target_step in range(data.target_length):
+            for target_offset in range(data.target_length):
                 row: dict[str, Any] = {
-                    "example_index": int(test_indices[local_example]),
+                    "partition": partition,
+                    "example_index": int(indices[local_example]),
                     "group_id": str(group),
-                    "target_step": int(target_steps[target_step]),
+                    "target_step": int(target_steps[target_offset]),
                 }
                 row.update(
                     {
-                        f"truth_{name}": float(truth[local_example, target_step, column])
+                        f"truth_{name}": float(truth[local_example, target_offset, column])
                         for column, name in enumerate(P8_PARAMETER_NAMES)
                     }
                 )
                 row.update(
                     {
-                        f"generated_{name}": float(generated[local_example, target_step, column])
-                        for column, name in enumerate(P8_PARAMETER_NAMES)
+                        f"predicted_{name}": float(predicted[local_example, target_offset, column])
+                        for column, name in enumerate(data.parameter_names)
                     }
                 )
                 writer.writerow(row)
     return path
+
+
+def export_frozen_selection_test_pairs(
+    data_directory: str | Path,
+    benchmark_root: str | Path,
+    selection_manifest: str | Path,
+    *,
+    device: str = "auto",
+) -> tuple[Path, dict[str, Any]]:
+    """Read a frozen validation decision and export test pairs for it only."""
+    data_directory = Path(data_directory).expanduser().resolve()
+    benchmark_root = Path(benchmark_root).expanduser().resolve()
+    selection_path = Path(selection_manifest).expanduser().resolve()
+    selection = json.loads(selection_path.read_text(encoding="utf-8"))
+    exports: list[dict[str, Any]] = []
+    for task in ("interpolation", "extrapolation"):
+        decision = selection["decisions"][task]
+        bundle = str(decision["selected_bundle"]).lower()
+        data_path = data_directory / f"step11abc_{task}_{bundle}.h5"
+        reference_path = data_directory / f"step11abc_{task}_p8.h5"
+        output_directory = benchmark_root / data_path.stem
+        registry_path = output_directory / f"{task}_step11abc_registry.json"
+        data = load_predictor_data_hdf5(data_path)
+        reference = load_predictor_data_hdf5(reference_path)
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        if registry["schema_version"] != STEP11ABC_REGISTRY_SCHEMA:
+            raise ValueError(f"Unsupported Step 11ABC registry: {registry_path}")
+        indices, prediction = _predict_registry_choice(
+            data, registry, output_directory, "test", device
+        )
+        pair_path = write_end_to_end_pairs(
+            data,
+            reference,
+            indices,
+            prediction,
+            output_directory,
+            partition="test",
+        )
+        exports.append(
+            {
+                "task_type": task,
+                "selected_bundle": bundle.upper(),
+                "model_type": registry["selection_policy"]["selected_model_type"],
+                "registry": str(registry_path),
+                "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
+                "test_pair_file": str(pair_path),
+                "test_pair_sha256": hashlib.sha256(pair_path.read_bytes()).hexdigest(),
+                "test_group_count": len(
+                    set(np.asarray(data.example_group_ids, dtype=str)[indices].tolist())
+                ),
+            }
+        )
+    manifest = {
+        "schema_version": STEP11ABC_TEST_EXPORT_SCHEMA,
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "frozen_selection_manifest": str(selection_path),
+        "frozen_selection_sha256": hashlib.sha256(selection_path.read_bytes()).hexdigest(),
+        "test_truth_used_for_selection": False,
+        "exports": exports,
+    }
+    output_path = benchmark_root / "step11abc_test_export_manifest.json"
+    output_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    return output_path, manifest
+
+
+def refresh_existing_validation_pairs(
+    data_directory: str | Path,
+    benchmark_root: str | Path,
+    *,
+    device: str = "auto",
+) -> list[Path]:
+    """Regenerate validation pair CSVs from already frozen model registries."""
+    data_directory = Path(data_directory).expanduser().resolve()
+    benchmark_root = Path(benchmark_root).expanduser().resolve()
+    outputs: list[Path] = []
+    for data_path in sorted(data_directory.glob("step11abc_*.h5")):
+        data = load_predictor_data_hdf5(data_path)
+        reference = load_predictor_data_hdf5(
+            data_directory / f"step11abc_{data.task_type}_p8.h5"
+        )
+        output_directory = benchmark_root / data_path.stem
+        registry_path = output_directory / f"{data.task_type}_step11abc_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        if registry["schema_version"] != STEP11ABC_REGISTRY_SCHEMA:
+            raise ValueError(f"Unsupported Step 11ABC registry: {registry_path}")
+        indices, prediction = _predict_registry_choice(
+            data, registry, output_directory, "validation", device
+        )
+        outputs.append(
+            write_end_to_end_pairs(
+                data,
+                reference,
+                indices,
+                prediction,
+                output_directory,
+                partition="validation",
+            )
+        )
+    return outputs

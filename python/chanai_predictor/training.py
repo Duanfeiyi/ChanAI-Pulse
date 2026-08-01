@@ -108,6 +108,8 @@ def train_model(
     data: PredictorData,
     config: TrainingConfig,
     output_directory: str | Path,
+    *,
+    evaluate_test: bool = True,
 ) -> tuple[Path, Path, dict[str, Any]]:
     """Train one neural model with train-only updates and validation stopping."""
     config.validate()
@@ -177,8 +179,13 @@ def train_model(
     elapsed = time.perf_counter() - started
     model.load_state_dict(best_state)
     validation_prediction = predict_model(model, data.inputs[validation_indices], device)
-    test_indices = data.partition_indices("test")
-    test_prediction = predict_model(model, data.inputs[test_indices], device)
+    metrics = {
+        "validation": metric_bundle(data, validation_prediction, validation_indices)
+    }
+    if evaluate_test:
+        test_indices = data.partition_indices("test")
+        test_prediction = predict_model(model, data.inputs[test_indices], device)
+        metrics["test"] = metric_bundle(data, test_prediction, test_indices)
     manifest = {
         "schema_version": MODEL_MANIFEST_SCHEMA_VERSION,
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -207,12 +214,7 @@ def train_model(
             },
             "history": history,
         },
-        "metrics": {
-            "validation": metric_bundle(
-                data, validation_prediction, validation_indices
-            ),
-            "test": metric_bundle(data, test_prediction, test_indices),
-        },
+        "metrics": metrics,
     }
     output_directory = Path(output_directory).expanduser().resolve()
     output_directory.mkdir(parents=True, exist_ok=True)

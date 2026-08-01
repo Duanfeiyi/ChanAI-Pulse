@@ -3,9 +3,11 @@
 ## 先看什么
 
 1. 打开 D 盘数据目录中的 `step11abc_corpus_manifest.json`：确认 40 条路线、8 个 HDF5 文件、3030 个训练窗口和 P2/P4/P6/P8 定义。
-2. 查看每个 `*_step11abc_registry.json`：确认每组有 3 个随机种子，且自动选择理由不是“偷偷看了测试真值”。
-3. 查看 `formal-end-to-end/step11abc_end_to_end_summary.csv`：PDP NRMSE 越小，说明用该参数包重新生成的信道功率-时延特性越接近隐藏真值。
-4. 查看 `step11abc_bundle_selection.json`：确认普通用户自动包遵守“最佳分数 5% 内优先较少参数”的规则。
+2. 查看每个 `*_step11abc_registry.json`：确认每组有 3 个随机种子、`selection_partition=validation`、`test_partition_used=false`。
+3. 查看 `formal-end-to-end/step11abc_validation_summary.csv`：这里只用验证集比较 P2/P4/P6/P8，PDP NRMSE 越小越好。
+4. 查看 `step11abc_bundle_selection.json`：确认普通用户自动包遵守“验证最佳分数 5% 内优先较少参数”的规则，并记录统一 PDP 时延网格和模型注册表哈希。
+5. 冻结后查看 `step11abc_test_summary.csv`：每个任务只能有一个参数包；它是最终报告，不允许再用来改参数包。
+6. 查看 `step11abc_system_registry.json`：确认 `test_truth_used_for_selection=false`，且参数补齐规则为“预测→模块二校准→场景→版本化默认值”。
 
 ## 如何理解本轮结果
 

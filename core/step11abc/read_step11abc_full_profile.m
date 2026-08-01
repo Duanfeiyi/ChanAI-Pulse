@@ -30,9 +30,15 @@ cm = channel_model(sps); %#ok<NASGU>
 values = double(fallback.values(:)).';
 names = string(fallback.parameter_names(:)).';
 source = findScenarioContainer(sps);
+parameterSources = repmat("versioned_default", size(names));
 for name = names
-    values(names == name) = readScalar(source, name, values(names == name));
+    [values(names == name), found] = readScalar( ...
+        source, name, values(names == name));
+    if found
+        parameterSources(names == name) = "full_6gpcm_scenario";
+    end
 end
+fallbackNames = names(parameterSources == "versioned_default");
 
 profile = struct( ...
     "scenario_name", scenarioName, ...
@@ -41,7 +47,9 @@ profile = struct( ...
     "parameter_names", names, ...
     "source", "full_6gpcm_public_api", ...
     "engine_class", "channel_model", ...
-    "fallback_used", ~isequal(source, sps));
+    "parameter_sources", parameterSources, ...
+    "fallback_parameter_names", fallbackNames, ...
+    "fallback_used", ~isempty(fallbackNames));
 end
 
 function source = findScenarioContainer(sps)
@@ -58,8 +66,9 @@ for fieldName = candidateNames
 end
 end
 
-function value = readScalar(source, fieldName, fallback)
+function [value, found] = readScalar(source, fieldName, fallback)
 value = fallback;
+found = false;
 if isobject(source) && isprop(source, fieldName)
     candidate = source.(fieldName);
 elseif isstruct(source) && isfield(source, fieldName)
@@ -70,5 +79,6 @@ end
 candidate = double(candidate);
 if isscalar(candidate) && isfinite(candidate)
     value = candidate;
+    found = true;
 end
 end

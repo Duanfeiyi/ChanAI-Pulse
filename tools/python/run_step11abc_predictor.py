@@ -12,7 +12,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "python"))
 
 from chanai_predictor.data import load_predictor_data_hdf5  # noqa: E402
-from chanai_predictor.step11abc import benchmark_model_family  # noqa: E402
+from chanai_predictor.step11abc import (  # noqa: E402
+    benchmark_model_family,
+    export_frozen_selection_test_pairs,
+    refresh_existing_validation_pairs,
+)
 
 
 def main() -> int:
@@ -23,7 +27,41 @@ def main() -> int:
     parser.add_argument("--patience", type=int, default=8)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--seeds", type=int, nargs="+", default=(11011, 11012, 11013))
+    parser.add_argument(
+        "--selection-manifest",
+        type=Path,
+        help="Skip training and export test pairs only for frozen validation choices.",
+    )
+    parser.add_argument(
+        "--refresh-validation-pairs",
+        action="store_true",
+        help="Skip training and recreate validation pair CSVs from existing registries.",
+    )
     arguments = parser.parse_args()
+    if arguments.refresh_validation_pairs and arguments.selection_manifest is not None:
+        parser.error("--refresh-validation-pairs and --selection-manifest are mutually exclusive.")
+    if arguments.refresh_validation_pairs:
+        outputs = refresh_existing_validation_pairs(
+            arguments.data_directory,
+            arguments.output_directory,
+            device=arguments.device,
+        )
+        print(json.dumps({"status": "ok", "validation_pair_files": [str(path) for path in outputs]}, ensure_ascii=False))
+        return 0
+    if arguments.selection_manifest is not None:
+        manifest_path, manifest = export_frozen_selection_test_pairs(
+            arguments.data_directory,
+            arguments.output_directory,
+            arguments.selection_manifest,
+            device=arguments.device,
+        )
+        print(
+            json.dumps(
+                {"status": "ok", "test_export_manifest": str(manifest_path), "exports": manifest["exports"]},
+                ensure_ascii=False,
+            )
+        )
+        return 0
     paths = sorted(arguments.data_directory.glob("step11abc_*.h5"))
     if not paths:
         raise FileNotFoundError("No step11abc_*.h5 files found.")

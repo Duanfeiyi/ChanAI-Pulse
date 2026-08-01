@@ -1,47 +1,244 @@
-function report = run_step11abc_end_to_end_validation(engineRoot, benchmarkRoot, outputDirectory, options)
-%RUN_STEP11ABC_END_TO_END_VALIDATION Offline P2/P4/P6/P8 Full-6GPCM check.
-%   Accuracy is deliberately emitted as a separate test artifact, not UI data.
+function report = run_step11abc_end_to_end_validation( ...
+        engineRoot, benchmarkRoot, outputDirectory, options)
+%RUN_STEP11ABC_END_TO_END_VALIDATION Leakage-safe Full-6GPCM evaluation.
+%   VALIDATION compares every P-bundle and freezes one choice per task.
+%   TEST reads that frozen choice and evaluates only the chosen P-bundles.
 
 arguments
     engineRoot (1, 1) string
     benchmarkRoot (1, 1) string
     outputDirectory (1, 1) string
-    options.MaxPairsPerBundle (1, 1) double {mustBeInteger, mustBePositive} = 3
+    options.Mode (1, 1) string {mustBeMember(options.Mode, ...
+        ["validation", "test"])} = "validation"
+    options.MaxPairsPerBundle (1, 1) double ...
+        {mustBeInteger, mustBePositive} = 5
+    options.SelectionManifest (1, 1) string = ""
+    options.CalibratedParameters (1, 1) struct = struct()
+    options.DelayBinCount (1, 1) double ...
+        {mustBeInteger, mustBePositive} = 64
+    options.DelayHeadroom (1, 1) double {mustBeNonnegative} = 0.20
 end
 if ~isfolder(benchmarkRoot)
-    error("run_step11abc_end_to_end_validation:BenchmarkRootMissing", "Benchmark root not found: %s", benchmarkRoot);
+    error("run_step11abc_end_to_end_validation:BenchmarkRootMissing", ...
+        "Benchmark root not found: %s", benchmarkRoot);
 end
 if ~isfolder(outputDirectory)
     mkdir(outputDirectory);
 end
-pairFiles = dir(fullfile(benchmarkRoot, "**", "*_step11abc_full_generator_pairs.csv"));
-if isempty(pairFiles)
-    error("run_step11abc_end_to_end_validation:PairsMissing", "No generator-pair CSV files found under %s", benchmarkRoot);
+
+if options.Mode == "validation"
+    report = runValidation(engineRoot, benchmarkRoot, ...
+        outputDirectory, options);
+else
+    report = runTest(engineRoot, benchmarkRoot, ...
+        outputDirectory, options);
 end
-rows = table();
-for fileIndex = 1:numel(pairFiles)
-    filePath = fullfile(pairFiles(fileIndex).folder, pairFiles(fileIndex).name);
-    data = readtable(filePath, "TextType", "string");
-    [taskType, bundleName] = inferIdentity(filePath);
-    selected = selectIndependentRows(data, options.MaxPairsPerBundle);
-    for pairIndex = 1:height(selected)
-        truth = probeFromRow(engineRoot, selected(pairIndex, :), "truth", pairIndex);
-        generated = probeFromRow(engineRoot, selected(pairIndex, :), "generated", pairIndex);
-        truthFeatures = cirFeatures(truth.dataset);
-        generatedFeatures = cirFeatures(generated.dataset);
-        newRow = table(string(taskType), string(bundleName), pairIndex, string(selected.group_id(pairIndex)), double(selected.target_step(pairIndex)), parameterNrmse(selected(pairIndex, :)), pdpNrmse(truthFeatures.pdp, generatedFeatures.pdp), abs(truthFeatures.rms_delay_s - generatedFeatures.rms_delay_s), truth.report.elapsed_s + generated.report.elapsed_s, truth.report.core_unchanged && generated.report.core_unchanged, 'VariableNames', {'task_type', 'bundle_name', 'pair_index', 'group_id', 'target_step', 'parameter_nrmse', 'pdp_nrmse', 'rms_delay_abs_error_s', 'elapsed_s', 'full_core_unchanged'});
-        rows = [rows; newRow]; %#ok<AGROW>
+end
+
+function report = runValidation(engineRoot, benchmarkRoot, ...
+        outputDirectory, options)
+pairFiles = dir(fullfile(benchmarkRoot, "**", ...
+    "*_step11abc_validation_generator_pairs.csv"));
+if isempty(pairFiles)
+    error("run_step11abc_end_to_end_validation:ValidationPairsMissing", ...
+        "No validation pair CSV files found under %s", benchmarkRoot);
+end
+[evaluations, delayEdges] = evaluatePairFiles(engineRoot, pairFiles, ...
+    options.MaxPairsPerBundle, [], options);
+[rows, sourceCounts] = scoreEvaluations(evaluations, delayEdges);
+summary = groupsummary(rows, {'task_type', 'bundle_name'}, 'mean', ...
+    {'parameter_nrmse', 'pdp_nrmse', 'rms_delay_abs_error_s', ...
+    'generated_delay_overflow_power_fraction'});
+selection = chooseSmallestAcceptableBundle(summary);
+selection.evaluation_partition = "validation";
+selection.test_truth_used_for_selection = false;
+selection.delay_grid = delayGridManifest(delayEdges);
+selection.parameter_resolution_policy = resolutionPolicy();
+selection.selected_model_registries = collectSelectedRegistries( ...
+    benchmarkRoot, selection);
+selection.parameter_source_counts = sourceCounts;
+
+writetable(rows, fullfile(outputDirectory, ...
+    "step11abc_validation_pairs.csv"));
+writetable(summary, fullfile(outputDirectory, ...
+    "step11abc_validation_summary.csv"));
+selectionPath = fullfile(outputDirectory, ...
+    "step11abc_bundle_selection.json");
+writeJson(selectionPath, selection);
+report = struct( ...
+    "schema_version", "v3.0-step11abc-validation-selection.2", ...
+    "evaluation_partition", "validation", ...
+    "pairs", rows, ...
+    "summary", summary, ...
+    "bundle_selection", selection, ...
+    "selection_manifest", selectionPath, ...
+    "product_ui_accuracy_plots", false, ...
+    "note", "Validation selects P-bundles; test routes remain unopened.");
+save(fullfile(outputDirectory, ...
+    "step11abc_validation_report.mat"), "report");
+end
+
+function report = runTest(engineRoot, benchmarkRoot, ...
+        outputDirectory, options)
+if strlength(options.SelectionManifest) == 0 || ...
+        ~isfile(options.SelectionManifest)
+    error("run_step11abc_end_to_end_validation:SelectionMissing", ...
+        "Test mode requires the frozen validation selection manifest.");
+end
+selection = read_step11abc_system_registry( ...
+    options.SelectionManifest, "RequireFinalTest", false);
+if ~isfield(selection, "evaluation_partition") || ...
+        string(selection.evaluation_partition) ~= "validation"
+    error("run_step11abc_end_to_end_validation:UnsafeSelection", ...
+        "Selection manifest is not a validation-only frozen decision.");
+end
+pairFiles = selectedTestPairFiles(benchmarkRoot, selection);
+verifyTestExportManifest(benchmarkRoot, options.SelectionManifest, pairFiles);
+if ~logical(selection.delay_grid.overflow_bin_enabled)
+    error("run_step11abc_end_to_end_validation:OverflowBinRequired", ...
+        "The frozen PDP grid must declare an overflow bin.");
+end
+delayEdges = [double(selection.delay_grid.finite_edges_s(:)).', Inf];
+[evaluations, usedEdges] = evaluatePairFiles(engineRoot, pairFiles, ...
+    options.MaxPairsPerBundle, delayEdges, options);
+if ~isequaln(delayEdges, usedEdges)
+    error("run_step11abc_end_to_end_validation:DelayGridChanged", ...
+        "The final test must reuse the frozen validation delay grid.");
+end
+[rows, sourceCounts] = scoreEvaluations(evaluations, delayEdges);
+summary = groupsummary(rows, {'task_type', 'bundle_name'}, 'mean', ...
+    {'parameter_nrmse', 'pdp_nrmse', 'rms_delay_abs_error_s', ...
+    'generated_delay_overflow_power_fraction'});
+writetable(rows, fullfile(outputDirectory, "step11abc_test_pairs.csv"));
+writetable(summary, fullfile(outputDirectory, "step11abc_test_summary.csv"));
+
+systemRegistry = struct( ...
+    "schema_version", "v3.0-step11abc-system-registry.1", ...
+    "created_utc", utcNow(), ...
+    "status", "frozen_and_tested", ...
+    "selection_partition", "validation", ...
+    "final_evaluation_partition", "test", ...
+    "test_truth_used_for_selection", false, ...
+    "selection_manifest", string(options.SelectionManifest), ...
+    "selection_manifest_sha256", sha256File(options.SelectionManifest), ...
+    "decisions", selection.decisions, ...
+    "selected_model_registries", selection.selected_model_registries, ...
+    "delay_grid", selection.delay_grid, ...
+    "parameter_resolution_policy", resolutionPolicy(), ...
+    "parameter_source_counts", sourceCounts, ...
+    "final_test_summary", table2struct(summary), ...
+    "full_6gpcm_core_unchanged", all(rows.full_core_unchanged), ...
+    "product_ui_accuracy_plots", false);
+registryPath = fullfile(outputDirectory, ...
+    "step11abc_system_registry.json");
+writeJson(registryPath, systemRegistry);
+report = struct( ...
+    "schema_version", "v3.0-step11abc-final-test.2", ...
+    "evaluation_partition", "test", ...
+    "pairs", rows, ...
+    "summary", summary, ...
+    "system_registry", systemRegistry, ...
+    "system_registry_path", registryPath, ...
+    "product_ui_accuracy_plots", false, ...
+    "note", "Final test evaluates frozen P-bundles only.");
+save(fullfile(outputDirectory, "step11abc_test_report.mat"), "report");
+end
+
+function [evaluations, delayEdges] = evaluatePairFiles( ...
+        engineRoot, pairFiles, maxCount, frozenEdges, options)
+delayEdges = [];
+if ~isempty(frozenEdges)
+    delayEdges = double(frozenEdges(:)).';
+    if numel(delayEdges) < 3 || delayEdges(1) ~= 0 || ...
+            ~isinf(delayEdges(end)) || any(diff(delayEdges) <= 0)
+        error("run_step11abc_end_to_end_validation:InvalidDelayGrid", ...
+            "Frozen delay-grid edges are invalid.");
     end
 end
-summary = groupsummary(rows, {'task_type', 'bundle_name'}, 'mean', {'parameter_nrmse', 'pdp_nrmse', 'rms_delay_abs_error_s'});
-selection = chooseSmallestAcceptableBundle(summary);
-writetable(rows, fullfile(outputDirectory, "step11abc_end_to_end_pairs.csv"));
-writetable(summary, fullfile(outputDirectory, "step11abc_end_to_end_summary.csv"));
-fid = fopen(fullfile(outputDirectory, "step11abc_bundle_selection.json"), "w");
-cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
-fprintf(fid, "%s\n", jsonencode(selection, PrettyPrint=true));
-report = struct("schema_version", "v3.0-step11abc-end-to-end-validation.1", "pairs", rows, "summary", summary, "bundle_selection", selection, "product_ui_accuracy_plots", false, "note", "External test evidence only; product UI remains characteristic-only.");
-save(fullfile(outputDirectory, "step11abc_end_to_end_report.mat"), "report");
+evaluations = repmat(struct( ...
+    "task_type", "", "bundle_name", "", "pair_index", 0, ...
+    "group_id", "", "target_step", 0, "truth", struct(), ...
+    "generated", struct(), "generated_model", struct(), ...
+    "parameter_provenance", struct([])), 0, 1);
+for fileIndex = 1:numel(pairFiles)
+    filePath = fullfile(pairFiles(fileIndex).folder, ...
+        pairFiles(fileIndex).name);
+    data = readtable(filePath, "TextType", "string");
+    [taskType, bundleName] = inferIdentity(filePath);
+    expectedPartition = "validation";
+    if contains(pairFiles(fileIndex).name, "_test_")
+        expectedPartition = "test";
+    end
+    if ~all(string(data.partition) == expectedPartition)
+        error("run_step11abc_end_to_end_validation:PartitionMismatch", ...
+            "Pair file %s contains the wrong partition.", filePath);
+    end
+    selected = selectIndependentRows(data, maxCount);
+    for pairIndex = 1:height(selected)
+        row = selected(pairIndex, :);
+        randomSeed = stablePairSeed(row.group_id, row.target_step);
+        truth = probeTruth(engineRoot, row, randomSeed);
+        [model, provenance] = resolveGeneratedModel( ...
+            engineRoot, row, options.CalibratedParameters);
+        generated = probeModel(engineRoot, model, randomSeed);
+        evaluations(end + 1, 1) = struct( ...
+            "task_type", string(taskType), ...
+            "bundle_name", string(bundleName), ...
+            "pair_index", pairIndex, ...
+            "group_id", string(row.group_id), ...
+            "target_step", double(row.target_step), ...
+            "truth", truth, ...
+            "generated", generated, ...
+            "generated_model", model, ...
+            "parameter_provenance", provenance); %#ok<AGROW>
+    end
+end
+if isempty(delayEdges)
+    maxTruthDelay = 0;
+    for index = 1:numel(evaluations)
+        maxTruthDelay = max(maxTruthDelay, maxDatasetDelay( ...
+            evaluations(index).truth.dataset));
+    end
+    finiteMax = max(1e-9, maxTruthDelay * (1 + options.DelayHeadroom));
+    delayEdges = [linspace(0, finiteMax, options.DelayBinCount + 1), Inf];
+end
+end
+
+function [rows, sourceCounts] = scoreEvaluations(evaluations, delayEdges)
+rows = table();
+sourceCounts = struct("predicted", 0, "module2_calibrated", 0, ...
+    "scenario_config", 0, "versioned_default", 0);
+for index = 1:numel(evaluations)
+    item = evaluations(index);
+    truthFeatures = compute_step11abc_cir_features( ...
+        item.truth.dataset, delayEdges);
+    generatedFeatures = compute_step11abc_cir_features( ...
+        item.generated.dataset, delayEdges);
+    provenance = item.parameter_provenance;
+    for source = ["predicted", "module2_calibrated", ...
+            "scenario_config", "versioned_default"]
+        sourceCounts.(source) = sourceCounts.(source) + ...
+            sum(string({provenance.source}) == source);
+    end
+    newRow = table( ...
+        string(item.task_type), string(item.bundle_name), ...
+        item.pair_index, string(item.group_id), item.target_step, ...
+        parameterNrmse(item.truth, item.generated_model), ...
+        pdpNrmse(truthFeatures.pdp, generatedFeatures.pdp), ...
+        abs(truthFeatures.rms_delay_s - generatedFeatures.rms_delay_s), ...
+        truthFeatures.delay_overflow_power_fraction, ...
+        generatedFeatures.delay_overflow_power_fraction, ...
+        string(jsonencode(provenance)), ...
+        item.truth.report.elapsed_s + item.generated.report.elapsed_s, ...
+        item.truth.report.core_unchanged && ...
+            item.generated.report.core_unchanged, ...
+        'VariableNames', {'task_type', 'bundle_name', 'pair_index', ...
+        'group_id', 'target_step', 'parameter_nrmse', 'pdp_nrmse', ...
+        'rms_delay_abs_error_s', 'truth_delay_overflow_power_fraction', ...
+        'generated_delay_overflow_power_fraction', ...
+        'parameter_provenance_json', 'elapsed_s', 'full_core_unchanged'});
+    rows = [rows; newRow]; %#ok<AGROW>
+end
 end
 
 function selected = selectIndependentRows(data, maxCount)
@@ -51,56 +248,175 @@ selected = selected(1:min(maxCount, height(selected)), :);
 end
 
 function [taskType, bundleName] = inferIdentity(filePath)
-parts = split(string(filePath), filesep);
-tokens = split(parts(end - 1), "_");
-taskType = tokens(2);
-bundleName = upper(tokens(end));
+[folder, ~, ~] = fileparts(filePath);
+[~, packageName] = fileparts(folder);
+tokens = regexp(packageName, ...
+    '^step11abc_(interpolation|extrapolation)_(p[2468])$', ...
+    'tokens', 'once');
+if isempty(tokens)
+    error("run_step11abc_end_to_end_validation:CannotInferIdentity", ...
+        "Cannot infer task/P-bundle from %s", filePath);
+end
+taskType = string(tokens{1});
+bundleName = upper(string(tokens{2}));
 end
 
-function output = probeFromRow(engineRoot, row, prefix, pairIndex)
+function pairFiles = selectedTestPairFiles(benchmarkRoot, selection)
+allFiles = dir(fullfile(benchmarkRoot, "**", ...
+    "*_step11abc_test_generator_pairs.csv"));
+pairFiles = allFiles([]);
+tasks = ["interpolation", "extrapolation"];
+for task = tasks
+    decision = selection.decisions.(matlab.lang.makeValidName(task));
+    wantedBundle = upper(string(decision.selected_bundle));
+    matches = false(numel(allFiles), 1);
+    for index = 1:numel(allFiles)
+        filePath = fullfile(allFiles(index).folder, allFiles(index).name);
+        [fileTask, fileBundle] = inferIdentity(filePath);
+        matches(index) = fileTask == task && fileBundle == wantedBundle;
+    end
+    if sum(matches) ~= 1
+        error("run_step11abc_end_to_end_validation:SelectedTestPairMissing", ...
+            "Expected exactly one test pair file for %s/%s.", ...
+            task, wantedBundle);
+    end
+    pairFiles(end + 1, 1) = allFiles(find(matches, 1)); %#ok<AGROW>
+end
+end
+
+function verifyTestExportManifest(benchmarkRoot, selectionPath, pairFiles)
+manifestPath = fullfile(benchmarkRoot, ...
+    "step11abc_test_export_manifest.json");
+if ~isfile(manifestPath)
+    error("run_step11abc_end_to_end_validation:TestExportMissing", ...
+        "Test export manifest is missing: %s", manifestPath);
+end
+manifest = jsondecode(fileread(manifestPath));
+if logical(manifest.test_truth_used_for_selection) || ...
+        ~strcmpi(string(manifest.frozen_selection_sha256), ...
+        sha256File(selectionPath))
+    error("run_step11abc_end_to_end_validation:UnsafeTestExport", ...
+        "Test export is not tied to the current frozen selection.");
+end
+if numel(manifest.exports) ~= numel(pairFiles)
+    error("run_step11abc_end_to_end_validation:UnexpectedTestExport", ...
+        "Test export must contain only the frozen task/bundle choices.");
+end
+for index = 1:numel(pairFiles)
+    path = string(fullfile(pairFiles(index).folder, pairFiles(index).name));
+    candidates = string({manifest.exports.test_pair_file});
+    match = find(strcmpi(candidates, path), 1);
+    if isempty(match) || ~strcmpi(sha256File(path), ...
+            string(manifest.exports(match).test_pair_sha256))
+        error("run_step11abc_end_to_end_validation:TestPairHashMismatch", ...
+            "Test pair file is missing or changed: %s", path);
+    end
+end
+end
+
+function output = probeTruth(engineRoot, row, randomSeed)
+names = canonicalP8();
+model = struct();
+for name = names
+    model.(name) = double(row.("truth_" + name));
+end
+for name = ["num_clusters", "num_rays"]
+    rounded = round(model.(name));
+    if abs(model.(name) - rounded) > 1e-4
+        error("run_step11abc_end_to_end_validation:NonIntegerTruth", ...
+            "Truth %s=%g is not an integer label.", name, model.(name));
+    end
+    model.(name) = rounded;
+end
+output = probeModel(engineRoot, model, randomSeed);
+end
+
+function [model, provenance] = resolveGeneratedModel( ...
+        engineRoot, row, calibrated)
+stepConfig = default_step11abc_config();
+routeNumber = double(extractAfter(string(row.group_id), "route-"));
+cycleIndex = mod(routeNumber - 1, ...
+    numel(stepConfig.route.scenario_cycle)) + 1;
+scenarioName = stepConfig.route.scenario_cycle(cycleIndex);
+frequencyHz = stepConfig.route.carrier_frequency_hz(cycleIndex);
+versioned = step11abc_versioned_generator_defaults(engineRoot);
+fallback = struct("parameter_names", canonicalP8(), ...
+    "values", versioned.values);
+profile = read_step11abc_full_profile( ...
+    engineRoot, scenarioName, frequencyHz, fallback);
+
+scenario = struct("scenario_version", ...
+    "full_6gpcm:" + scenarioName);
+for index = 1:numel(profile.parameter_names)
+    if profile.parameter_sources(index) == "full_6gpcm_scenario"
+        scenario.(profile.parameter_names(index)) = profile.values(index);
+    end
+end
+versionedDefaults = versioned.model;
+predictedVariables = string(row.Properties.VariableNames);
+predictedVariables = predictedVariables( ...
+    startsWith(predictedVariables, "predicted_"));
+predictedNames = extractAfter(predictedVariables, "predicted_");
+predictedValues = zeros(1, numel(predictedNames));
+for index = 1:numel(predictedNames)
+    predictedValues(index) = double(row.(predictedVariables(index)));
+end
+generationConfig = default_prediction_generation_config("mock");
+request = struct( ...
+    "target_count", 1, ...
+    "parameter_names", predictedNames, ...
+    "predicted_parameters", predictedValues, ...
+    "prediction_manifest", struct( ...
+        "schema_version", "v3.0-step11abc-offline-prediction.1"), ...
+    "parameter_sources", struct( ...
+        "calibrated", calibrated, ...
+        "scenario", scenario, ...
+        "versioned_defaults", versionedDefaults, ...
+        "defaults_version", "v3.0-step11abc-full-probe.1"), ...
+    "parameter_bounds", generationConfig.parameter_bounds);
+[model, provenance] = resolve_prediction_generator_parameters(request, 1);
+end
+
+function output = probeModel(engineRoot, model, randomSeed)
 config = default_full_6gpcm_probe_config(engineRoot);
-config.random_seed = 8000 + pairIndex;
+config.random_seed = randomSeed;
 config.sample_count = 1;
-config.DS_mu = row.(prefix + "_DS_mu");
-config.KF_mu = row.(prefix + "_KF_mu");
-config.DS_sigma = row.(prefix + "_DS_sigma");
-config.KF_sigma = row.(prefix + "_KF_sigma");
-config.r_DS = row.(prefix + "_r_DS");
-config.LNS_ksi = row.(prefix + "_LNS_ksi");
-config.num_clusters = round(row.(prefix + "_num_clusters"));
-config.num_rays = round(row.(prefix + "_num_rays"));
+for name = canonicalP8()
+    config.(name) = model.(name);
+end
 output = run_full_6gpcm_probe(config);
 end
 
-function features = cirFeatures(dataset)
-power = abs(dataset.cir.coefficient).^2;
-delay = dataset.cir.delay_s;
-pathPower = squeeze(sum(power, [1, 2, 4, 5]));
-pathDelay = squeeze(mean(delay, [1, 2, 4, 5]));
-pathPower = pathPower(:);
-pathDelay = pathDelay(:);
-weight = pathPower / max(eps, sum(pathPower));
-meanDelay = sum(weight .* pathDelay);
-rmsDelay = sqrt(max(0, sum(weight .* (pathDelay - meanDelay).^2)));
-edges = linspace(0, max(1e-9, max(pathDelay)), 65);
-[~, ~, bins] = histcounts(pathDelay, edges);
-pdp = accumarray(max(1, bins), pathPower, [64, 1], @sum, 0);
-features = struct("pdp", pdp / max(eps, sum(pdp)), "rms_delay_s", rmsDelay);
+function value = stablePairSeed(groupId, targetStep)
+routeNumber = double(extractAfter(string(groupId), "route-"));
+value = 8000 + routeNumber * 1000 + mod(double(targetStep), 1000);
+end
+
+function value = maxDatasetDelay(dataset)
+delay = double(dataset.cir.delay_s(:));
+if any(~isfinite(delay)) || any(delay < 0)
+    error("run_step11abc_end_to_end_validation:InvalidDelay", ...
+        "CIR delays must be finite and nonnegative.");
+end
+value = max(delay);
 end
 
 function value = pdpNrmse(truth, prediction)
-value = sqrt(mean((truth(:) - prediction(:)).^2)) / max(eps, sqrt(mean(truth(:).^2)));
+value = sqrt(mean((truth(:) - prediction(:)).^2)) / ...
+    max(eps, sqrt(mean(truth(:).^2)));
 end
 
-function value = parameterNrmse(row)
-names = ["DS_mu", "KF_mu", "DS_sigma", "KF_sigma", "r_DS", "LNS_ksi", "num_clusters", "num_rays"];
+function value = parameterNrmse(truthOutput, prediction)
+names = canonicalP8();
 truth = zeros(1, numel(names));
-prediction = zeros(1, numel(names));
+generated = zeros(1, numel(names));
+truthConfig = truthOutput.dataset.metadata.config;
 for index = 1:numel(names)
-    truth(index) = row.("truth_" + names(index));
-    prediction(index) = row.("generated_" + names(index));
+    truth(index) = truthConfig.(names(index));
+    generated(index) = prediction.(names(index));
 end
-value = sqrt(mean((truth - prediction).^2)) / max(eps, sqrt(mean(truth.^2)));
+value = sqrt(mean((truth - generated).^2)) / ...
+    max(eps, sqrt(mean(truth.^2)));
 end
 
 function selection = chooseSmallestAcceptableBundle(summary)
@@ -112,7 +428,103 @@ for task = tasks.'
     candidate = subset(score <= min(score) * 1.05, :);
     rank = double(extractAfter(string(candidate.bundle_name), "P"));
     [~, index] = min(rank);
-    decisions.(matlab.lang.makeValidName(task)) = struct("selected_bundle", candidate.bundle_name(index), "best_pdp_nrmse", min(score), "selection_tolerance", 0.05, "reason", "smallest_bundle_within_5_percent_of_best_end_to_end_pdp_nrmse");
+    decisions.(matlab.lang.makeValidName(task)) = struct( ...
+        "selected_bundle", candidate.bundle_name(index), ...
+        "best_validation_pdp_nrmse", min(score), ...
+        "selected_validation_pdp_nrmse", ...
+            candidate.mean_pdp_nrmse(index), ...
+        "selection_tolerance", 0.05, ...
+        "reason", ...
+            "smallest_bundle_within_5_percent_of_best_validation_pdp_nrmse");
 end
-selection = struct("schema_version", "v3.0-step11abc-bundle-selection.1", "ordinary_user_policy", "auto", "advanced_user_policy", "manual_compatible_bundle_selection", "decisions", decisions);
+selection = struct( ...
+    "schema_version", "v3.0-step11abc-bundle-selection.2", ...
+    "created_utc", utcNow(), ...
+    "ordinary_user_policy", "auto", ...
+    "advanced_user_policy", "manual_compatible_bundle_selection", ...
+    "decisions", decisions);
+end
+
+function records = collectSelectedRegistries(benchmarkRoot, selection)
+tasks = ["interpolation", "extrapolation"];
+records = repmat(struct("task_type", "", "selected_bundle", "", ...
+    "path", "", "sha256", ""), numel(tasks), 1);
+for index = 1:numel(tasks)
+    task = tasks(index);
+    decision = selection.decisions.(matlab.lang.makeValidName(task));
+    bundle = lower(string(decision.selected_bundle));
+    path = fullfile(benchmarkRoot, ...
+        "step11abc_" + task + "_" + bundle, ...
+        task + "_step11abc_registry.json");
+    if ~isfile(path)
+        error("run_step11abc_end_to_end_validation:RegistryMissing", ...
+            "Selected model registry does not exist: %s", path);
+    end
+    registry = jsondecode(fileread(path));
+    if ~isfield(registry, "selection_policy") || ...
+            ~strcmp(string(registry.selection_policy.selection_partition), ...
+            "validation") || logical(registry.selection_policy.test_partition_used)
+        error("run_step11abc_end_to_end_validation:UnsafeRegistry", ...
+            "Selected registry is not validation-only: %s", path);
+    end
+    records(index) = struct( ...
+        "task_type", task, ...
+        "selected_bundle", upper(bundle), ...
+        "path", string(path), ...
+        "sha256", sha256File(path));
+end
+end
+
+function manifest = delayGridManifest(delayEdges)
+manifest = struct( ...
+    "schema_version", "v3.0-step11abc-delay-grid.1", ...
+    "frozen_from_partition", "validation_truth_only", ...
+    "regular_bin_count", numel(delayEdges) - 2, ...
+    "finite_max_s", delayEdges(end - 1), ...
+    "overflow_bin_enabled", true, ...
+    "finite_edges_s", delayEdges(1:end - 1));
+end
+
+function policy = resolutionPolicy()
+policy = struct( ...
+    "priority", ["predicted", "module2_calibrated", ...
+        "scenario_config", "versioned_default"], ...
+    "resolver", "resolve_prediction_generator_parameters", ...
+    "per_parameter_provenance_required", true, ...
+    "truth_allowed_as_missing_parameter_source", false);
+end
+
+function names = canonicalP8()
+names = ["DS_mu", "KF_mu", "DS_sigma", "KF_sigma", ...
+    "r_DS", "LNS_ksi", "num_clusters", "num_rays"];
+end
+
+function writeJson(path, value)
+fid = fopen(path, "w");
+if fid < 0
+    error("run_step11abc_end_to_end_validation:CannotWrite", ...
+        "Cannot write %s", path);
+end
+cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
+fprintf(fid, "%s\n", jsonencode(value, PrettyPrint=true));
+end
+
+function value = sha256File(path)
+fid = fopen(path, "rb");
+if fid < 0
+    error("run_step11abc_end_to_end_validation:CannotHash", ...
+        "Cannot read %s", path);
+end
+cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
+bytes = fread(fid, Inf, "*uint8");
+digest = javaMethod("getInstance", ...
+    "java.security.MessageDigest", "SHA-256");
+digest.update(typecast(uint8(bytes(:)), "int8"));
+raw = typecast(int8(digest.digest()), "uint8");
+value = lower(string(reshape(dec2hex(raw, 2).', 1, [])));
+end
+
+function value = utcNow()
+value = string(datetime("now", "TimeZone", "UTC", ...
+    "Format", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
 end
