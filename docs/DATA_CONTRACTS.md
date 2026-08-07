@@ -79,10 +79,20 @@ last  15% -> test
 
 Windows are created inside each partition. Z-score mean and standard deviation are derived only from the real training segment. `append_generated_training_windows` may append generated windows to `train` only. Validation and test remain from the real/evaluation sequence.
 
-## Planned Complex-H contract
+## Complex-H contract (v2.0)
 
-Complex-valued \(H(t,f)\), phase-aware tensors, MIMO axes, Base Models and online adaptation are **not implemented**. The proposed v2.0 design is maintained in `docs/ideas_and_todos/`; it must not be used as the contract of the current MATLAB App.
+The Complex-H representation establishes the data foundation for dynamic wideband MIMO and space-time-frequency tensor prediction. 
 
+Core functions handling Complex-H data must validate the following structure:
+
+```matlab
+record.complex_h        % [Tx x Rx x Subcarrier x Snapshot], complex double
+record.num_tx           % integer, number of transmit antennas
+record.num_rx           % integer, number of receive antennas
+record.subcarriers      % integer, number of frequency subcarriers
+record.center_freq_hz   % double, center frequency
+record.bandwidth_hz     % double, total bandwidth
+```
 ## Privacy boundary
 
 Public demo files must be synthetic and declare public/demo provenance. Do not include private measurement snapshots, source filenames, locations, device identifiers, user paths, timestamps, model checkpoints or experiment outputs in this repository or its documentation.
