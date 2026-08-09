@@ -83,4 +83,5 @@ desktop.ini
 
 # Python generated files
 __pycache__/
+.venv/
 *.py[cod]

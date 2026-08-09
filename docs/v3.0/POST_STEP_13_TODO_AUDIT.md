@@ -35,7 +35,7 @@ Step 13：独立 Benchmark（本分支，等待 PR 合并）
 | GRU/LSTM/TCN 精度提升与自动推荐 | 尚未稳定超过简单基线 | v3.1-1～v3.1-4 |
 | 扩展 P8 以后的角度、空间和动态参数 | 尚需标签、单位、生成器映射和敏感度验证 | v3.1-2 |
 | 端到端参数→6GPCM→CIR 多场景精度评价 | Step 13 已提供框架，仍需更大语料和冻结测试集 | v3.1-5 |
-| MAT/HDF5 转换向导 | 已有 SAGE/旧 WiFo 专用 Converter，无通用 UI 向导 | v3.0.x 或 v3.1-1 |
+| MAT/HDF5 转换向导 | Step 14 已实现正式向导、通用显式映射和专用 Adapter 调度 | v3.0 已完成 |
 | QuaDRiGa 正式生成 Adapter | 现有可选转换示例，不是正式注册生成后端 | 后续生成器扩展 |
 | Experiment Manager | Manifest/报告已有基础，尚无统一实验生命周期管理器 | v3.1 研究基础设施 |
 | PDF、资源占用、跨数据集排行榜 | Step 13 当前导出 CSV/Markdown/PNG/Manifest | Step 14/v3.1，可选 |
