@@ -1,104 +1,95 @@
 # ChanAI Pulse
 
-ChanAI Pulse is a MATLAB desktop research prototype for channel-data characterization, lightweight synthetic channel generation, and baseline time-series prediction. The public repository is intended for reproducible code review, synthetic demonstrations, and research-development collaboration; it is not a packaged end-user product or a validated all-band/all-scenario channel-prediction system.
+ChanAI Pulse is a MATLAB desktop research platform for capability-driven channel-data analysis, generator calibration, parameter prediction, and predicted CIR/CTF export. The public repository is intended for reproducible code review, synthetic demonstrations, and research collaboration; it does not claim that every band, scenario, generator, or prediction model has been scientifically validated.
 
-## v3.0 development entries
+## v3.0 public entries
 
-The current v3.0 development branch provides two deliberately separate entries:
+The v3.0 release candidate has two deliberately separate applications:
 
 ```matlab
-ChannelSimulator   % channel import, calibration, prediction and CIR/CTF export
+ChannelSimulator   % import, characterize, calibrate, predict, generate and export
 ChannelBenchmark   % independent ground-truth accuracy evaluation
 ```
 
-`ChannelSimulator` never displays target ground truth or prediction accuracy.
-`ChannelBenchmark` accepts the complete original v3 HDF5 file plus one formal
-prediction export directory, validates alignment, compares Persistence/Linear
-baselines, and exports CSV/Markdown/PNG/Manifest reports. See
-[`docs/BENCHMARK_PLAN.md`](docs/BENCHMARK_PLAN.md).
+`ChannelSimulator` does not read target-region ground truth for model selection and does not display prediction accuracy. `ChannelBenchmark` accepts the complete original standard HDF5 file plus a formal prediction-export directory, validates strict alignment, compares Persistence and Linear baselines, and exports CSV/Markdown/PNG/Manifest reports.
 
-**Current released baseline:** v1.1.0. The current `main` branch also contains v2.0 design documents and the frozen v3.0 requirement baseline; those documents are plans, not implemented v2.0 or v3.0 functionality.
+## v3.0 implemented workflow
 
-## What is implemented
+- A formal three-page MATLAB UI with Chinese/English switching and normal/advanced user modes.
+- Standard CIR/CTF HDF5 input with canonical dimensions `Tx × Rx × Npath/Nf × Nt × N_sample`.
+- A source-preserving MAT conversion wizard for known structures and explicit user mappings, including MAT v7/v7.3, complex arrays, real/imaginary pairs, known SAGE folders, and legacy WiFo HDF5.
+- Explicit interpolation/extrapolation tasks, including original-axis to MATLAB-index conversion.
+- Capability-driven visualization: 1/3/6/9 standard channel-characteristic plots plus an optional delay–sample heatmap where supported.
+- Generator-parameter calibration with Grid Search, simulated annealing (SA), automatic recommendation, and advanced manual override.
+- Automatic generator compatibility evaluation across 6GPCM-Lite and an externally configured Full 6GPCM adapter; an error is shown only after all formal candidates fail.
+- A frozen v3.0 parameter-prediction product baseline using calibrated Persistence without target-ground-truth leakage.
+- Predicted parameter-to-CIR generation and auditable CIR/CTF/Manifest export.
+- An independent Benchmark application for complex NMSE/correlation, PDP/delay, spatial/angle, time/Doppler metrics and baseline comparison according to data capability.
+- Focused and cumulative MATLAB/Python regression tests using public synthetic fixtures.
 
-- A MATLAB App with three pages: **Characterization**, **Channel Generation**, and **Prediction & Training**.
-- Loading one or more local MATLAB files, extracting a compatible numeric channel representation, and rendering four legacy characteristics: angular display, delay-power display, delay-spread CDF, and normalized Doppler display.
-- The internal `6GPCM-lite` clustered synthetic generator, deterministic with a configured seed, plus conversion of its generated CIR output into the legacy DPSD training representation.
-- Time-domain DPSD sequence experiments with chronological Train / Validation / Test partitions (default 70% / 15% / 15%), training-only normalization, and TCN, LSTM, or GRU baseline models.
-- Generated samples may be appended to the training partition; validation and test use the real evaluation sequence.
-- MATLAB-level dataset-contract validation, SAGE-compatible conversion helpers, automated tests, model export, and prediction-result export selected by the user at run time.
+## Important scientific limits
 
-## Important current limits
-
-- The current prediction workflow is a **legacy power/DPSD time-domain baseline**, not complex-valued channel-matrix \(H\) prediction.
-- `Freq` and `Space` are interface selections only; they do not yet route to independent frequency- or spatial-domain prediction pipelines.
-- The GUI directly loads compatible `.mat` files. ChanAIs dataset validation/loading helpers exist, but a ChanAIs dataset-root browser is not yet wired into the App.
-- `6GPCM-lite` is an internal lightweight synthetic generator, not official 6GPCM or QuaDRiGa. It is suitable for engineering tests and controlled augmentation experiments, not standalone physical-validation claims.
-- The legacy DS-CDF evaluation function uses a Gaussian approximation, not an empirical CDF. See [open issues](docs/OPEN_ISSUES_AND_REFACTOR_ROADMAP.md).
-- Current band and scenario controls provide UI configuration and defaults; they are not evidence that every listed band or scenario has been scientifically validated.
-- Complex-H, Base Model, online adaptation, QuaDRiGa integration, dynamic wideband MIMO, and space-time-frequency \(H\) tensor prediction are future v2.0 directions.
+- The v3.0 product registry deliberately falls back to **Persistence**. GRU/LSTM/TCN research code and adapters exist, but those models have not yet passed the frozen multi-dataset, multi-seed admission gate. Automatic neural-model recommendation and uploaded-data fine-tuning belong to v3.1.
+- The formal target-generation path is currently frozen for sample/position-axis tasks. Time/frequency-axis import and plotting are supported, but their complete target-generation semantics remain future work.
+- The current P6/P8 parameter bundles are engineering baselines, not proof that two, six, or eight predicted parameters are universally optimal.
+- Full 6GPCM remains an external, separately configured dependency. Its core source is not modified or redistributed by this repository.
+- QuaDRiGa is an optional conversion example, not a registered v3.0 production generator backend.
+- “MAT support” means known formats or a user-confirmed explicit variable/dimension mapping. Power-only data without phase cannot be reconstructed as a complete complex CIR/CTF.
+- Accuracy claims must come from `ChannelBenchmark` on an independent test set, not from the prediction UI or the public synthetic review fixtures.
 
 ## Requirements
 
-- MATLAB with Deep Learning Toolbox, Signal Processing Toolbox, and Statistics and Machine Learning Toolbox.
-- MATLAB R2022b was used for the original baseline; compatibility with other releases should be verified locally.
-- Communications Toolbox and 5G Toolbox are not required by the current automated smoke test, but may be useful for broader research work.
+- MATLAB. The v3.0 release candidate is regression-tested locally with MATLAB R2024b.
+- Python is optional for predictor-side and cross-language HDF5 tests; see `tools/python/requirements-v3-step10.txt` and the testing documentation.
+- An external Full 6GPCM installation is optional. Without it, compatible SISO tasks can still use 6GPCM-Lite; unsupported dimensions are reported honestly.
 
 ## Quick start
 
-Clone the repository, open MATLAB in the repository root, and run:
+Open MATLAB in the repository root:
 
 ```matlab
 addpath(genpath(pwd))
-run("tests/smoke_test.m")
-ChannelSimulatorApp
+ChannelSimulator
 ```
 
-`ChannelSimulatorApp` is the public App entry point. The App startup routine also registers `app/plotting/` and `core/` paths, but adding the repository tree explicitly is the supported development and test workflow.
+To evaluate an exported prediction independently:
 
-The public `demo_data/` files are synthetic and may be used for a basic loading demonstration. They are not benchmark evidence. Never add private measurements, local model files, or experiment outputs to the repository.
-
-## Current workflow
-
-```text
-Local compatible MAT files
-  -> legacy characterization and visualization
-  -> optional 6GPCM-lite synthetic generation
-  -> DPSD sequence preparation
-  -> chronological Train / Validation / Test experiment
-  -> TCN / LSTM / GRU baseline training
-  -> held-out evaluation and recursive future prediction
+```matlab
+ChannelBenchmark
 ```
 
-When generated data is selected, the App keeps it in the training-source path; held-out validation and test targets are drawn from the real/evaluation sequence.
+To prepare public synthetic Step 14 review data:
+
+```matlab
+paths = prepare_step14_review_data();
+```
+
+The public `demo_data/` files are synthetic and may be used for workflow review. They are not prediction-accuracy evidence. Never add private measurements, local model checkpoints, or experiment outputs to the repository.
 
 ## Repository layout
 
 ```text
-app/                 MATLAB App and external plot renderers
-core/                GUI-independent MATLAB logic
-configs/             reserved public configuration area
-demo_data/           small synthetic demonstration data only
-docs/                current implementation docs, plans, and historical records
+app/                 formal MATLAB applications and plotting UI
+core/                GUI-independent contracts, ingestion, generation, optimization,
+                     prediction, characterization and benchmark services
+configs/             public configuration
+demo_data/           small public synthetic fixtures
+docs/                maintained v3.0/v3.1 documentation and historical records
+examples/            public review-data and optional integration examples
+python/              predictor-side Python package and interfaces
 release/             source-release and packaging notes
-tests/               MATLAB automated tests and opt-in local checks
-tools/                dataset conversion and documentation utilities
+tests/               MATLAB/Python automated tests and local opt-in checks
+tools/               conversion, audit and documentation utilities
 ```
-
-See [Repository Structure](docs/REPOSITORY_STRUCTURE.md) for the complete, maintained directory guide.
 
 ## Documentation
 
-Start with the [documentation index](docs/README.md).
-
-- [API Reference](docs/API_REFERENCE.md)
-- [Feature-to-Code Map](docs/FEATURE_TO_CODE_MAP.md)
-- [Data Contracts](docs/DATA_CONTRACTS.md)
-- [Testing Guide](docs/TESTING.md)
-- [GUI Manual Test Checklist](docs/GUI_MANUAL_TEST_CHECKLIST.md)
-- [Roadmap](ROADMAP.md)
-- [v3.0 requirements and development baseline](docs/v3.0/README.md) — planned work, not implemented functionality
-- [v2.0 design notes and work plan](docs/ideas_and_todos/README.md) — future planning only
+- [v3.0 documentation index](docs/v3.0/README.md)
+- [v3.0 data contract](docs/v3.0/DATA_CONTRACT.md)
+- [MAT conversion guide](docs/v3.0/STEP_14_MAT_CONVERSION_GUIDE.md)
+- [Step 14 manual review](docs/v3.0/STEP_14_MANUAL_REVIEW_GUIDE.md)
+- [Full 6GPCM external setup](docs/v3.0/FULL_6GPCM_EXTERNAL_SETUP.md)
+- [v3.1 prediction-accuracy plan](docs/v3.1/V3.1预测精度与准确性迭代计划.md)
 
 ## Citation and license
 

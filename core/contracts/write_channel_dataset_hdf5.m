@@ -69,9 +69,16 @@ else
     shape = uint64(size(value));
 end
 
+chunkLength = max(1, min(numel(flatValue), 1024 * 1024));
+chunkShape = size(flatValue);
+chunkShape(1) = min(chunkShape(1), chunkLength);
 h5create(filePath, basePath + "_values", size(flatValue), ...
-    "Datatype", class(flatValue));
-h5write(filePath, basePath + "_values", flatValue);
+    "Datatype", class(flatValue), "ChunkSize", chunkShape);
+for first = 1:chunkLength:numel(flatValue)
+    count = min(chunkLength, numel(flatValue) - first + 1);
+    h5write(filePath, basePath + "_values", ...
+        flatValue(first:(first + count - 1)), [first, 1], [count, 1]);
+end
 h5create(filePath, basePath + "_shape", size(shape), ...
     "Datatype", "uint64");
 h5write(filePath, basePath + "_shape", shape);

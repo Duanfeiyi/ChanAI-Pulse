@@ -10,6 +10,7 @@ classdef ChannelSimulatorV3App < handle
 
     properties (Access = private)
         RootPath string
+        RootGrid matlab.ui.container.GridLayout
         TabGroup matlab.ui.container.TabGroup
         ModuleOneTab matlab.ui.container.Tab
         ModuleTwoTab matlab.ui.container.Tab
@@ -20,12 +21,13 @@ classdef ChannelSimulatorV3App < handle
         ProgressOverlay matlab.ui.container.Panel
         ProgressTitleLabel matlab.ui.control.Label
         ProgressPercentLabel matlab.ui.control.Label
-        ProgressGauge matlab.ui.control.LinearGauge
+        ProgressBar struct = struct()
         ProgressDetailArea matlab.ui.control.TextArea
         ProgressElapsedLabel matlab.ui.control.Label
         ProgressDismissButton matlab.ui.control.Button
 
         FileLabel matlab.ui.control.Label
+        MatConversionButton matlab.ui.control.Button
         TaskModeDropDown matlab.ui.control.DropDown
         TaskAxisDropDown matlab.ui.control.DropDown
         TaskPresetDropDown matlab.ui.control.DropDown
@@ -52,7 +54,8 @@ classdef ChannelSimulatorV3App < handle
         OptimizerDropDown matlab.ui.control.DropDown
         ModuleTwoStatusArea matlab.ui.control.TextArea
         ModuleTwoManifestArea matlab.ui.control.TextArea
-        ModuleTwoProgressGauge matlab.ui.control.LinearGauge
+        ModuleTwoProgressBar struct = struct()
+        ModuleTwoProgressFraction double = 0
         ModuleTwoParameterTable matlab.ui.control.Table
         ModuleTwoRunButton matlab.ui.control.Button
         ModuleTwoCancelButton matlab.ui.control.Button
@@ -166,6 +169,8 @@ classdef ChannelSimulatorV3App < handle
                 "prediction_additional_plot_count", 0, ...
                 "language", app.CurrentLanguage, ...
                 "progress_visible", app.ProgressVisible, ...
+                "progress_style", "horizontal_fill", ...
+                "progress_fraction", get_filled_progress_value(app.ProgressBar), ...
                 "module_two_status", string(app.ModuleTwoStatusArea.Value(:)), ...
                 "module_three_status", string(app.ModuleThreeStatusArea.Value(:)), ...
                 "calibration_errors", strings(0, 1));
@@ -219,10 +224,12 @@ classdef ChannelSimulatorV3App < handle
                 "Position", [30, 30, 1540, 920], ...
                 "Color", [0.96, 0.97, 0.985], ...
                 "Visible", "off", ...
-                "SizeChangedFcn", @(~, ~) app.layoutProgressOverlay(), ...
+                "AutoResizeChildren", "off", ...
+                "SizeChangedFcn", @(~, ~) app.layoutApplication(), ...
                 "CloseRequestFcn", @(~, ~) delete(app));
-            root = uigridlayout(app.UIFigure, [2, 1], ...
+            app.RootGrid = uigridlayout(app.UIFigure, [2, 1], ...
                 "RowHeight", {62, "1x"}, "Padding", [10, 8, 10, 8]);
+            root = app.RootGrid;
 
             header = uipanel(root, "BackgroundColor", "white", ...
                 "BorderColor", border);
@@ -255,7 +262,7 @@ classdef ChannelSimulatorV3App < handle
             app.createModuleTwo(blue, border, muted);
             app.createModuleThree(blue, border, muted);
             app.createProgressOverlay(blue, border, muted);
-            app.layoutProgressOverlay();
+            app.layoutApplication();
             app.localizeCurrentView();
         end
 
@@ -266,12 +273,15 @@ classdef ChannelSimulatorV3App < handle
             controls = uipanel(layout, "Title", "数据导入与任务设置", ...
                 "FontWeight", "bold", "BackgroundColor", "white", ...
                 "BorderColor", border);
-            grid = uigridlayout(controls, [16, 1], ...
-                "RowHeight", {31, 42, 22, 30, 30, 30, 22, 30, 22, 30, ...
+            grid = uigridlayout(controls, [17, 1], ...
+                "RowHeight", {31, 31, 42, 22, 30, 30, 30, 22, 30, 22, 30, ...
                 22, 30, 50, 76, 38, 38}, ...
                 "Padding", [12, 10, 12, 10], "RowSpacing", 5);
             uibutton(grid, "push", "Text", "浏览信道文件…", ...
                 "ButtonPushedFcn", @(~, ~) app.browseFile());
+            app.MatConversionButton = uibutton(grid, "push", ...
+                "Text", "MAT 数据转换向导…", ...
+                "ButtonPushedFcn", @(~, ~) app.openMatWizard());
             app.FileLabel = uilabel(grid, "Text", "尚未选择文件", ...
                 "FontName", "Consolas", "FontColor", muted, ...
                 "WordWrap", "on", "BackgroundColor", [0.97, 0.98, 1]);
@@ -396,11 +406,8 @@ classdef ChannelSimulatorV3App < handle
             app.ProgressPercentLabel = uilabel(grid, "Text", "0%", ...
                 "FontSize", 26, "FontWeight", "bold", ...
                 "HorizontalAlignment", "center", "FontColor", blue);
-            app.ProgressGauge = uigauge(grid, "linear", ...
-                "Limits", [0, 1], "Value", 0, ...
-                "MajorTicks", [0, 0.25, 0.5, 0.75, 1], ...
-                "MajorTickLabels", ["0%", "25%", "50%", "75%", "100%"], ...
-                "FontSize", 12);
+            app.ProgressBar = create_filled_progress_bar(grid, ...
+                Value=0, Text="0%", ShowText=true);
             app.ProgressDetailArea = uitextarea(grid, "Editable", "off", ...
                 "Value", ["当前阶段：等待开始"; "详细信息将在运行时显示。"], ...
                 "FontSize", 12, "BackgroundColor", [0.97, 0.985, 1]);
@@ -432,6 +439,13 @@ classdef ChannelSimulatorV3App < handle
             app.ProgressOverlay.Position = [cardX, cardY, cardWidth, cardHeight];
         end
 
+        function layoutApplication(app)
+            if isempty(app.UIFigure) || ~isvalid(app.UIFigure)
+                return;
+            end
+            app.layoutProgressOverlay();
+        end
+
         function createModuleTwo(app, blue, border, muted)
             layout = uigridlayout(app.ModuleTwoTab, [1, 3], ...
                 "ColumnWidth", {315, "1x", 300}, ...
@@ -449,10 +463,8 @@ classdef ChannelSimulatorV3App < handle
             app.ModuleTwoCancelButton = uibutton(grid, "push", ...
                 "Text", "取消当前运行", "Enable", "off", ...
                 "ButtonPushedFcn", @(~, ~) app.requestCancellation());
-            app.ModuleTwoProgressGauge = uigauge(grid, "linear", ...
-                "Limits", [0, 1], "Value", 0, ...
-                "MajorTicks", [0, 0.25, 0.5, 0.75, 1], ...
-                "MajorTickLabels", ["0%", "25%", "50%", "75%", "100%"]);
+            app.ModuleTwoProgressBar = create_filled_progress_bar(grid, ...
+                Value=0, Text="0%", ShowText=true);
             uilabel(grid, "Text", "阶段：准备数据");
             uilabel(grid, "Text", "阶段：提取参考特性");
             uilabel(grid, "Text", "阶段：参数标定与生成");
@@ -588,17 +600,56 @@ classdef ChannelSimulatorV3App < handle
         end
 
         function browseFile(app)
-            [name, folder] = uigetfile({"*.h5;*.hdf5", "v3 信道 HDF5 (*.h5, *.hdf5)"}, ...
-                "选择 v3 信道文件");
+            [name, folder] = uigetfile({ ...
+                "*.h5;*.hdf5;*.mat", "信道数据 (*.h5, *.hdf5, *.mat)"; ...
+                "*.h5;*.hdf5", "v3 信道 HDF5 (*.h5, *.hdf5)"; ...
+                "*.mat", "MATLAB 数据 (*.mat)"}, ...
+                "选择信道数据文件");
             if isequal(name, 0)
                 app.restoreWindowFocus();
                 return;
             end
-            app.SelectedFile = string(fullfile(folder, name));
+            selected = string(fullfile(folder, name));
+            [~, ~, extension] = fileparts(selected);
+            if lower(string(extension)) == ".mat"
+                app.restoreWindowFocus();
+                app.openMatWizard(selected);
+                return;
+            end
+            app.SelectedFile = selected;
             app.resetLoadedState();
             app.FileLabel.Text = app.SelectedFile;
             app.setGlobalStatus("已选择文件，等待加载", "neutral");
             app.restoreWindowFocus();
+        end
+
+        function openMatWizard(app, sourcePath)
+            arguments
+                app
+                sourcePath (1, 1) string = ""
+            end
+            wizard = ChannelMatConversionWizard( ...
+                RootPath=app.RootPath, ...
+                Language=app.CurrentLanguage, ...
+                SourcePath=sourcePath, ...
+                OnConverted=@(outputPath, ~) app.acceptConvertedMatFile(outputPath));
+            setappdata(app.UIFigure, "ChanAIPulseMatWizard", wizard);
+        end
+
+        function acceptConvertedMatFile(app, outputPath)
+            outputPath = string(outputPath);
+            if ~isfile(outputPath)
+                uialert(app.UIFigure, ...
+                    app.tr("转换结果文件不存在，无法自动加载。"), ...
+                    app.tr("MAT 转换失败"));
+                return;
+            end
+            app.SelectedFile = outputPath;
+            app.resetLoadedState();
+            app.FileLabel.Text = outputPath;
+            app.setGlobalStatus("MAT 转换完成，正在自动加载", "running");
+            app.restoreWindowFocus();
+            app.loadAndAnalyze();
         end
 
         function updateTaskPreview(app)
@@ -953,7 +1004,9 @@ classdef ChannelSimulatorV3App < handle
             app.updateProgress(0.03, "模块二：准备数据", ...
                 "正在提取已知区域的参考特性。", 0, 0, "");
             app.ModuleTwoCancelButton.Enable = "on";
-            app.ModuleTwoProgressGauge.Value = 0.02;
+            app.ModuleTwoProgressFraction = 0.02;
+            update_filled_progress_bar(app.ModuleTwoProgressBar, ...
+                app.ModuleTwoProgressFraction, State="running");
             app.ModuleTwoStatusArea.Value = [ ...
                 "准备数据…"; "提取已知区域参考特性…"; "正在选择优化策略…"];
             try
@@ -1039,8 +1092,10 @@ classdef ChannelSimulatorV3App < handle
 
         function calibrationProgress(app, event)
             if isfield(event, "progress")
-                app.ModuleTwoProgressGauge.Value = max(0, min(1, ...
+                app.ModuleTwoProgressFraction = max(0, min(1, ...
                     double(event.progress)));
+                update_filled_progress_bar(app.ModuleTwoProgressBar, ...
+                    app.ModuleTwoProgressFraction, State="running");
             end
             phase = "运行中";
             message = "正在执行参数标定";
@@ -1054,9 +1109,9 @@ classdef ChannelSimulatorV3App < handle
                 "参数标定运行中"; ...
                 "阶段: " + phase; ...
                 "进度: " + sprintf("%.0f%%", ...
-                    100 * app.ModuleTwoProgressGauge.Value); ...
+                    100 * app.ModuleTwoProgressFraction); ...
                 message];
-            app.updateProgress(0.10 + 0.45 * app.ModuleTwoProgressGauge.Value, ...
+            app.updateProgress(0.10 + 0.45 * app.ModuleTwoProgressFraction, ...
                 "模块二：" + phase, message, 0, 0, "");
             drawnow limitrate;
         end
@@ -1238,7 +1293,9 @@ classdef ChannelSimulatorV3App < handle
                 "选择来源: " + string(result.selection_source); ...
                 "理由: " + string(result.selection_reason)];
             if result.success
-                app.ModuleTwoProgressGauge.Value = 1;
+                app.ModuleTwoProgressFraction = 1;
+                update_filled_progress_bar(app.ModuleTwoProgressBar, 1, ...
+                    Text="100%", State="success");
                 parameterNames = string(fieldnames(result.best.parameters));
                 parameterValues = zeros(numel(parameterNames), 1);
                 for parameterIndex = 1:numel(parameterNames)
@@ -1257,7 +1314,9 @@ classdef ChannelSimulatorV3App < handle
                     "best_score=" + string(result.manifest.best_score); ...
                     "backend=" + string(result.config.generator_config.backend)];
             else
-                app.ModuleTwoProgressGauge.Value = 0;
+                app.ModuleTwoProgressFraction = 0;
+                update_filled_progress_bar(app.ModuleTwoProgressBar, 0, ...
+                    Text="0%", State="error");
                 app.ModuleTwoParameterTable.Data = table( ...
                     strings(0, 1), zeros(0, 1), strings(0, 1), ...
                     'VariableNames', {'Parameter', 'Value', 'Source'});
@@ -1749,7 +1808,8 @@ classdef ChannelSimulatorV3App < handle
                 app.ProgressDismissButton.Enable == "off";
             if ~continueCurrentRun
                 app.ProgressStartedAt = tic;
-                app.ProgressGauge.Value = 0;
+                update_filled_progress_bar(app.ProgressBar, 0, ...
+                    Text="0%", State="running");
                 app.ProgressPercentLabel.Text = "0%";
                 app.ProgressDismissButton.Enable = "off";
                 app.ProgressOverlay.Visible = "on";
@@ -1768,7 +1828,8 @@ classdef ChannelSimulatorV3App < handle
                 app.beginProgress("正在运行", "正在准备任务。");
             end
             fraction = max(0, min(1, double(fraction)));
-            app.ProgressGauge.Value = fraction;
+            update_filled_progress_bar(app.ProgressBar, fraction, ...
+                Text=sprintf("%.0f%%", 100 * fraction), State="running");
             app.ProgressPercentLabel.Text = sprintf("%.0f%%", 100 * fraction);
             lines = ["当前阶段：" + string(phase); string(detail)];
             if targetCount > 0
@@ -1788,7 +1849,8 @@ classdef ChannelSimulatorV3App < handle
                 return;
             end
             if success
-                app.ProgressGauge.Value = 1;
+                update_filled_progress_bar(app.ProgressBar, 1, ...
+                    Text="100%", State="success");
                 app.ProgressPercentLabel.Text = "100%";
                 app.ProgressTitleLabel.Text = app.tr("运行完成");
                 app.ProgressDetailArea.Value = app.trLines([ ...
@@ -1796,6 +1858,9 @@ classdef ChannelSimulatorV3App < handle
                     "可点击“收起进度面板”继续查看结果。"]);
                 app.ProgressTitleLabel.FontColor = [0.08, 0.50, 0.25];
             else
+                update_filled_progress_bar(app.ProgressBar, ...
+                    get_filled_progress_value(app.ProgressBar), ...
+                    State="error");
                 app.ProgressTitleLabel.Text = app.tr("运行未完成");
                 app.ProgressDetailArea.Value = app.trLines([ ...
                     "最终状态：未完成"; string(detail); ...
@@ -1856,7 +1921,9 @@ classdef ChannelSimulatorV3App < handle
             app.ModuleTwoRunButton.Enable = "off";
             app.RunPredictionButton.Enable = "off";
             app.ExportButton.Enable = "off";
-            app.ModuleTwoProgressGauge.Value = 0;
+            app.ModuleTwoProgressFraction = 0;
+            update_filled_progress_bar(app.ModuleTwoProgressBar, 0, ...
+                Text="0%", State="neutral");
             for name = string(fieldnames(app.DimensionCardLabels)).'
                 app.DimensionCardLabels.(name).Text = "—";
             end

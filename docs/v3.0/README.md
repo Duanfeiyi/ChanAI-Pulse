@@ -1,6 +1,6 @@
 # ChanAI Pulse v3.0 基线文档
 
-> 状态：Step 0～10 已完成并合并；Step 11 正在独立分支实现
+> 状态：Step 0～13 已完成并合并；Step 14 已实现并通过人工验收，等待 PR 和负责人手动合并
 >
 > 决策日期：2026-07-28
 >
@@ -86,6 +86,12 @@
 - [Step 11 Demo 与人工审阅](STEP_11_VISUAL_REVIEW.md)
 - [Step 11 自动验证记录](STEP_11_VALIDATION.md)
 - [Step 11 验收清单](STEP_11_ACCEPTANCE.md)
+- [Step 14 发布收尾计划](STEP_14_RELEASE_PLAN.md)
+- [Step 14 MAT 转换向导使用说明](STEP_14_MAT_CONVERSION_GUIDE.md)
+- [Step 14 人工审阅指南](STEP_14_MANUAL_REVIEW_GUIDE.md)
+- [Step 14 自动验证记录](STEP_14_VALIDATION.md)
+- [Step 14 发布检查与冻结边界](STEP_14_RELEASE_CHECKLIST.md)
+- [v3.0.0 Release Candidate 说明](STEP_14_RELEASE_NOTES.md)
 - [v3.0 后续工作 Steps](../v3.0后续工作Steps.md)
 
 ## 变更规则
