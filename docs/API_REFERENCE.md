@@ -85,6 +85,16 @@ This is the maintained reference for public MATLAB interfaces in the current rep
 
 ## Evaluation
 
+### Independent Step 13 Benchmark
+
+| Function / path | Contract, inputs and outputs | Called by / tests / status |
+| --- | --- | --- |
+| `ChannelBenchmark(Visible=...)` | Opens the independent three-page Benchmark app. It is deliberately separate from `ChannelSimulator`. | `test_step13_benchmark`; implemented. |
+| `run_channel_benchmark(originalFile, predictionDirectory, config)`<br>`core/benchmark/run_channel_benchmark.m` | Strictly aligns complete original v3 HDF5 data with one prediction export, builds known-only Persistence/Linear baselines, computes capability-driven complex/channel metrics, and returns global/per-target/per-link results. | Step 13 App and tests; implemented. |
+| `run_repeated_channel_benchmark(originalFile, predictionDirectories, config)`<br>`core/benchmark/run_repeated_channel_benchmark.m` | Evaluates at least two independently exported stochastic realizations of the same task and reports per-metric mean/std/min/max. It never regenerates data or silently reuses target truth. | Optional programmatic Step 13 repeated-realization path; tested. |
+| `validate_benchmark_alignment(original, bundle)`<br>`core/benchmark/validate_benchmark_alignment.m` | Rejects task, target-order, shape, coordinate, unit, and leakage-proof mismatches before any accuracy calculation. `PASS` means comparable, not accurate. | Step 13 core/UI and deliberate mismatch test. |
+| `export_channel_benchmark_report(result, outputRoot)`<br>`core/benchmark/export_channel_benchmark_report.m` | Creates a non-overwriting timestamped CSV/Markdown/PNG/Manifest report bundle. | Step 13 core/UI and report test. |
+
 | Function / path | Contract, inputs and outputs | Called by / tests / status |
 | --- | --- | --- |
 | `compute_rmse(predicted, truth)` | Scalar RMSE over aligned numeric arrays. | prediction evaluation. |

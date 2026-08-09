@@ -1,86 +1,40 @@
-# ChanAIs Benchmark Plan
+# ChanAI Pulse v3.0 独立 Benchmark
 
-## 1. Benchmark Motivation
+## 当前状态
 
-ChanAI Pulse has a long-term research ambition to support broader wireless-channel studies. A reproducible benchmark is needed before comparing characterization, generation, or prediction methods under consistent data splits, metrics, and reporting rules. This benchmark is not implemented.
+Step 13 已把原来的“未来规划”落实为独立 MATLAB 程序。正式预测平台仍由
+`ChannelSimulator.m` 启动；准确度评价由并列入口 `ChannelBenchmark.m` 启动。
+两者不会共享目标区真值。
 
-The benchmark plan is currently a roadmap. No private measured datasets are included in this repository, and no new benchmark implementation is added in this stage.
+## 两个输入
 
-## 2. Supported Tasks
+1. 完整的原始 v3 HDF5 信道文件：Benchmark 从中读取目标区 Ground Truth；
+2. `ChannelSimulator` 导出的预测文件夹：至少包含 `predicted_cir.h5`、
+   `prediction_result.json`、`generator_manifest.json` 和
+   `prediction_manifest.json`。
 
-### Channel Characterization
+新导出包带有 `benchmark_context`。它只记录已知区、目标区、任务轴和原输入
+维度，不包含目标区真值。旧导出包缺少这段信息时会被严格拒绝，需要重新导出。
 
-Evaluate whether a method can extract stable and meaningful channel statistics, such as delay spread, angular spectrum, power delay profile, Doppler-related features, and scenario-level descriptors.
+## 评价规则
 
-### Channel Generation
+- 先验证任务、目标顺序、Tx/Rx/Nt/Nf、单位、坐标和原文件 SHA-256；
+- 只在对齐通过后读取目标区真值并计算指标；
+- Persistence 与 Linear 基线只使用已知区；
+- `PASS/WARNING/FAIL` 只表示数据是否可公平比较；
+- 预测质量用误差和“优于/接近/差于基线”表达，不伪造统一准确率百分比。
 
-Evaluate whether generated channel data can match target statistical properties and support downstream prediction tasks.
+基础指标包括 Complex NMSE、幅度 NRMSE、相位 MAE、复相关、PDP NRMSE、
+RMS 时延扩展误差和运行时间。空间、角度、时间和多普勒指标根据输入维度逐级
+启用，与平台的 1/3/6/9 图能力规则一致。
 
-### Channel Prediction
+## 输出
 
-Evaluate short-term and recursive channel prediction performance across different frequency bands, scenarios, and temporal windows.
+每次导出创建新的时间戳文件夹，绝不覆盖旧结果。内容包括：
 
-### Missing Data Completion
+- 总表、逐目标表、逐 Tx/Rx 链路表 CSV；
+- Markdown 报告；
+- 全局指标和逐目标比较 PNG；
+- 可追溯 Benchmark Manifest JSON。
 
-Evaluate whether models can reconstruct missing channel samples, incomplete channel matrices, or partially observed time-frequency channel responses.
-
-## 3. Evaluation Metrics
-
-Initial candidate metrics include:
-
-- RMSE
-- NRMSE
-- MAE
-- Capacity Accuracy
-- K-S Distance
-- Inference Latency
-- Training Time
-- PDP matching score
-- Doppler spectrum matching score
-- Delay spread CDF matching score
-
-Additional metrics may be added after the ChanAIs Dataset schema and benchmark tasks are frozen.
-
-## 4. Baseline Models
-
-Candidate baselines include:
-
-- Statistical channel models
-- Persistence and moving-average predictors
-- LSTM
-- GRU
-- TCN
-- Lightweight Transformer-style models
-- Scenario-specific generation baselines
-
-The first benchmark version should prioritize stable, reproducible baselines rather than overly complex models.
-
-## 5. Dataset Split Strategy
-
-Recommended split levels:
-
-- Random sample split for basic sanity checks.
-- Time-based split for prediction tasks.
-- Scenario-based split for generalization testing.
-- Frequency-band split for cross-band transfer evaluation.
-- Device or measurement-session split when metadata allows.
-
-Each benchmark release should publish fixed train, validation, and test lists to avoid accidental data leakage.
-
-## 6. Future Leaderboard
-
-A future leaderboard may report:
-
-- Task name
-- Dataset version
-- Scenario
-- Frequency band
-- Model name
-- Metrics
-- Training cost
-- Inference latency
-- Code availability
-- Reproducibility notes
-
-The leaderboard should only be introduced after the dataset license, schema, and evaluation scripts are stable.
-
+PDF、资源占用、跨数据集排行榜和 GRU/LSTM/TCN 正式模型排名留给 Step 14/v3.1。

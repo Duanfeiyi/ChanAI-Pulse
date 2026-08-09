@@ -57,6 +57,10 @@ GitHub：
 - [ ] Step 13：建立软件外部 Benchmark
 - [ ] Step 14：集成、回归、文档和发布
 
+Step 13 跟踪 Issue：[Issue #59](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/59)。
+当前实现分支为 `codex/v3-step-13-benchmark`，完成自动测试后等待人工审阅；尚未
+commit、push 或创建 PR。
+
 勾选含义：对应 Step 的实现、测试、文档、需求追踪和 PR 已经合并到 `main`。
 
 ## 3. Step 0 Issue

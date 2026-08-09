@@ -22,9 +22,9 @@ scenarios = struct( ...
 
 exportRoot = string(tempname);
 mkdir(exportRoot);
-cleanupExport = onCleanup(@() rmdir(exportRoot, "s")); %#ok<NASGU>
+cleanupExport = onCleanup(@() rmdir(exportRoot, "s"));
 app = ChannelSimulator(Visible="off");
-cleanupApp = onCleanup(@() delete(app)); %#ok<NASGU>
+cleanupApp = onCleanup(@() delete(app));
 
 for index = 1:numel(scenarios)
     scenario = scenarios(index);
@@ -58,6 +58,13 @@ for index = 1:numel(scenarios)
     assert(isfile(files.cir_hdf5));
     assert(isfile(files.ctf_hdf5));
     assert(isfile(files.result_json));
+    exportedSummary = jsondecode(fileread(files.result_json));
+    assert(isfield(exportedSummary, "benchmark_context"));
+    assert(~exportedSummary.benchmark_context. ...
+        target_ground_truth_read_by_prediction);
+    assert(strcmpi(string(exportedSummary.benchmark_context. ...
+        original_file_sha256), compute_benchmark_file_sha256( ...
+        fullfile(fixtureRoot, scenarioFile))));
     roundTrip = read_channel_dataset_hdf5(files.cir_hdf5);
     assert(roundTrip.dimensions.Tx == after.input_dimensions.Tx);
     assert(roundTrip.dimensions.Rx == after.input_dimensions.Rx);

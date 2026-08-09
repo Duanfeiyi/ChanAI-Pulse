@@ -22,7 +22,7 @@
 | V3-REQ-014 | MATLAB 或 Python 均可实现算法 | 全部 | 1、6、10 | Step 10 PyTorch Predictor、MATLAB Adapter 和跨语言预测一致性测试通过 | 已验证 |
 | V3-REQ-015 | 所有正式函数输入输出清晰并有接口文档 | 全部 | 1、6、9、10、11、12、14 | Step 11 新增 Request/Result、参数来源、导出和失败规则接口指南；Step 12 将补齐正式 UI 启动、操作和导出文档；发布总审计仍待 Step 14 | 进行中 |
 | V3-REQ-016 | 模块三不显示准确度、Ground Truth 或误差图 | 模块三 | 10、11、12 | Step 11 正式风格 Demo 只显示已知/预测参数与预测 CIR 特性；无 Ground Truth/RMSE/准确率；正式三页UI待Step 12 | 进行中 |
-| V3-REQ-017 | 准确度验证放在软件外部 Benchmark | 外部测试 | 13 | 独立执行和数据隔离测试 | 待实现 |
+| V3-REQ-017 | 准确度验证放在软件外部 Benchmark | 外部测试 | 13 | `ChannelBenchmark` 独立入口；严格对齐、已知区基线、目标区隔离、四类能力与报告测试 | 等待人工审阅 |
 | V3-REQ-018 | 正式输出保存版本、配置、随机种子和来源 | 全部 | 1、6、7、8、9、10、11 | `PredictionResult` 保存 Predictor/Generator Manifest、逐目标种子、参数来源、维度、连续性、缓存键和 HDF5/JSON 导出 | 已验证 |
 | V3-REQ-019 | 三页面整体结构以冻结的 v3.0 设计为基线 | GUI | 12 | 布局和交互人工验收 | 已冻结 |
 | V3-REQ-020 | 仓库保持公开，通过短分支和 PR 修改 `main` | 工程 | 0、14 | 仓库设置和 PR 记录 | 已冻结 |
