@@ -66,6 +66,8 @@ models/*
 output/
 outputs/
 tmp/
+review_data/
+benchmark_outputs/
 *.ppt
 *.pptx
 *.pdf

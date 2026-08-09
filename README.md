@@ -2,6 +2,21 @@
 
 ChanAI Pulse is a MATLAB desktop research prototype for channel-data characterization, lightweight synthetic channel generation, and baseline time-series prediction. The public repository is intended for reproducible code review, synthetic demonstrations, and research-development collaboration; it is not a packaged end-user product or a validated all-band/all-scenario channel-prediction system.
 
+## v3.0 development entries
+
+The current v3.0 development branch provides two deliberately separate entries:
+
+```matlab
+ChannelSimulator   % channel import, calibration, prediction and CIR/CTF export
+ChannelBenchmark   % independent ground-truth accuracy evaluation
+```
+
+`ChannelSimulator` never displays target ground truth or prediction accuracy.
+`ChannelBenchmark` accepts the complete original v3 HDF5 file plus one formal
+prediction export directory, validates alignment, compares Persistence/Linear
+baselines, and exports CSV/Markdown/PNG/Manifest reports. See
+[`docs/BENCHMARK_PLAN.md`](docs/BENCHMARK_PLAN.md).
+
 **Current released baseline:** v1.1.0. The current `main` branch also contains v2.0 design documents and the frozen v3.0 requirement baseline; those documents are plans, not implemented v2.0 or v3.0 functionality.
 
 ## What is implemented
