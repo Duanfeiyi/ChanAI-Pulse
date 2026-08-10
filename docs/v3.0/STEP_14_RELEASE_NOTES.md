@@ -1,6 +1,6 @@
-# ChanAI Pulse v3.0.0-rc.1 Release Notes
+# ChanAI Pulse v3.0.0 Release Notes
 
-## 本次候选版的核心成果
+## 本次正式版的核心成果
 
 ChanAI Pulse v3.0 把早期分散的演示代码整理成两个职责分离的正式入口：
 
@@ -30,11 +30,14 @@ ChanAI Pulse v3.0 把早期分散的演示代码整理成两个职责分离的�
 
 ## 发布说明
 
-`v3.0.0-rc.1` 表示功能和文档已进入人工验收候选状态，不等于已发布正式 Tag。最终 `v3.0.0` Tag 必须在：
+`v3.0.0` 是本次正式源码版本。PR #62 已于 2026-08-09 由 `Duanfeiyi` 手动合并到
+`main`，合并提交为 `d74157e86e59238c6345418439e922a687bc44ce`。GitHub `v3.0.0`
+Tag/Release 仍必须在下列最终动作完成后，由项目负责人手动创建：
 
 1. Step 14 人工验收通过；
 2. PR 由 `Duanfeiyi` 手动合并；
-3. 合并后重新生成干净基线 Manifest；
-4. 项目负责人明确批准发布。
+3. 合并后的文档收尾 PR 由 `Duanfeiyi` 手动合并；
+4. 在最终干净 `main` revision 上重新生成基线 Manifest；
+5. 项目负责人明确批准发布。
 
 Codex 不会自行合并 PR 或创建正式发布 Tag。

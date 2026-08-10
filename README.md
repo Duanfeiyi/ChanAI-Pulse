@@ -4,7 +4,7 @@ ChanAI Pulse is a MATLAB desktop research platform for capability-driven channel
 
 ## v3.0 public entries
 
-The v3.0 release candidate has two deliberately separate applications:
+The v3.0 release has two deliberately separate applications:
 
 ```matlab
 ChannelSimulator   % import, characterize, calibrate, predict, generate and export
@@ -39,7 +39,7 @@ ChannelBenchmark   % independent ground-truth accuracy evaluation
 
 ## Requirements
 
-- MATLAB. The v3.0 release candidate is regression-tested locally with MATLAB R2024b.
+- MATLAB. The v3.0 release is regression-tested locally with MATLAB R2024b.
 - Python is optional for predictor-side and cross-language HDF5 tests; see `tools/python/requirements-v3-step10.txt` and the testing documentation.
 - An external Full 6GPCM installation is optional. Without it, compatible SISO tasks can still use 6GPCM-Lite; unsupported dimensions are reported honestly.
 

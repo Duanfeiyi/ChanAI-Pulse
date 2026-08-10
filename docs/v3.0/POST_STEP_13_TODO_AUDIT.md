@@ -8,9 +8,9 @@
 Step 13 不是 v3.0 的最后一步。当前正式主线仍有：
 
 ```text
-Step 13：独立 Benchmark（本分支，等待 PR 合并）
-→ Step 14：全平台集成回归、文档同步、发布审计
-→ v3.0 发布候选
+Step 13：独立 Benchmark（PR #60 已合并）
+→ Step 14：全平台集成回归、文档同步、发布审计（PR #62 已合并）
+→ v3.0 合并后 Manifest 与发布决策收尾
 → v3.1：预测精度、训练语料、参数包和 ModelRegistry v2
 ```
 

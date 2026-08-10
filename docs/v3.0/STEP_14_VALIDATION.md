@@ -2,7 +2,7 @@
 
 > 日期：2026-08-09
 > 分支：`codex/v3-step-14-release`
-> 状态：自动检查与项目负责人人工验收均已通过，允许创建 PR
+> 状态：自动检查与项目负责人人工验收均已通过；PR #62 已于 2026-08-09 由项目负责人手动合并。2026-08-10 已在干净 worktree 完成 post-merge Manifest 预检和 Step 14 聚焦回归。
 
 ## 已通过
 
@@ -77,8 +77,15 @@ OK
 
 ## 自动检查结论
 
-Step 14 自动检查和项目负责人人工验收均已通过。最终未完成项只剩提交/PR、负责人手动合并，以及合并后在干净 `main` 上生成最终基线 Manifest/决定 Tag。
+Step 14 自动检查和项目负责人人工验收均已通过，PR #62 已手动合并到
+`main`（`d74157e86e59238c6345418439e922a687bc44ce`）。在干净收尾 worktree 上，
+`create_v3_release_manifest` 已成功预检，记录 `git_dirty=false` 和上述 revision；
+Step 14 聚焦回归亦再次通过。
+
+正式收尾仍需：同步本文档与发布清单的合并后状态；由项目负责人手动合并该小型文档收尾 PR；
+随后在新的干净 `main` revision 上重新生成最终 Manifest，并由项目负责人决定是否创建
+`v3.0.0` Tag/GitHub Release。Codex 不执行合并或创建 Tag/Release。
 
 ## 人工验收入口
 
-见 [STEP_14_MANUAL_REVIEW_GUIDE.md](STEP_14_MANUAL_REVIEW_GUIDE.md)。项目负责人已确认人工验收通过并允许提交、push 和创建 PR；Codex 不执行合并。
+见 [STEP_14_MANUAL_REVIEW_GUIDE.md](STEP_14_MANUAL_REVIEW_GUIDE.md)。项目负责人已确认人工验收通过并已手动合并 PR #62；Codex 不执行合并。
