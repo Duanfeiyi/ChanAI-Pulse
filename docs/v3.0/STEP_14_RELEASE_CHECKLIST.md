@@ -20,16 +20,18 @@
 
 ## 人工检查
 
-- [ ] 标准 H5 直接加载；
-- [ ] 自动 MAT 转换并回到模块一；
-- [ ] 手动维度映射；
-- [ ] power-only 拒绝；
-- [ ] SAGE 文件夹转换；
-- [ ] 横向进度条比例、状态色、窗口缩放；
-- [ ] 主平台和 MAT 向导中文/English；
-- [ ] 完整内插和外推；
-- [ ] CIR/CTF/Manifest 导出；
-- [ ] `ChannelBenchmark` 严格对齐和报告导出。
+> 项目负责人已于 2026-08-09 确认整体人工验收通过；下列项目据该验收记录冻结。
+
+- [x] 标准 H5 直接加载；
+- [x] 自动 MAT 转换并回到模块一；
+- [x] 手动维度映射；
+- [x] power-only 拒绝；
+- [x] SAGE 文件夹转换；
+- [x] 横向进度条比例、状态色、窗口缩放；
+- [x] 主平台和 MAT 向导中文/English；
+- [x] 完整内插和外推；
+- [x] CIR/CTF/Manifest 导出；
+- [x] `ChannelBenchmark` 严格对齐和报告导出。
 
 人工步骤见 [STEP_14_MANUAL_REVIEW_GUIDE.md](STEP_14_MANUAL_REVIEW_GUIDE.md)。
 
@@ -43,12 +45,16 @@
 - 预测端不读取目标 Ground Truth；
 - 独立 Benchmark 准确度评估边界。
 
-## 合并后才能完成的最后动作
+## PR #62 合并后、v3.0.0 Tag 前的最后动作
 
-以下内容现在不能伪装成已完成：
+PR #62 已于 2026-08-09 由项目负责人手动合并，合并提交为
+`d74157e86e59238c6345418439e922a687bc44ce`。2026-08-10 的干净 worktree 预检已成功生成
+Manifest，记录 `git_dirty=false` 和该 revision；该预检产物位于 Git 忽略的 `review_data/`，
+不能代替最终发布基线。
 
-1. 由项目负责人手动合并 Step 14 PR；
-2. 在干净 `main` 上重新运行 `create_v3_release_manifest`；
-3. 确认 Manifest 中 `git_dirty=false` 且 revision 为合并提交；
-4. 项目负责人决定是否创建 `v3.0.0` Tag/GitHub Release；
-5. 以该 revision 作为 v3.1-0 唯一正式对照组。
+1. [x] 项目负责人手动合并 Step 14 PR；
+2. [x] 在干净 worktree 上运行 `create_v3_release_manifest` 预检，并确认 `git_dirty=false`；
+3. [ ] 将本文档收尾状态经独立 PR 由项目负责人手动合并；
+4. [ ] 在该 PR 合并后的干净 `main` 上重新运行 `create_v3_release_manifest`，使最终 Manifest 指向最终发布 revision；
+5. [ ] 项目负责人决定是否创建 `v3.0.0` Tag/GitHub Release；
+6. [ ] 以最终 revision 作为 v3.1-0 唯一正式对照组。
