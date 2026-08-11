@@ -55,6 +55,11 @@ legacy/
 !demo_data/v3_step10/
 !demo_data/v3_step10/**
 
+# The v3.1-1 bundled runtime is code plus required static assets, not data.
+!third_party/
+!third_party/full_6gpcm/
+!third_party/full_6gpcm/**
+
 # Experiment and runtime outputs
 experiments/exp_*/
 results/*

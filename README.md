@@ -21,7 +21,7 @@ ChannelBenchmark   % independent ground-truth accuracy evaluation
 - Explicit interpolation/extrapolation tasks, including original-axis to MATLAB-index conversion.
 - Capability-driven visualization: 1/3/6/9 standard channel-characteristic plots plus an optional delay–sample heatmap where supported.
 - Generator-parameter calibration with Grid Search, simulated annealing (SA), automatic recommendation, and advanced manual override.
-- Automatic generator compatibility evaluation across 6GPCM-Lite and an externally configured Full 6GPCM adapter; an error is shown only after all formal candidates fail.
+- Automatic generator compatibility evaluation across 6GPCM-Lite and the bundled Full 6GPCM adapter; an error is shown only after all formal candidates fail.
 - A frozen v3.0 parameter-prediction product baseline using calibrated Persistence without target-ground-truth leakage.
 - Predicted parameter-to-CIR generation and auditable CIR/CTF/Manifest export.
 - An independent Benchmark application for complex NMSE/correlation, PDP/delay, spatial/angle, time/Doppler metrics and baseline comparison according to data capability.
@@ -32,7 +32,7 @@ ChannelBenchmark   % independent ground-truth accuracy evaluation
 - The v3.0 product registry deliberately falls back to **Persistence**. GRU/LSTM/TCN research code and adapters exist, but those models have not yet passed the frozen multi-dataset, multi-seed admission gate. Automatic neural-model recommendation and uploaded-data fine-tuning belong to v3.1.
 - The formal target-generation path is currently frozen for sample/position-axis tasks. Time/frequency-axis import and plotting are supported, but their complete target-generation semantics remain future work.
 - The current P6/P8 parameter bundles are engineering baselines, not proof that two, six, or eight predicted parameters are universally optimal.
-- Full 6GPCM remains an external, separately configured dependency. Its core source is not modified or redistributed by this repository.
+- Full 6GPCM is bundled at `third_party/full_6gpcm/`. Its core files are kept unchanged; ChanAI Pulse calls it only through an adapter.
 - QuaDRiGa is an optional conversion example, not a registered v3.0 production generator backend.
 - “MAT support” means known formats or a user-confirmed explicit variable/dimension mapping. Power-only data without phase cannot be reconstructed as a complete complex CIR/CTF.
 - Accuracy claims must come from `ChannelBenchmark` on an independent test set, not from the prediction UI or the public synthetic review fixtures.
@@ -41,7 +41,7 @@ ChannelBenchmark   % independent ground-truth accuracy evaluation
 
 - MATLAB. The v3.0 release is regression-tested locally with MATLAB R2024b.
 - Python is optional for predictor-side and cross-language HDF5 tests; see `tools/python/requirements-v3-step10.txt` and the testing documentation.
-- An external Full 6GPCM installation is optional. Without it, compatible SISO tasks can still use 6GPCM-Lite; unsupported dimensions are reported honestly.
+- Full 6GPCM is included in the repository. Compatible SISO tasks keep 6GPCM-Lite as the first automatic choice; MIMO or Lite-incompatible tasks automatically use bundled Full 6GPCM when available. Advanced users may explicitly override `EngineRoot` or `CHANAI_FULL_6GPCM_ROOT` for a separate installation.
 
 ## Quick start
 
@@ -72,6 +72,7 @@ The public `demo_data/` files are synthetic and may be used for workflow review.
 app/                 formal MATLAB applications and plotting UI
 core/                GUI-independent contracts, ingestion, generation, optimization,
                      prediction, characterization and benchmark services
+third_party/         bundled Full 6GPCM runtime, kept unchanged
 configs/             public configuration
 demo_data/           small public synthetic fixtures
 docs/                maintained v3.0/v3.1 documentation and historical records
@@ -88,7 +89,7 @@ tools/               conversion, audit and documentation utilities
 - [v3.0 data contract](docs/v3.0/DATA_CONTRACT.md)
 - [MAT conversion guide](docs/v3.0/STEP_14_MAT_CONVERSION_GUIDE.md)
 - [Step 14 manual review](docs/v3.0/STEP_14_MANUAL_REVIEW_GUIDE.md)
-- [Full 6GPCM external setup](docs/v3.0/FULL_6GPCM_EXTERNAL_SETUP.md)
+- [v3.1-1 bundled Full 6GPCM guide](docs/v3.1/V3_1_1_BUNDLED_FULL_6GPCM.md)
 - [v3.1 prediction-accuracy plan](docs/v3.1/V3.1预测精度与准确性迭代计划.md)
 
 ## Citation and license

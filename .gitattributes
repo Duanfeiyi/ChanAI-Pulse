@@ -1,0 +1,4 @@
+# Preserve the bundled Full 6GPCM runtime byte-for-byte.  Its integrity
+# checks deliberately cover original file bytes, including line endings and
+# pre-existing whitespace in the approved package.
+third_party/full_6gpcm/** -text -whitespace
