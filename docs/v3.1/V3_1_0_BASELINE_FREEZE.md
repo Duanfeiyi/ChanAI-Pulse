@@ -1,6 +1,6 @@
 # v3.1-0：v3.0.0 可比较基线冻结
 
-> 状态：进行中，等待项目负责人审阅本地工作区改动后再决定是否提交。
+> 状态：等待项目负责人审阅并手动合并 Draft PR。
 >
 > 跟踪：[Issue #65](https://github.com/Duanfeiyi/ChanAI-Pulse/issues/65)
 >
@@ -153,8 +153,8 @@ core/prediction_generation/create_calibrated_persistence_prediction.m
 - [x] Step 14 聚焦回归在新 worktree 通过；
 - [x] P6/P8 Persistence、数据隔离、参数顺序、生成器和 Benchmark 边界已记录；
 - [x] Full 6GPCM 外置资产的 ZIP/入口哈希及“未重新分发”状态已记录；
-- [ ] 项目负责人审阅本文、决定是否提交 v3.1-0 文档 PR；
-- [ ] 在该文档基线获批准后，启动 v3.1-1 的许可证证据审计与完整入库准备。
+- [ ] 项目负责人审阅并手动合并本 Draft PR；
+- [ ] 该 PR 合并后，启动 v3.1-1 的许可证证据审计与完整入库准备。
 
 ## 8. 非范围
 
