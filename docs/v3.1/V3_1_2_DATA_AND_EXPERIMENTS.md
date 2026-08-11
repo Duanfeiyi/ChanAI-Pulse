@@ -14,9 +14,11 @@
 - `120` 个路线组，每路线 `120` 个参数样本；
 - Train / Validation / Test 为 `84 / 18 / 18` 路线组；
 - 维持冻结的 P2/P4/P6/P8 参数顺序、16/4 上下文/目标长度，以及内插/外推分离；
-- 记录场景、中心频率、速度、Tx/Rx 天线数量和路线时长；
-- 标签是 Full 6GPCM 公共 API 场景配置派生的生成器真值，加确定性路线扰动；它们不是实测标签；
+- 记录场景、中心频率、速度、Tx/Rx 天线数量和路线时长；其中速度和天线数量在 v3.1-2 中仅是路线目录元数据，不是预测器输入，也不改变参数标签；
+- 标签由 Full 6GPCM 公共 API 场景配置加确定性路线扰动派生；它们不是实测标签，也不等同于按每组速度和天线配置实际生成的 CIR；
 - 内置 Full 6GPCM 核心不被修改。
+
+按速度和 Tx/Rx 天线配置实际运行 Full 6GPCM、生成 CIR/CTF 并评价参数预测影响，属于 v3.1-6 的独立端到端 Benchmark。v3.1-2 不提前宣称具备这项能力。
 
 按完整路线组切分，所有滑窗都只能属于一个分区。训练归一化只能从训练路线计算；Validation/Test 不参与选择或调参。
 
@@ -62,7 +64,7 @@ asset = create_v31_2_local_assets("D:\research-assets\ChanAI-Pulse-v3.1-assets")
 - MATLAB 版本、Release、平台；
 - 输出子目录和本地资产策略。
 
-`update_experiment_status` 只允许 `pending → running → completed/failed` 或 `pending → failed`，并保留完整状态历史。`validate_experiment_record` 会验证结构、状态以及已附加数据 Manifest 是否被替换。
+`update_experiment_status` 只允许 `pending → running → completed/failed` 或 `pending → failed`，并保留完整状态历史。`validate_experiment_record` 会验证结构、实验与状态 ID、实验配置哈希，以及已附加数据 Manifest 是否被替换。
 
 ## 验证
 
@@ -72,7 +74,7 @@ asset = create_v31_2_local_assets("D:\research-assets\ChanAI-Pulse-v3.1-assets")
 matlab -batch "cd('repository-root'); addpath(genpath(pwd)); run('tests/run_v31_2_regression.m');"
 ```
 
-该回归同时覆盖 v3.1-1 的 bundled Full 6GPCM 回归，以及 v3.1-2 的路线级无泄漏划分、无覆盖资产写入、文件哈希、实验状态迁移、重复实验 ID 拒绝和数据 Manifest 篡改检测。
+该回归同时覆盖 v3.1-1 的 bundled Full 6GPCM 回归，以及 v3.1-2 的路线级无泄漏划分、参数语料能力边界、无覆盖资产写入、文件哈希、实验状态迁移、重复实验 ID 拒绝、实验配置篡改和数据 Manifest 篡改检测。
 
 ## 非范围
 

@@ -25,6 +25,23 @@ if isempty(errors)
     if string(manifest.schema_version) ~= "v3.1-2-experiment-record.1"
         errors(end + 1, 1) = "Unsupported experiment manifest schema.";
     end
+    try
+        configHash = sha256_experiment_config(manifest.experiment_config);
+        if configHash ~= string(manifest.experiment_config_sha256)
+            errors(end + 1, 1) = "Experiment configuration hash changed.";
+        end
+    catch exception
+        errors(end + 1, 1) = ...
+            "Experiment configuration cannot be hashed: " + string(exception.message);
+    end
+    if ~isfield(status, "schema_version") || ...
+            string(status.schema_version) ~= "v3.1-2-experiment-status.1"
+        errors(end + 1, 1) = "Unsupported experiment status schema.";
+    end
+    if ~isfield(status, "experiment_id") || ...
+            string(status.experiment_id) ~= string(manifest.experiment_id)
+        errors(end + 1, 1) = "Experiment manifest and status ids do not match.";
+    end
     allowed = ["pending", "running", "completed", "failed"];
     if ~isfield(status, "status") || ~any(string(status.status) == allowed)
         errors(end + 1, 1) = "Experiment status is missing or invalid.";
