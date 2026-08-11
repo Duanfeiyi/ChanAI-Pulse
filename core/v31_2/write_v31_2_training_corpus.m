@@ -1,0 +1,89 @@
+function asset = write_v31_2_training_corpus(corpus, assetRoot)
+%WRITE_V31_2_TRAINING_CORPUS Persist a local corpus with an auditable manifest.
+%   The destination is intentionally outside Git. Existing corpus paths are
+%   never overwritten, so incomplete or differently configured assets cannot
+%   silently replace a completed corpus.
+
+arguments
+    corpus (1, 1) struct
+    assetRoot (1, 1) string
+end
+required = ["schema_version", "corpus_id", "config", "group_catalog", ...
+    "generator", "bundles", "summary"];
+for name = required
+    if ~isfield(corpus, name)
+        error("write_v31_2_training_corpus:InvalidCorpus", ...
+            "Corpus is missing %s.", name);
+    end
+end
+if string(corpus.schema_version) ~= "v3.1-2-training-corpus.1"
+    error("write_v31_2_training_corpus:InvalidCorpus", ...
+        "Unsupported corpus schema.");
+end
+if strlength(strtrim(assetRoot)) == 0
+    error("write_v31_2_training_corpus:InvalidAssetRoot", ...
+        "assetRoot cannot be empty.");
+end
+if ~isfolder(assetRoot)
+    mkdir(assetRoot);
+end
+corpusDirectory = fullfile(assetRoot, "corpora", corpus.corpus_id);
+if isfolder(corpusDirectory) || isfile(corpusDirectory)
+    error("write_v31_2_training_corpus:CorpusExists", ...
+        "Refusing to overwrite corpus asset: %s", corpusDirectory);
+end
+mkdir(corpusDirectory);
+bundleDirectory = fullfile(corpusDirectory, "predictor_bundles");
+stepManifest = write_step11abc_training_corpus(corpus, bundleDirectory);
+
+files = dir(fullfile(bundleDirectory, "*.h5"));
+entries = repmat(struct("relative_path", "", "bytes", 0, "sha256", ""), ...
+    numel(files), 1);
+for index = 1:numel(files)
+    filePath = fullfile(files(index).folder, files(index).name);
+    entries(index).relative_path = string(fullfile("predictor_bundles", files(index).name));
+    entries(index).bytes = files(index).bytes;
+    entries(index).sha256 = sha256_file(filePath);
+end
+manifest = struct( ...
+    "schema_version", "v3.1-2-corpus-asset-manifest.1", ...
+    "created_utc", utcNow(), ...
+    "corpus_id", corpus.corpus_id, ...
+    "corpus_schema_version", corpus.schema_version, ...
+    "asset_policy", corpus.config.asset_policy, ...
+    "generator", corpus.generator, ...
+    "summary", corpus.summary, ...
+    "group_catalog", table2struct(corpus.group_catalog), ...
+    "parameter_bundles", corpus.config.parameter_bundles, ...
+    "predictor_files", entries, ...
+    "step11abc_write_manifest", stepManifest, ...
+    "path_policy", "relative_paths_only");
+manifestPath = fullfile(corpusDirectory, "corpus_manifest.json");
+writeNewJson(manifestPath, manifest);
+asset = struct( ...
+    "schema_version", "v3.1-2-corpus-asset-reference.1", ...
+    "corpus_id", corpus.corpus_id, ...
+    "root", string(corpusDirectory), ...
+    "manifest_path", string(manifestPath), ...
+    "manifest_sha256", sha256_file(manifestPath), ...
+    "predictor_bundle_count", numel(entries), ...
+    "status", "completed");
+end
+
+function writeNewJson(path, value)
+if isfile(path)
+    error("write_v31_2_training_corpus:FileExists", ...
+        "Refusing to overwrite asset manifest: %s", path);
+end
+fid = fopen(path, "w");
+if fid < 0
+    error("write_v31_2_training_corpus:CannotWrite", "Cannot write %s", path);
+end
+cleanup = onCleanup(@() fclose(fid));
+fprintf(fid, "%s\n", jsonencode(value, PrettyPrint=true));
+end
+
+function value = utcNow()
+value = string(datetime("now", "TimeZone", "UTC", ...
+    "Format", "yyyy-MM-dd'T'HH:mm:ss'Z'"));
+end
