@@ -26,6 +26,9 @@ catch exception
     return;
 end
 config = mergeStruct(defaults, config);
+if config.backend == "full_6gpcm"
+    config = normalizeFullEngineMetadata(config);
+end
 for fieldName = ["dimensions", "scenario", "model", "ctf", ...
         "backend_options", "engine"]
     if ~isfield(config, fieldName) || ...
@@ -283,6 +286,33 @@ if config.dimensions.Npath ~= 0
 end
 report = addWarning(report, ...
     "Full 6GPCM public_api mode uses a project-owned wrapper while keeping the external core read-only.");
+end
+
+function config = normalizeFullEngineMetadata(config)
+% The bundled artifact has a fixed integrity hash.  A developer-supplied
+% root is still accepted, but is intentionally not claimed to be that
+% bundled artifact and is not checked against its hash.
+if isfield(config, "engine") && isfield(config.engine, "test_only") && ...
+        isequal(config.engine.test_only, true)
+    return;
+end
+installation = resolve_full_6gpcm_root( ...
+    EngineRoot=string(config.engine_root), UseEnvironment=false);
+if installation.is_bundled
+    config.engine.id = "full_6gpcm_bundled";
+    config.engine.version = "260317";
+    config.engine.source_package_name = "bundled_full_6gpcm";
+    config.engine.source_package_sha256 = ...
+        "fcf151adf94038a6cf10d86c6dd687938b085a8f78a64d6829b5439c1d6c5875";
+    config.engine.expected_tree_sha256 = ...
+        "369d778674004bbda6231b89b967b12c1fecacdddf9306b842db8982309a8ae9";
+else
+    config.engine.id = "full_6gpcm_external_override";
+    config.engine.version = "user-supplied";
+    config.engine.source_package_name = "advanced_external_override";
+    config.engine.source_package_sha256 = "";
+    config.engine.expected_tree_sha256 = "";
+end
 end
 
 function output = mergeStruct(defaults, supplied)

@@ -506,7 +506,7 @@ classdef ChannelSimulatorV3App < handle
             app.OptimizerDropDown = uidropdown(advancedGrid, ...
                 "Items", ["自动选择（推荐）", "Grid Search", "模拟退火 SA"], ...
                 "ItemsData", ["auto", "grid", "sa"], "Value", "auto");
-            uilabel(advancedGrid, "Text", "Full 6GPCM 外置根目录（仅 Full）");
+            uilabel(advancedGrid, "Text", "Full 6GPCM 根目录（高级覆盖，可留空）");
             app.EngineRootField = uieditfield(advancedGrid, "text", ...
                 "Value", "", ...
                 "ValueChangedFcn", @(~, ~) app.refreshBackendCompatibility());
@@ -1537,16 +1537,8 @@ classdef ChannelSimulatorV3App < handle
             if strlength(root) > 0
                 return;
             end
-            configured = default_generator_config("full_6gpcm");
-            root = strtrim(string(configured.engine_root));
-            if strlength(root) > 0
-                return;
-            end
-            sibling = fullfile(fileparts(app.RootPath), ...
-                "ChanAI-Pulse-v3-step11abc-assets", "full6gpcm", "source");
-            if isfile(fullfile(sibling, "generate_channel_v1.m"))
-                root = string(sibling);
-            end
+            installation = resolve_full_6gpcm_root();
+            root = installation.root;
         end
 
         function scenario = generatorScenario(app, scenario, dimensions)

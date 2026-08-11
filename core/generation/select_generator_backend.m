@@ -51,7 +51,9 @@ for index = 1:numel(backends)
         config.dimensions.N_sample = double(dimensions.N_sample);
     end
     if backend == "full_6gpcm"
-        config.engine_root = options.FullEngineRoot;
+        if strlength(strtrim(options.FullEngineRoot)) > 0
+            config.engine_root = options.FullEngineRoot;
+        end
         config.backend_options.full_interface = candidate.adapter_variant;
     end
 
