@@ -1,0 +1,84 @@
+{
+  "schema_version": "v3.1-6-end-to-end-config.1",
+  "protocol_id": "v31_6_end_to_end_benchmark.2",
+  "parameter_bundle": "P8",
+  "tasks": ["interpolation", "extrapolation"],
+  "registry_models": [
+    "persistence",
+    "linear",
+    "ar",
+    "kalman",
+    "gru",
+    "lstm",
+    "tcn",
+    "dlinear",
+    "nlinear"
+  ],
+  "additional_baselines": ["v3_0_official"],
+  "v3_0_official": {
+    "interpolation": {"model": "persistence", "bundle": "P8"},
+    "extrapolation": {"model": "persistence", "bundle": "P6"}
+  },
+  "parameter_evaluation": {
+    "partitions": ["validation", "test"],
+    "window_policy": "all_partition_windows",
+    "route_aggregation_required": true,
+    "sensitivity_weights": [
+      0.8469573954643916,
+      0.4749541908056322,
+      0.4635136126948468,
+      0.2803567405448548,
+      0.3918137948670611,
+      0.2784303768385839,
+      0.6698246643175313,
+      0.3061787532827122
+    ]
+  },
+  "generator_evaluation": {
+    "backend": "full_6gpcm",
+    "interface": "public_api",
+    "representative_window": "last_window_per_route",
+    "representative_target_offset_zero_based": 0,
+    "validation_route_count": 5,
+    "validation_route_method": "lowest_sha256_ranked_group_ids",
+    "test_route_count": 18,
+    "primary_seed": 31601,
+    "stability_seeds": [31601, 31602, 31603],
+    "stability_subset_method": "lowest_sha256_ranked_group_ids",
+    "stability_subset_route_count": 6,
+    "snapshot_count": 4,
+    "snapshot_interval_s": 0.25,
+    "ctf_frequency_count": 64,
+    "bandwidth_hz": 100000000,
+    "delay_bin_count": 128,
+    "delay_grid_method": "zero_padded_ifft_of_fixed_ctf_grid",
+    "truth_and_prediction_share_seed": true,
+    "route_speed_tx_rx_frequency_applied": true
+  },
+  "adaptation_evaluation": {
+    "enabled": true,
+    "report_role": "secondary_separate_from_unadapted_main_report",
+    "selection": "registry_auto",
+    "candidate_models": ["gru", "lstm", "tcn"],
+    "method": "output_head_only",
+    "known_region_policy": "same_route_windows_strictly_before_actual_target",
+    "minimum_relative_improvement": 0.01,
+    "maximum_epochs": 20,
+    "patience": 4,
+    "maximum_seconds": 20,
+    "fallback_required": true
+  },
+  "test_policy": {
+    "validation_gate_required": true,
+    "test_export_is_create_once_no_overwrite": true,
+    "test_cannot_change_registry": true,
+    "test_cannot_change_thresholds": true,
+    "bug_fix_requires_new_protocol_run_id_and_full_rerun": true
+  },
+  "asset_policy": {
+    "large_cir_ctf_cache": "git_external",
+    "tracked": ["code", "config", "tests", "documentation", "small_summary", "hash_manifest"],
+    "private_measurements_allowed": false,
+    "absolute_paths_in_tracked_artifacts_allowed": false
+  }
+}
