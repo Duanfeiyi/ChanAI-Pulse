@@ -59,6 +59,27 @@ assert(string(interpolation.task_type) == "interpolation");
 assert(string(interpolation.selection.selected_model) == "gru");
 assert(isequal(double(interpolation.prediction_shape(:))', [18, 4, 2]));
 
+officialRoot = fullfile(root, "models", "official", "v3.1.0");
+requestRoot = fullfile(root, "demo_data", "v31_5", "requests");
+config.selection_mode = "auto";
+config.requested_model = "";
+officialAuto = run_predictor_request_adapter( ...
+    fullfile(requestRoot, "extrapolation_neutral_p8_request.json"), ...
+    fullfile(officialRoot, "extrapolation", ...
+        "extrapolation_model_registry_v2.json"), config);
+assert(string(officialAuto.selection.selected_model) == "kalman");
+assert(isequal(double(officialAuto.prediction_shape(:))', [1, 4, 8]));
+
+config.selection_mode = "manual";
+config.requested_model = "tcn";
+officialManual = run_predictor_request_adapter( ...
+    fullfile(requestRoot, "interpolation_neutral_p8_request.json"), ...
+    fullfile(officialRoot, "interpolation", ...
+        "interpolation_model_registry_v2.json"), config);
+assert(string(officialManual.selection.selected_model) == "tcn");
+assert(logical(officialManual.selection.manual_non_recommended));
+assert(isequal(double(officialManual.prediction_shape(:))', [1, 4, 8]));
+
 failed = false;
 try
     run_predictor_adapter( ...

@@ -2,7 +2,7 @@ function result = run_predictor_adapter(dataPath, registryPath, config)
 %RUN_PREDICTOR_ADAPTER Call the Step 10 Python predictor through JSON files.
 %   RESULT = RUN_PREDICTOR_ADAPTER(DATA, REGISTRY, CONFIG) never reads
 %   target truth to choose a model. Ordinary users use CONFIG.selection_mode
-%   "auto"; advanced users may request "gru", "lstm", or "tcn".
+%   "auto"; advanced users may request any compatible Registry v2 model.
 
 arguments
     dataPath (1, 1) string
@@ -74,7 +74,9 @@ mustBeMember(string(config.partition), ["train", "validation", "test", "all"]);
 mustBeMember(string(config.adaptation_mode), ["off", "auto", "force"]);
 mustBeMember(string(config.device), ["auto", "cpu", "cuda"]);
 if string(config.selection_mode) == "manual"
-    mustBeMember(string(config.requested_model), ["gru", "lstm", "tcn"]);
+    mustBeMember(string(config.requested_model), ...
+        ["persistence", "linear", "ar", "kalman", ...
+        "gru", "lstm", "tcn", "dlinear", "nlinear"]);
 end
 if ~isnumeric(config.minimum_adaptation_improvement) || ...
         ~isscalar(config.minimum_adaptation_improvement) || ...

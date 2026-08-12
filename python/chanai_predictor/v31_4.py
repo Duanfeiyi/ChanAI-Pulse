@@ -10,14 +10,14 @@ import sys
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import torch
 
 from .contracts import PredictorData, TrainingConfig
 from .data import load_predictor_data_hdf5
-from .models import linear_predict, persistence_predict
+from .models import BASELINE_PREDICTORS, ar_predict, kalman_predict
 from .training import load_checkpoint, metric_bundle, predict_model, train_model
 
 
@@ -82,102 +82,6 @@ def _target_coordinates(data: PredictorData) -> tuple[np.ndarray, np.ndarray]:
         )
         target = left + np.arange(data.target_length, dtype=np.float64)
     return known, target
-
-
-def _ar_forecast(values: np.ndarray, horizon: int, order: int = 4) -> np.ndarray:
-    order = min(order, len(values) - 1)
-    if order < 1:
-        return np.repeat(values[-1], horizon)
-    rows = np.asarray([values[i - order : i] for i in range(order, len(values))])
-    target = values[order:]
-    design = np.column_stack((rows, np.ones(len(rows))))
-    regularizer = np.eye(design.shape[1]) * 1e-3
-    regularizer[-1, -1] = 0
-    coefficients = np.linalg.solve(
-        design.T @ design + regularizer, design.T @ target
-    )
-    history = list(np.asarray(values, dtype=np.float64))
-    for _ in range(horizon):
-        row = np.asarray(history[-order:] + [1.0])
-        history.append(float(row @ coefficients))
-    return np.asarray(history[-horizon:])
-
-
-def ar_predict(data: PredictorData, inputs: np.ndarray) -> np.ndarray:
-    """Per-example ridge AR(4); interpolation blends two causal directions."""
-    inputs = np.asarray(inputs, dtype=np.float64)
-    result = np.empty((len(inputs), data.target_length, data.parameter_count))
-    left_length = data.context_length // 2
-    for sample in range(len(inputs)):
-        for parameter in range(data.parameter_count):
-            if data.task_type == "extrapolation":
-                result[sample, :, parameter] = _ar_forecast(
-                    inputs[sample, :, parameter], data.target_length
-                )
-            else:
-                forward = _ar_forecast(
-                    inputs[sample, :left_length, parameter], data.target_length
-                )
-                backward = _ar_forecast(
-                    inputs[sample, left_length:, parameter][::-1], data.target_length
-                )[::-1]
-                weight = (np.arange(data.target_length) + 1) / (data.target_length + 1)
-                result[sample, :, parameter] = forward * (1 - weight) + backward * weight
-    return result.astype(np.float32)
-
-
-def _kalman_forecast(values: np.ndarray, horizon: int) -> np.ndarray:
-    state = np.asarray([values[0], 0.0], dtype=np.float64)
-    covariance = np.eye(2)
-    transition = np.asarray([[1.0, 1.0], [0.0, 1.0]])
-    observation = np.asarray([[1.0, 0.0]])
-    process_noise = np.diag([1e-3, 1e-4])
-    observation_noise = np.asarray([[5e-2]])
-    for value in values:
-        state = transition @ state
-        covariance = transition @ covariance @ transition.T + process_noise
-        innovation = value - float((observation @ state)[0])
-        residual_covariance = observation @ covariance @ observation.T + observation_noise
-        gain = covariance @ observation.T @ np.linalg.inv(residual_covariance)
-        state = state + gain[:, 0] * innovation
-        covariance = (np.eye(2) - gain @ observation) @ covariance
-    output = []
-    for _ in range(horizon):
-        state = transition @ state
-        covariance = transition @ covariance @ transition.T + process_noise
-        output.append(state[0])
-    return np.asarray(output)
-
-
-def kalman_predict(data: PredictorData, inputs: np.ndarray) -> np.ndarray:
-    """Constant-velocity Kalman filter with two-sided interpolation blending."""
-    inputs = np.asarray(inputs, dtype=np.float64)
-    result = np.empty((len(inputs), data.target_length, data.parameter_count))
-    left_length = data.context_length // 2
-    for sample in range(len(inputs)):
-        for parameter in range(data.parameter_count):
-            if data.task_type == "extrapolation":
-                result[sample, :, parameter] = _kalman_forecast(
-                    inputs[sample, :, parameter], data.target_length
-                )
-            else:
-                forward = _kalman_forecast(
-                    inputs[sample, :left_length, parameter], data.target_length
-                )
-                backward = _kalman_forecast(
-                    inputs[sample, left_length:, parameter][::-1], data.target_length
-                )[::-1]
-                weight = (np.arange(data.target_length) + 1) / (data.target_length + 1)
-                result[sample, :, parameter] = forward * (1 - weight) + backward * weight
-    return result.astype(np.float32)
-
-
-BASELINE_PREDICTORS: dict[str, Callable[[PredictorData, np.ndarray], np.ndarray]] = {
-    "persistence": persistence_predict,
-    "linear": linear_predict,
-    "ar": ar_predict,
-    "kalman": kalman_predict,
-}
 
 
 def route_nrmse(
