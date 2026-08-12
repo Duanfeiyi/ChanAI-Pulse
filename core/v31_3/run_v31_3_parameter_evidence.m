@@ -7,14 +7,11 @@ arguments
     assetRoot (1, 1) string
     options.CorpusManifestPath (1, 1) string
     options.EngineRoot (1, 1) string = ""
-    options.ExperimentId (1, 1) string = "v31_3_parameter_evidence.1"
+    options.ExperimentId (1, 1) string = ""
     options.Config (1, 1) struct = default_v31_3_evidence_config()
 end
 config = options.Config;
-if string(config.schema_version) ~= "v3.1-3-parameter-evidence-config.1"
-    error("run_v31_3_parameter_evidence:UnsupportedConfig", ...
-        "Unsupported v3.1-3 evidence configuration.");
-end
+validate_v31_3_evidence_config(config);
 assetReport = validate_v31_2_corpus_asset(options.CorpusManifestPath);
 if ~assetReport.is_valid
     error("run_v31_3_parameter_evidence:InvalidCorpusAsset", ...
@@ -25,8 +22,13 @@ if ~installation.has_public_api
     error("run_v31_3_parameter_evidence:FullEngineUnavailable", ...
         "Full 6GPCM public API is unavailable at %s.", installation.root);
 end
+experimentId = options.ExperimentId;
+if strlength(strtrim(experimentId)) == 0
+    experimentId = "v31_3_parameter_evidence." + string(datetime( ...
+        "now", "TimeZone", "UTC", "Format", "yyyyMMdd_HHmmss_SSS"));
+end
 record = create_experiment(assetRoot, ...
-    "ExperimentId", options.ExperimentId, ...
+    "ExperimentId", experimentId, ...
     "DatasetManifestPath", options.CorpusManifestPath, ...
     "ExperimentConfig", config, ...
     "CodeRoot", string(fileparts(fileparts(fileparts(mfilename("fullpath"))))));

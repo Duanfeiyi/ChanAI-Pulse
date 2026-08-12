@@ -7,6 +7,7 @@ arguments
     engineRoot (1, 1) string
     config (1, 1) struct = default_v31_3_evidence_config()
 end
+validate_v31_3_evidence_config(config);
 validateSensitivityConfig(config);
 defaults = step11abc_versioned_generator_defaults(engineRoot);
 rows = table();

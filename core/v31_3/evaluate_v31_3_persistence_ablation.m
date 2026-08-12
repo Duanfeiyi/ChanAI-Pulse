@@ -8,6 +8,7 @@ arguments
     corpusManifestPath (1, 1) string
     config (1, 1) struct = default_v31_3_evidence_config()
 end
+validate_v31_3_evidence_config(config);
 assetReport = validate_v31_2_corpus_asset(corpusManifestPath);
 if ~assetReport.is_valid
     error("evaluate_v31_3_persistence_ablation:InvalidCorpusAsset", ...
