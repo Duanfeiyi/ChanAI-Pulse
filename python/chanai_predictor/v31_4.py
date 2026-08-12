@@ -379,7 +379,13 @@ def _selected_prediction(
     model_type = selected["model_type"]
     if model_type in BASELINE_PREDICTORS:
         return BASELINE_PREDICTORS[model_type](data, data.inputs[indices])
-    model, _ = load_checkpoint(selected["selected_checkpoint"], device=device)
+    checkpoint = Path(selected["selected_checkpoint"]).expanduser().resolve()
+    expected_sha256 = selected.get("selected_checkpoint_sha256")
+    if not expected_sha256:
+        raise ValueError("The frozen neural selection is missing its checkpoint SHA-256.")
+    if _sha256(checkpoint) != expected_sha256:
+        raise ValueError("The frozen neural checkpoint SHA-256 does not match.")
+    model, _ = load_checkpoint(checkpoint, device=device)
     return predict_model(model, data.inputs[indices], device)
 
 
@@ -580,9 +586,13 @@ def finalize_test_once(
     opened_utc = _utc_now()
     task_results: dict[str, Any] = {}
     for task, task_result in study["tasks"].items():
-        data = load_predictor_data_hdf5(
-            data_directory / f"step11abc_{task}_p8.h5"
-        )
+        data_path = data_directory / f"step11abc_{task}_p8.h5"
+        dataset = task_result.get("dataset", {})
+        if dataset.get("file") != data_path.name or not dataset.get("sha256"):
+            raise ValueError(f"The frozen {task} dataset identity is incomplete.")
+        if _sha256(data_path) != dataset["sha256"]:
+            raise ValueError(f"The frozen {task} dataset SHA-256 does not match.")
+        data = load_predictor_data_hdf5(data_path)
         selected = next(
             (
                 item

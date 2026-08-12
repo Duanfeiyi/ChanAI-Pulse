@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import sys
-import unittest
+import hashlib
 import json
+import sys
 import tempfile
+import unittest
 from dataclasses import replace
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from chanai_predictor.v31_4 import (  # noqa: E402
     BASELINE_TYPES,
     MODEL_TYPES,
     _aggregate_runs,
+    _selected_prediction,
     ar_predict,
     finalize_test_once,
     kalman_predict,
@@ -150,6 +152,81 @@ class V314ModelStudyTests(unittest.TestCase):
                 model, _ = load_checkpoint(checkpoint)
                 prediction = predict_model(model, data.inputs[:2])
                 self.assertEqual(prediction.shape, (2, 4, 8))
+                frozen_prediction = _selected_prediction(
+                    data,
+                    {
+                        "model_type": model_type,
+                        "selected_checkpoint": str(checkpoint),
+                        "selected_checkpoint_sha256": hashlib.sha256(
+                            checkpoint.read_bytes()
+                        ).hexdigest(),
+                    },
+                    "validation",
+                    "cpu",
+                )
+                self.assertEqual(frozen_prediction.shape, (4, 4, 8))
+
+    def test_selected_prediction_rejects_changed_checkpoint(self) -> None:
+        data = fixture()
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "changed.pt"
+            checkpoint.write_bytes(b"not-the-frozen-checkpoint")
+            selected = {
+                "model_type": "dlinear",
+                "selected_checkpoint": str(checkpoint),
+                "selected_checkpoint_sha256": "0" * 64,
+            }
+            with self.assertRaisesRegex(ValueError, "checkpoint SHA-256"):
+                _selected_prediction(data, selected, "validation", "cpu")
+
+    def test_test_finalization_rejects_changed_dataset_before_loading(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            data_root = root / "data"
+            data_root.mkdir()
+            data_path = data_root / "step11abc_interpolation_p8.h5"
+            data_path.write_bytes(b"changed-after-freeze")
+            study = root / "v31_4_model_study_manifest.json"
+            study.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "v3.1-4-model-study.1",
+                        "tasks": {
+                            "interpolation": {
+                                "dataset": {
+                                    "file": data_path.name,
+                                    "sha256": "0" * 64,
+                                },
+                                "candidate_aggregates": [],
+                                "selection": {"model_type": "persistence"},
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            gate_root = root / "full_6gpcm_gate"
+            gate_root.mkdir()
+            gate = gate_root / "v31_4_full_6gpcm_gate.json"
+            gate.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "v3.1-4-full-6gpcm-validation-gate.1",
+                        "evaluation_partition": "validation",
+                        "test_partition_used": False,
+                        "full_6gpcm_core_modified": False,
+                        "passed": True,
+                        "full_6gpcm_tree_sha256_before": "same",
+                        "full_6gpcm_tree_sha256_after": "same",
+                        "study_manifest_sha256": hashlib.sha256(
+                            study.read_bytes()
+                        ).hexdigest(),
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "dataset SHA-256"):
+                finalize_test_once(study, gate, data_root)
 
     def test_test_finalization_rejects_unbound_gate_before_reading_data(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
