@@ -1,0 +1,70 @@
+{
+  "schema_version": "v3.1-4-model-study-config.1",
+  "parameter_bundle": "P8",
+  "tasks": ["interpolation", "extrapolation"],
+  "context_length": 16,
+  "target_length": 4,
+  "selection_partition": "validation",
+  "test_policy": "open_once_after_all_validation_choices_are_frozen",
+  "baselines": ["persistence", "linear", "ar", "kalman"],
+  "trainable_models": ["gru", "lstm", "tcn", "dlinear", "nlinear"],
+  "research_only_non_blocking": ["transformer", "patchtst", "itransformer"],
+  "seeds": [31401, 31402, 31403],
+  "main_loss": "equal_weight_mse_on_train_only_zscore_parameters",
+  "sensitivity_weighted_ablation": {
+    "parameter_order": [
+      "DS_mu",
+      "KF_mu",
+      "DS_sigma",
+      "KF_sigma",
+      "r_DS",
+      "LNS_ksi",
+      "num_clusters",
+      "num_rays"
+    ],
+    "weights": [
+      0.8469573954643916,
+      0.4749541908056322,
+      0.4635136126948468,
+      0.2803567405448548,
+      0.3918137948670611,
+      0.2784303768385839,
+      0.6698246643175313,
+      0.3061787532827122
+    ],
+    "source": "v3.1-3 Full 6GPCM sensitivity evidence .4",
+    "selection_effect": "report_only"
+  },
+  "search": {
+    "strategy": "two_stage_small_grid",
+    "search_seed": 31401,
+    "device_policy": "GRU/LSTM/DLinear/NLinear use requested device; TCN uses CPU after a local one-epoch CPU/GPU timing check",
+    "maximum_epochs": 60,
+    "patience": 8,
+    "batch_size": 128,
+    "gru_lstm": [
+      {"hidden_size": 32, "num_layers": 1, "learning_rate": 0.001},
+      {"hidden_size": 64, "num_layers": 2, "dropout": 0.1, "learning_rate": 0.0005}
+    ],
+    "tcn": [
+      {"channels": 32, "kernel_size": 3, "learning_rate": 0.001, "maximum_epochs": 30, "patience": 5},
+      {"channels": 64, "kernel_size": 5, "learning_rate": 0.0005, "maximum_epochs": 30, "patience": 5}
+    ],
+    "dlinear_nlinear": [
+      {"learning_rate": 0.001},
+      {"learning_rate": 0.0005, "weight_decay": 0.00001}
+    ]
+  },
+  "admission": {
+    "minimum_relative_validation_nrmse_improvement": 0.1,
+    "minimum_validation_route_win_rate": 0.6,
+    "maximum_route_to_baseline_ratio": 2.0,
+    "maximum_seed_relative_standard_deviation": 0.1,
+    "full_6gpcm_validation_gate_required": true
+  },
+  "artifact_policy": {
+    "checkpoints_logs_and_full_results": "git_external",
+    "tracked": ["code", "config", "tests", "documentation", "small_summary"],
+    "private_measurements_allowed": false
+  }
+}

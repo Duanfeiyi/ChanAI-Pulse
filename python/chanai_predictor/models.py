@@ -182,8 +182,89 @@ class SequenceRegressor(nn.Module):
         }
 
 
-def build_model(data: PredictorData, config: TrainingConfig) -> SequenceRegressor:
+class LinearDecompositionRegressor(nn.Module):
+    """Small DLinear/NLinear forecaster with no future inputs in extrapolation."""
+
+    def __init__(
+        self,
+        model_type: str,
+        task_type: str,
+        parameter_count: int,
+        context_length: int,
+        target_length: int,
+        config: TrainingConfig,
+    ):
+        super().__init__()
+        if model_type not in ("dlinear", "nlinear"):
+            raise ValueError(f"Unsupported linear neural model: {model_type}")
+        self.model_type = model_type
+        self.task_type = task_type
+        self.parameter_count = parameter_count
+        self.context_length = context_length
+        self.target_length = target_length
+        self.config = config
+        if model_type == "dlinear":
+            self.seasonal = nn.Linear(context_length, target_length)
+            self.trend = nn.Linear(context_length, target_length)
+        else:
+            self.linear = nn.Linear(context_length, target_length)
+
+    @staticmethod
+    def _moving_average(values: torch.Tensor) -> torch.Tensor:
+        transposed = values.transpose(1, 2)
+        padded = F.pad(transposed, (1, 1), mode="replicate")
+        return F.avg_pool1d(padded, kernel_size=3, stride=1).transpose(1, 2)
+
+    def _anchor(self, values: torch.Tensor) -> torch.Tensor:
+        if self.task_type == "extrapolation":
+            return values[:, -1:, :]
+        left = self.context_length // 2
+        return (values[:, left - 1 : left, :] + values[:, left : left + 1, :]) / 2
+
+    def forward(self, values: torch.Tensor) -> torch.Tensor:
+        if self.model_type == "nlinear":
+            anchor = self._anchor(values)
+            centered = values - anchor
+            output = self.linear(centered.transpose(1, 2)).transpose(1, 2)
+            return output + anchor
+        trend = self._moving_average(values)
+        seasonal = values - trend
+        return (
+            self.seasonal(seasonal.transpose(1, 2))
+            + self.trend(trend.transpose(1, 2))
+        ).transpose(1, 2)
+
+    def architecture_dict(self) -> dict[str, Any]:
+        return {
+            "model_type": self.model_type,
+            "task_type": self.task_type,
+            "parameter_count": self.parameter_count,
+            "context_length": self.context_length,
+            "target_length": self.target_length,
+            "training_config": asdict(self.config),
+            "parameter_count_total": sum(p.numel() for p in self.parameters()),
+            "interpolation_encoder": (
+                "two_sided_known_context"
+                if self.task_type == "interpolation"
+                else "not_applicable"
+            ),
+            "causal_extrapolation": self.task_type == "extrapolation",
+        }
+
+
+def build_model(data: PredictorData, config: TrainingConfig) -> nn.Module:
     config.validate()
+    if config.loss_weights and len(config.loss_weights) != data.parameter_count:
+        raise ValueError("loss_weights must contain one value per predicted parameter.")
+    if config.model_type in ("dlinear", "nlinear"):
+        return LinearDecompositionRegressor(
+            config.model_type,
+            data.task_type,
+            data.parameter_count,
+            data.context_length,
+            data.target_length,
+            config,
+        )
     return SequenceRegressor(
         config.model_type,
         data.task_type,
@@ -194,9 +275,21 @@ def build_model(data: PredictorData, config: TrainingConfig) -> SequenceRegresso
     )
 
 
-def build_model_from_manifest(manifest: dict[str, Any]) -> SequenceRegressor:
-    training = TrainingConfig(**manifest["architecture"]["training_config"])
+def build_model_from_manifest(manifest: dict[str, Any]) -> nn.Module:
+    training_values = dict(manifest["architecture"]["training_config"])
+    if "loss_weights" in training_values:
+        training_values["loss_weights"] = tuple(training_values["loss_weights"])
+    training = TrainingConfig(**training_values)
     architecture = manifest["architecture"]
+    if architecture["model_type"] in ("dlinear", "nlinear"):
+        return LinearDecompositionRegressor(
+            architecture["model_type"],
+            architecture["task_type"],
+            int(architecture["parameter_count"]),
+            int(architecture["context_length"]),
+            int(architecture["target_length"]),
+            training,
+        )
     return SequenceRegressor(
         architecture["model_type"],
         architecture["task_type"],

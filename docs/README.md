@@ -26,6 +26,7 @@ This index separates documentation that describes the current MATLAB implementat
 - [v3.0 data interface guide](v3.0/DATA_INTERFACE_GUIDE.md)
 - [ChanAIs dataset specification](DATASET_SPECIFICATION.md)
 - [Experiment data protocol](EXPERIMENT_DATA_PROTOCOL.md)
+- [v3.1-4 fair P8 model training and admission](v3.1/V3_1_4_MODEL_TRAINING.md)
 - [Dataset policy](DATASET_POLICY.md)
 - [Dataset converter](../tools/dataset_converter/README.md)
 - [Benchmark plan](BENCHMARK_PLAN.md) — planned, not an implemented benchmark

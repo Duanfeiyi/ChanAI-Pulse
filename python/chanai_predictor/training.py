@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 import random
 import sys
 import time
@@ -13,12 +14,15 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from .contracts import MODEL_MANIFEST_SCHEMA_VERSION, PredictorData, TrainingConfig
-from .models import SequenceRegressor, build_model, build_model_from_manifest
+from .models import build_model, build_model_from_manifest
 
 
 def set_reproducible_seed(seed: int, deterministic: bool = True) -> None:
@@ -61,12 +65,12 @@ def _loader(
 
 
 def predict_model(
-    model: SequenceRegressor,
+    model: nn.Module,
     inputs: np.ndarray,
     device: str | torch.device = "cpu",
     batch_size: int = 256,
 ) -> np.ndarray:
-    target_device = torch.device(device)
+    target_device = resolve_device(device) if isinstance(device, str) else torch.device(device)
     model = model.to(target_device)
     model.eval()
     values = torch.from_numpy(np.asarray(inputs, dtype=np.float32))
@@ -125,7 +129,14 @@ def train_model(
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
     )
-    loss_function = nn.MSELoss()
+    if config.loss_weights:
+        loss_weights = torch.tensor(config.loss_weights, dtype=torch.float32, device=device)
+        loss_weights = loss_weights / loss_weights.mean()
+
+        def loss_function(prediction: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+            return torch.mean((prediction - target) ** 2 * loss_weights.view(1, 1, -1))
+    else:
+        loss_function = nn.MSELoss()
     train_loader = _loader(
         data, train_indices, config.batch_size, True, config.seed
     )
@@ -237,14 +248,15 @@ def train_model(
 
 def load_checkpoint(
     checkpoint_path: str | Path, device: str | torch.device = "cpu"
-) -> tuple[SequenceRegressor, dict[str, Any]]:
+) -> tuple[nn.Module, dict[str, Any]]:
     checkpoint_path = Path(checkpoint_path).expanduser().resolve()
+    target_device = resolve_device(device) if isinstance(device, str) else torch.device(device)
     try:
         payload = torch.load(
-            checkpoint_path, map_location=torch.device(device), weights_only=True
+            checkpoint_path, map_location=target_device, weights_only=True
         )
     except TypeError:
-        payload = torch.load(checkpoint_path, map_location=torch.device(device))
+        payload = torch.load(checkpoint_path, map_location=target_device)
     manifest = payload["manifest"]
     if manifest["schema_version"] != MODEL_MANIFEST_SCHEMA_VERSION:
         raise ValueError(
@@ -252,7 +264,7 @@ def load_checkpoint(
         )
     model = build_model_from_manifest(manifest)
     model.load_state_dict(payload["state_dict"])
-    model.to(torch.device(device))
+    model.to(target_device)
     model.eval()
     return model, manifest
 
