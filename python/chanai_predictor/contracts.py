@@ -18,6 +18,8 @@ ADAPTATION_SCHEMA_VERSION = "v3.0-predictor-adaptation-result.1"
 
 SUPPORTED_TASKS = ("interpolation", "extrapolation")
 SUPPORTED_NEURAL_MODELS = ("gru", "lstm", "tcn")
+SUPPORTED_RESEARCH_NEURAL_MODELS = ("dlinear", "nlinear")
+SUPPORTED_TRAINABLE_MODELS = SUPPORTED_NEURAL_MODELS + SUPPORTED_RESEARCH_NEURAL_MODELS
 SUPPORTED_BASELINES = ("persistence", "linear")
 SUPPORTED_MODELS = SUPPORTED_BASELINES + SUPPORTED_NEURAL_MODELS
 SUPPORTED_SELECTION_MODES = ("auto", "manual")
@@ -169,10 +171,11 @@ class TrainingConfig:
     min_delta: float = 1e-6
     device: str = "auto"
     deterministic: bool = True
+    loss_weights: tuple[float, ...] = field(default_factory=tuple)
 
     def validate(self) -> None:
-        if self.model_type not in SUPPORTED_NEURAL_MODELS:
-            raise ValueError(f"Unsupported neural model: {self.model_type}")
+        if self.model_type not in SUPPORTED_TRAINABLE_MODELS:
+            raise ValueError(f"Unsupported trainable model: {self.model_type}")
         if self.hidden_size < 1 or self.num_layers < 1:
             raise ValueError("RNN sizes must be positive.")
         if self.kernel_size < 2 or self.tcn_channels < 1:
@@ -183,6 +186,8 @@ class TrainingConfig:
             raise ValueError("Training rate and batch size must be positive.")
         if self.max_epochs < 1 or self.patience < 1:
             raise ValueError("Epoch and patience values must be positive.")
+        if self.loss_weights and any(weight <= 0 for weight in self.loss_weights):
+            raise ValueError("All parameter loss weights must be positive.")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -201,6 +206,7 @@ class TrainingConfig:
             "min_delta": self.min_delta,
             "device": self.device,
             "deterministic": self.deterministic,
+            "loss_weights": list(self.loss_weights),
         }
 
 
