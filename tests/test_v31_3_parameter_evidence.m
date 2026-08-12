@@ -37,6 +37,46 @@ assert(~frozen.test_truth_used_for_selection, ...
 assert(numel(frozen.decisions) == 2, "One frozen decision per task is required.");
 assert(string(frozen.decisions(1).bundle_name) == "P8" && ...
     string(frozen.decisions(2).bundle_name) == "P8", ...
-    "The deterministic synthetic evidence should preserve P6/P8 task choices.");
+    "The deterministic synthetic evidence should preserve P8/P8 task choices.");
+assert(string(frozen.selection_partition) == "validation" && ...
+    ~frozen.test_truth_used_for_selection, ...
+    "The freeze record must derive its no-test-truth claim from validation-only selection.");
+
+testSelection = config;
+testSelection.selection_partition = "test";
+assertThrows(@() freeze_v31_3_parameter_bundles( ...
+    syntheticSensitivity, rows, testSelection), ...
+    "validate_v31_3_evidence_config:SelectionMustBeValidation");
+
+validationReport = config;
+validationReport.report_partition = "validation";
+assertThrows(@() evaluate_v31_3_persistence_ablation( ...
+    asset.manifest_path, validationReport), ...
+    "validate_v31_3_evidence_config:ReportMustBeTest");
+
+unmapped = config;
+unmapped.parameter_names(8) = "unsupported_parameter";
+unmapped.parameter_bundles.P8(8) = "unsupported_parameter";
+assertThrows(@() validate_v31_3_evidence_config(unmapped), ...
+    "validate_v31_3_evidence_config:IncompleteGeneratorMapping");
+
+flooredSensitivity = syntheticSensitivity;
+flooredSensitivity.sensitivity_score(1) = ...
+    config.freezing.sensitivity_score_floor / 2;
+floored = freeze_v31_3_parameter_bundles(flooredSensitivity, rows, config);
+assert(floored.effective_sensitivity_scores(1) == 0, ...
+    "Sensitivity evidence below the configured floor must not affect coverage.");
 
 fprintf("PASS: v3.1-3 ablation and parameter-bundle freeze are valid.\n");
+
+function assertThrows(action, expectedIdentifier)
+try
+    action();
+catch exception
+    assert(string(exception.identifier) == expectedIdentifier, ...
+        "Expected %s, received %s.", expectedIdentifier, exception.identifier);
+    return;
+end
+error("test_v31_3_parameter_evidence:ExpectedError", ...
+    "Expected %s to be raised.", expectedIdentifier);
+end

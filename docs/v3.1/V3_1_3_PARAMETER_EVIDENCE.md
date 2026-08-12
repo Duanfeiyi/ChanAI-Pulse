@@ -1,6 +1,6 @@
 # v3.1-3：参数敏感度、消融与参数包冻结
 
-> 状态：已实现并完成正式本地证据研究，等待项目负责人审阅和手动合并 PR。
+> 状态：✅ 已完成，PR #70 已由项目负责人手动合并。
 
 ## 目标
 
@@ -18,7 +18,9 @@
 
 ## 正式本地证据
 
-正式记录为 `v31_3_parameter_evidence.3`，其数据 Manifest SHA-256 为：
+正式记录为 `v31_3_parameter_evidence.4`，对应干净提交
+`9c925dc5de9c0cacdf350f6b650875b1d8d99ee6`，且记录中的 `git_dirty=false`。
+此前的 `.3` 保留为历史运行，但不是最终引用证据。正式数据 Manifest SHA-256 为：
 
 ```text
 757f98752bf52c6963264d4f369d0ee5d506d9d06d3fa9869325d21c161ec124
@@ -57,7 +59,17 @@ addpath(genpath(pwd))
 report = run_v31_3_local_evidence();
 ```
 
-默认输出在仓库同级 `ChanAI-Pulse-v3.1-assets/experiments/`。同一实验 ID 不会被覆盖；若需要重跑，必须使用新的实验 ID，并保留旧记录的状态和 Manifest。
+默认输出在仓库同级 `ChanAI-Pulse-v3.1-assets/experiments/`，并自动生成带 UTC
+时间戳的新实验 ID。也可以显式指定可审计的实验 ID：
+
+```matlab
+report = run_v31_3_local_evidence("", ...
+    "ExperimentId", "v31_3_parameter_evidence.5");
+```
+
+同一实验 ID 不会被覆盖；重跑必须使用新 ID，并保留旧记录的状态和 Manifest。
+代码强制 `selection_partition=validation`、`report_partition=test`，配置试图使用
+Test 选择参数包时会立即失败，不能生成虚假的“未使用测试真值”声明。
 
 ## 边界和下一步
 

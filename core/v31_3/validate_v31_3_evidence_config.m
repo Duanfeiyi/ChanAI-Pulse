@@ -1,0 +1,83 @@
+function validate_v31_3_evidence_config(config)
+%VALIDATE_V31_3_EVIDENCE_CONFIG Enforce frozen scientific invariants.
+
+arguments
+    config (1, 1) struct
+end
+required = ["schema_version", "parameter_names", "parameter_bounds", ...
+    "parameter_bundles", "tasks", "selection_partition", ...
+    "report_partition", "sensitivity", "freezing"];
+if ~all(isfield(config, required))
+    error("validate_v31_3_evidence_config:MissingField", ...
+        "The v3.1-3 evidence configuration is incomplete.");
+end
+if string(config.schema_version) ~= "v3.1-3-parameter-evidence-config.1"
+    error("validate_v31_3_evidence_config:UnsupportedSchema", ...
+        "Unsupported v3.1-3 evidence configuration schema.");
+end
+if string(config.selection_partition) ~= "validation"
+    error("validate_v31_3_evidence_config:SelectionMustBeValidation", ...
+        "Parameter-bundle selection must use validation only; test is report-only.");
+end
+if string(config.report_partition) ~= "test"
+    error("validate_v31_3_evidence_config:ReportMustBeTest", ...
+        "The report-only partition must be test.");
+end
+
+names = string(config.parameter_names);
+bounds = double(config.parameter_bounds);
+if isempty(names) || numel(unique(names)) ~= numel(names) || ...
+        ~isequal(size(bounds), [numel(names), 2]) || ...
+        any(~isfinite(bounds), "all") || any(bounds(:, 1) >= bounds(:, 2))
+    error("validate_v31_3_evidence_config:InvalidParameters", ...
+        "Parameter names must be unique and have finite increasing bounds.");
+end
+expectedBundles = [2, 4, 6, 8];
+for count = expectedBundles
+    field = "P" + count;
+    if ~isfield(config.parameter_bundles, field) || count > numel(names) || ...
+            ~isequal(string(config.parameter_bundles.(field)), names(1:count))
+        error("validate_v31_3_evidence_config:InvalidBundle", ...
+            "%s must be the first %d frozen parameters.", field, count);
+    end
+end
+if ~isequal(string(config.tasks), ["interpolation", "extrapolation"])
+    error("validate_v31_3_evidence_config:InvalidTasks", ...
+        "v3.1-3 requires interpolation and extrapolation in frozen order.");
+end
+
+freezing = config.freezing;
+requiredFreezing = ["minimum_extrapolation_coverage", ...
+    "minimum_interpolation_coverage", "minimum_p8_increment", ...
+    "sensitivity_score_floor", "require_full_generator_mapping"];
+if ~all(isfield(freezing, requiredFreezing))
+    error("validate_v31_3_evidence_config:MissingFreezingField", ...
+        "The v3.1-3 freezing configuration is incomplete.");
+end
+probabilities = double([freezing.minimum_extrapolation_coverage, ...
+    freezing.minimum_interpolation_coverage, freezing.minimum_p8_increment]);
+floorValue = double(freezing.sensitivity_score_floor);
+mappingRequired = freezing.require_full_generator_mapping;
+if any(~isfinite(probabilities)) || any(probabilities < 0) || ...
+        any(probabilities > 1) || ~isscalar(floorValue) || ...
+        ~isfinite(floorValue) || floorValue < 0
+    error("validate_v31_3_evidence_config:InvalidFreezingThreshold", ...
+        "Coverage/increment values must be in [0,1] and the score floor nonnegative.");
+end
+if ~isscalar(mappingRequired) || ...
+        ~(islogical(mappingRequired) || ...
+        (isnumeric(mappingRequired) && isfinite(mappingRequired) && ...
+        any(mappingRequired == [0, 1])))
+    error("validate_v31_3_evidence_config:InvalidGeneratorMappingFlag", ...
+        "require_full_generator_mapping must be one logical value.");
+end
+
+if logical(mappingRequired)
+    publicApiParameters = ["DS_mu", "KF_mu", "DS_sigma", "KF_sigma", ...
+        "r_DS", "LNS_ksi", "num_clusters", "num_rays"];
+    if ~isequal(names, publicApiParameters)
+        error("validate_v31_3_evidence_config:IncompleteGeneratorMapping", ...
+            "The frozen P8 order must map exactly to the Full 6GPCM public API.");
+    end
+end
+end
