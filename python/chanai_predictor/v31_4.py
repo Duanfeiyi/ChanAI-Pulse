@@ -571,6 +571,8 @@ def finalize_test_once(
         raise ValueError("The Full 6GPCM gate reports a modified core.")
     if not gate.get("passed"):
         raise ValueError("The Full 6GPCM validation gate did not pass.")
+    if gate.get("study_manifest_sha256") != _sha256(study_path):
+        raise ValueError("The Full 6GPCM gate is not bound to this frozen study manifest.")
     if gate.get("full_6gpcm_tree_sha256_before") != gate.get(
         "full_6gpcm_tree_sha256_after"
     ):

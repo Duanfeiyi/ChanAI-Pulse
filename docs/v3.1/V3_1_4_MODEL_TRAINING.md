@@ -60,7 +60,7 @@ python tools/python/run_v31_4_model_study.py study `
 report = run_v31_4_full_6gpcm_gate("<assets>/experiments/v31_4_model_study.1");
 ```
 
-只有该门成功后，才执行一次：
+只有该门成功后，才执行一次。门清单必须记录冻结研究 Manifest 的 SHA-256；`finalize-test` 会验证二者绑定关系、验证门分区、Full 6GPCM 树哈希及通过状态后才读取 Test：
 
 ```powershell
 python tools/python/run_v31_4_model_study.py finalize-test `
@@ -76,6 +76,13 @@ python tools/python/run_v31_4_model_study.py finalize-test `
 
 ## 正式结果
 
-正式运行完成后，本节只记录可公开、可审查的小型摘要；完整实验资产保留在 Git 外。Test 结果是冻结选择后的描述性报告，不反向改变选择。
+正式干净记录为 `v31_4_model_study.3`，代码 revision 为 `5017b208f3294cf237e1cd0d7e29aedde6e939b4`，运行时 `git_dirty=false`，语料 Manifest SHA-256 为 `757f98752bf52c6963264d4f369d0ee5d506d9d06d3fa9869325d21c161ec124`。完整路径无关摘要见 [`V3_1_4_MODEL_STUDY_SUMMARY.json`](V3_1_4_MODEL_STUDY_SUMMARY.json)。
 
-_待本次正式本地实验与 Full 6GPCM 验证门完成后填写。_
+| 任务 | 最强简单基线 | 最佳可训练候选 | 三种子验证 NRMSE | 相对改善 | 冻结选择 |
+|---|---:|---:|---:|---:|---:|
+| 内插 | Persistence，0.114786 | NLinear | 0.103353 ± 0.000023 | 9.9604% | Persistence |
+| 外推 | Kalman，0.156845 | DLinear | 0.142128 ± 0.000042 | 9.3830% | Kalman |
+
+两项最佳可训练候选都在全部 18 条验证路线胜出、最差路线也未超过基线，但平均改善均未达到事先锁定的 10% 门槛，因此不得准入。敏感度加权消融没有改变结论。冻结后的一次性 Test NRMSE 分别为 0.113592（Persistence 内插）和 0.154866（Kalman 外推）；Test 未用于选择，也未改变选择。
+
+Full 6GPCM 验证门对每任务 5 个独立验证路线样本成功生成并得到有限指标：内插 PDP NRMSE 为 0.004674，外推为 0.000662；核心树哈希前后均为 `369d778674004bbda6231b89b967b12c1fecacdddf9306b842db8982309a8ae9`。这证明候选映射和生成链可运行，不提前替代 v3.1-6 的独立端到端准确度结论。

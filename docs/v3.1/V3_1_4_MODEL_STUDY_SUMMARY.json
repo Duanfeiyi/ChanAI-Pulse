@@ -1,0 +1,66 @@
+{
+  "schema_version": "v3.1-4-public-model-study-summary.1",
+  "experiment_id": "v31_4_model_study.3",
+  "experiment_status": "completed",
+  "code_revision": "5017b208f3294cf237e1cd0d7e29aedde6e939b4",
+  "code_dirty_at_run": false,
+  "corpus_id": "chanaipulse-v3.1-corpus.1",
+  "corpus_manifest_sha256": "757f98752bf52c6963264d4f369d0ee5d506d9d06d3fa9869325d21c161ec124",
+  "parameter_bundle": "P8",
+  "context_to_target": "16_to_4",
+  "route_group_split": [84, 18, 18],
+  "seeds": [31401, 31402, 31403],
+  "test_truth_used_for_selection": false,
+  "tasks": {
+    "interpolation": {
+      "best_simple_baseline": "persistence",
+      "baseline_validation_nrmse": 0.11478629670540842,
+      "best_trainable_candidate": "nlinear",
+      "candidate_validation_nrmse_mean": 0.10335310392524903,
+      "candidate_validation_nrmse_std": 0.0000232426197127213,
+      "relative_validation_nrmse_improvement": 0.0996041610219549,
+      "validation_route_win_rate": 1.0,
+      "maximum_route_to_baseline_ratio": 0.9180228127224216,
+      "passed_parameter_gate": false,
+      "frozen_selection": "persistence",
+      "selection_reason": "safe_baseline_fallback_no_trainable_candidate_passed",
+      "sensitivity_weighted_ablation": {
+        "model": "nlinear",
+        "validation_nrmse": 0.10345484181413746,
+        "selection_effect": "none_report_only"
+      },
+      "test_once_nrmse": 0.1135922883710375
+    },
+    "extrapolation": {
+      "best_simple_baseline": "kalman",
+      "baseline_validation_nrmse": 0.1568451655706215,
+      "best_trainable_candidate": "dlinear",
+      "candidate_validation_nrmse_mean": 0.1421283622781043,
+      "candidate_validation_nrmse_std": 0.0000417262131018747,
+      "relative_validation_nrmse_improvement": 0.0938301364850852,
+      "validation_route_win_rate": 1.0,
+      "maximum_route_to_baseline_ratio": 0.9453295550094295,
+      "passed_parameter_gate": false,
+      "frozen_selection": "kalman",
+      "selection_reason": "safe_baseline_fallback_no_trainable_candidate_passed",
+      "sensitivity_weighted_ablation": {
+        "model": "dlinear",
+        "validation_nrmse": 0.14231146650685472,
+        "selection_effect": "none_report_only"
+      },
+      "test_once_nrmse": 0.15486633770811906
+    }
+  },
+  "full_6gpcm_validation_gate": {
+    "passed": true,
+    "partition": "validation",
+    "pairs_per_task": 5,
+    "interpolation_pdp_nrmse": 0.00467373453351828,
+    "extrapolation_pdp_nrmse": 0.000661633176431956,
+    "tree_sha256_before": "369d778674004bbda6231b89b967b12c1fecacdddf9306b842db8982309a8ae9",
+    "tree_sha256_after": "369d778674004bbda6231b89b967b12c1fecacdddf9306b842db8982309a8ae9",
+    "core_modified": false
+  },
+  "conclusion": "No trainable candidate passed every pre-registered admission rule; keep Persistence for interpolation and Kalman for extrapolation as v3.1-4 recommendations.",
+  "artifact_policy": "Full checkpoints, logs and experiment outputs remain outside Git; this file contains only the public path-free audit summary."
+}

@@ -25,6 +25,7 @@ from chanai_predictor.v31_4 import (  # noqa: E402
     MODEL_TYPES,
     _aggregate_runs,
     ar_predict,
+    finalize_test_once,
     kalman_predict,
 )
 
@@ -149,6 +150,35 @@ class V314ModelStudyTests(unittest.TestCase):
                 model, _ = load_checkpoint(checkpoint)
                 prediction = predict_model(model, data.inputs[:2])
                 self.assertEqual(prediction.shape, (2, 4, 8))
+
+    def test_test_finalization_rejects_unbound_gate_before_reading_data(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            study = root / "v31_4_model_study_manifest.json"
+            gate_root = root / "full_6gpcm_gate"
+            gate_root.mkdir()
+            gate = gate_root / "v31_4_full_6gpcm_gate.json"
+            study.write_text(
+                json.dumps({"schema_version": "v3.1-4-model-study.1", "tasks": {}}),
+                encoding="utf-8",
+            )
+            gate.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "v3.1-4-full-6gpcm-validation-gate.1",
+                        "evaluation_partition": "validation",
+                        "test_partition_used": False,
+                        "full_6gpcm_core_modified": False,
+                        "passed": True,
+                        "full_6gpcm_tree_sha256_before": "same",
+                        "full_6gpcm_tree_sha256_after": "same",
+                        "study_manifest_sha256": "wrong",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "not bound"):
+                finalize_test_once(study, gate, root)
 
 
 if __name__ == "__main__":
