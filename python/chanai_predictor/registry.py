@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from .contracts import (
     REGISTRY_SCHEMA_VERSION,
+    REGISTRY_V2_SCHEMA_VERSION,
+    SUPPORTED_MODELS,
     SUPPORTED_NEURAL_MODELS,
     PredictorData,
     PredictionRequest,
@@ -24,6 +26,7 @@ def compatibility_signature(data: PredictorData) -> dict[str, Any]:
         "task_type": data.task_type,
         "context_layout": data.context_layout,
         "parameter_names": list(data.parameter_names),
+        "parameter_units": list(data.parameter_units),
         "context_length": data.context_length,
         "target_length": data.target_length,
         "parameter_count": data.parameter_count,
@@ -35,6 +38,7 @@ def request_compatibility_signature(request: PredictionRequest) -> dict[str, Any
         "task_type": request.task_type,
         "context_layout": request.context_layout,
         "parameter_names": list(request.parameter_names),
+        "parameter_units": list(request.parameter_units),
         "context_length": request.context_length,
         "target_length": request.target_length,
         "parameter_count": request.parameter_count,
@@ -50,7 +54,18 @@ def assert_compatible(
         else request_compatibility_signature(data)
     )
     actual = entry["compatibility"]
-    mismatches = [key for key, value in expected.items() if actual.get(key) != value]
+    required = (
+        "task_type",
+        "context_layout",
+        "parameter_names",
+        "context_length",
+        "target_length",
+        "parameter_count",
+    )
+    compared = list(required)
+    if "parameter_units" in actual:
+        compared.append("parameter_units")
+    mismatches = [key for key in compared if actual.get(key) != expected[key]]
     if mismatches:
         details = ", ".join(
             f"{key}: model={actual.get(key)!r}, data={expected[key]!r}"
@@ -151,9 +166,91 @@ def train_model_family(
 def load_registry(path: str | Path) -> tuple[Path, dict[str, Any]]:
     path = Path(path).expanduser().resolve()
     registry = json.loads(path.read_text(encoding="utf-8"))
-    if registry["schema_version"] != REGISTRY_SCHEMA_VERSION:
+    if registry["schema_version"] not in (
+        REGISTRY_SCHEMA_VERSION,
+        REGISTRY_V2_SCHEMA_VERSION,
+    ):
         raise ValueError(f"Unsupported registry schema: {registry['schema_version']}")
+    if registry["schema_version"] == REGISTRY_V2_SCHEMA_VERSION:
+        _validate_v2_registry(registry)
     return path, registry
+
+
+def _validate_v2_registry(registry: dict[str, Any]) -> None:
+    if registry.get("parameter_bundle") != "P8":
+        raise ValueError("ModelRegistry v2 requires the frozen P8 parameter bundle.")
+    compatibility = registry.get("compatibility", {})
+    if compatibility.get("parameter_bundle") != "P8":
+        raise ValueError("ModelRegistry v2 compatibility must declare P8.")
+    preprocessing = registry.get("preprocessing", {})
+    parameter_count = compatibility.get("parameter_count")
+    if not isinstance(parameter_count, int) or parameter_count < 1:
+        raise ValueError("ModelRegistry v2 parameter count is invalid.")
+    if any(
+        len(preprocessing.get(name, [])) != parameter_count
+        for name in ("normalization_mean", "normalization_std", "parameter_bounds")
+    ):
+        raise ValueError("ModelRegistry v2 preprocessing does not match P8.")
+    entries = registry.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise ValueError("ModelRegistry v2 must contain model entries.")
+    model_types = [entry.get("model_type") for entry in entries]
+    if len(model_types) != len(set(model_types)):
+        raise ValueError("ModelRegistry v2 contains duplicate model types.")
+    model_ids = [entry.get("model_id") for entry in entries]
+    if len(model_ids) != len(set(model_ids)):
+        raise ValueError("ModelRegistry v2 contains duplicate model IDs.")
+    selected = registry.get("selection_policy", {}).get("selected_model_type")
+    if selected not in model_types:
+        raise ValueError("The recommended model is absent from ModelRegistry v2.")
+    for entry in entries:
+        model_type = entry.get("model_type")
+        if model_type not in SUPPORTED_MODELS:
+            raise ValueError(f"Unsupported ModelRegistry v2 model: {model_type}")
+        if not entry.get("model_id") or "compatibility" not in entry:
+            raise ValueError(f"Incomplete ModelRegistry v2 entry: {model_type}")
+        if entry["compatibility"] != compatibility:
+            raise ValueError(
+                f"ModelRegistry v2 compatibility differs for {model_type}."
+            )
+        if entry.get("checkpoint") is not None and not entry.get("checkpoint_sha256"):
+            raise ValueError(f"Checkpoint hash is missing for {model_type}.")
+    policy = registry.get("selection_policy", {})
+    if policy.get("target_ground_truth_used_at_prediction_time") is not False:
+        raise ValueError("ModelRegistry v2 must prohibit target-truth selection.")
+    unknown_fallbacks = set(policy.get("fallback_chain", [])) - set(model_types)
+    if unknown_fallbacks:
+        raise ValueError("ModelRegistry v2 fallback chain contains unknown models.")
+
+
+def resolve_entry_checkpoint(
+    registry_path: str | Path,
+    registry: dict[str, Any],
+    entry: dict[str, Any],
+) -> Path | None:
+    """Resolve and verify a registry-owned checkpoint without path traversal."""
+    relative = entry.get("checkpoint")
+    if relative is None:
+        return None
+    relative_path = Path(relative)
+    if relative_path.is_absolute() or ".." in relative_path.parts:
+        raise ValueError("Registry checkpoint paths must stay relative to the registry.")
+    registry_path = Path(registry_path).expanduser().resolve()
+    checkpoint = (registry_path.parent / relative_path).resolve()
+    if registry_path.parent != checkpoint.parent and registry_path.parent not in checkpoint.parents:
+        raise ValueError("Registry checkpoint path escapes the model package.")
+    if not checkpoint.is_file():
+        raise FileNotFoundError(f"Registered checkpoint is missing: {relative}")
+    expected = entry.get("checkpoint_sha256")
+    if registry.get("schema_version") == REGISTRY_V2_SCHEMA_VERSION and not expected:
+        raise ValueError("ModelRegistry v2 requires a checkpoint SHA-256.")
+    if expected:
+        actual = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+        if actual != expected:
+            raise ValueError(
+                f"Registered checkpoint SHA-256 mismatch for {entry['model_type']}."
+            )
+    return checkpoint
 
 
 def select_registry_entry(
@@ -165,10 +262,15 @@ def select_registry_entry(
     if selection_mode == "auto":
         model_type = registry["selection_policy"]["selected_model_type"]
     elif selection_mode == "manual":
-        if requested_model not in SUPPORTED_NEURAL_MODELS:
+        supported = (
+            SUPPORTED_MODELS
+            if registry["schema_version"] == REGISTRY_V2_SCHEMA_VERSION
+            else SUPPORTED_NEURAL_MODELS
+        )
+        if requested_model not in supported:
             raise ValueError(
                 "Manual selection requires one of: "
-                + ", ".join(SUPPORTED_NEURAL_MODELS)
+                + ", ".join(supported)
             )
         model_type = requested_model
     else:
@@ -179,5 +281,11 @@ def select_registry_entry(
     if not candidates:
         raise ValueError(f"Model {model_type} is not present in this registry.")
     entry = candidates[0]
+    if (
+        registry["schema_version"] == REGISTRY_V2_SCHEMA_VERSION
+        and selection_mode == "manual"
+        and not entry.get("manual_selection_allowed", False)
+    ):
+        raise ValueError(f"Model {model_type} is not enabled for manual selection.")
     assert_compatible(entry, data)
     return entry

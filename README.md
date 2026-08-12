@@ -92,6 +92,8 @@ tools/               conversion, audit and documentation utilities
 - [v3.1-1 bundled Full 6GPCM guide](docs/v3.1/V3_1_1_BUNDLED_FULL_6GPCM.md)
 - [v3.1-2 corpus and Experiment Manager guide](docs/v3.1/V3_1_2_DATA_AND_EXPERIMENTS.md)
 - [v3.1-3 parameter evidence and bundle freeze](docs/v3.1/V3_1_3_PARAMETER_EVIDENCE.md)
+- [v3.1-4 fair P8 model training and admission](docs/v3.1/V3_1_4_MODEL_TRAINING.md)
+- [v3.1-5 official models, Registry v2 and safe adaptation](docs/v3.1/V3_1_5_MODEL_REGISTRY_AND_ADAPTATION.md)
 - [v3.1 prediction-accuracy plan](docs/v3.1/V3.1预测精度与准确性迭代计划.md)
 - [v3.0--v3.2 master plan and status](docs/CHANAIPULSE_V3_0_TO_V3_2_MASTER_PLAN.md)
 

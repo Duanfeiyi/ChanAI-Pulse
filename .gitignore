@@ -66,6 +66,11 @@ results/*
 !results/README.md
 models/*
 !models/README.md
+!models/official/
+!models/official/v3.1.0/
+!models/official/v3.1.0/**/
+!models/official/v3.1.0/**/*.json
+!models/official/v3.1.0/**/*.pt
 
 # Local presentation, report, and temporary authoring outputs
 output/

@@ -19,6 +19,7 @@ from chanai_predictor import (  # noqa: E402
     train_model_family,
     write_request_from_dataset,
 )
+from chanai_predictor.contracts import SUPPORTED_MODELS  # noqa: E402
 
 
 def _training(arguments: argparse.Namespace) -> dict:
@@ -91,7 +92,10 @@ def _make_request(arguments: argparse.Namespace) -> dict:
 
 
 def _request_prediction(arguments: argparse.Namespace) -> dict:
-    policy = AdaptationPolicy(mode=arguments.adaptation)
+    policy = AdaptationPolicy(
+        mode=arguments.adaptation,
+        min_relative_improvement=arguments.minimum_adaptation_improvement,
+    )
     adaptation_data = (
         load_predictor_data_hdf5(arguments.adaptation_data)
         if arguments.adaptation_data is not None
@@ -145,7 +149,7 @@ def build_parser() -> argparse.ArgumentParser:
     prediction.add_argument(
         "--selection", choices=("auto", "manual"), default="auto"
     )
-    prediction.add_argument("--model", choices=("gru", "lstm", "tcn"))
+    prediction.add_argument("--model", choices=SUPPORTED_MODELS)
     prediction.add_argument(
         "--partition", choices=("train", "validation", "test", "all"), default="test"
     )
@@ -179,7 +183,7 @@ def build_parser() -> argparse.ArgumentParser:
     request_prediction.add_argument(
         "--selection", choices=("auto", "manual"), default="auto"
     )
-    request_prediction.add_argument("--model", choices=("gru", "lstm", "tcn"))
+    request_prediction.add_argument("--model", choices=SUPPORTED_MODELS)
     request_prediction.add_argument(
         "--adaptation", choices=("off", "auto", "force"), default="off"
     )
@@ -187,6 +191,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--adaptation-data",
         type=Path,
         help="Optional labeled known-region HDF5 used only for safe head adaptation.",
+    )
+    request_prediction.add_argument(
+        "--minimum-adaptation-improvement", type=float, default=0.01
     )
     request_prediction.add_argument(
         "--device", choices=("auto", "cpu", "cuda"), default="auto"

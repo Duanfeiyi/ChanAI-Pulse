@@ -1,0 +1,985 @@
+{
+  "schema_version": "v3.1-predictor-model-registry.2",
+  "package_version": "v3.1.0-base-models.1",
+  "created_utc": "2026-08-12T10:18:57.572308+00:00",
+  "parameter_bundle": "P8",
+  "source_evidence": {
+    "experiment_id": "v31_4_model_study.3",
+    "study_schema_version": "v3.1-4-model-study.1",
+    "code_revision": "5017b208f3294cf237e1cd0d7e29aedde6e939b4",
+    "code_dirty": false,
+    "selection_partition": "validation",
+    "test_truth_used_for_selection": false
+  },
+  "selection_policy": {
+    "ordinary_user": "registry_recommendation_then_safe_known_region_adaptation",
+    "selected_model_type": "kalman",
+    "selected_model_reason": "safe_baseline_fallback_no_trainable_candidate_passed",
+    "fallback_chain": [
+      "kalman",
+      "persistence",
+      "linear"
+    ],
+    "auto_adaptation_candidates": [
+      "gru",
+      "lstm",
+      "tcn"
+    ],
+    "adapted_candidate_must_beat_base_model": true,
+    "adapted_candidate_must_beat_registry_baseline": true,
+    "minimum_relative_improvement": 0.01,
+    "target_ground_truth_used_at_prediction_time": false
+  },
+  "compatibility": {
+    "task_type": "extrapolation",
+    "context_layout": "history_then_future",
+    "parameter_bundle": "P8",
+    "parameter_names": [
+      "DS_mu",
+      "KF_mu",
+      "DS_sigma",
+      "KF_sigma",
+      "r_DS",
+      "LNS_ksi",
+      "num_clusters",
+      "num_rays"
+    ],
+    "parameter_units": [
+      "log10_s",
+      "dB",
+      "log10_s_std",
+      "dB",
+      "dimensionless",
+      "dB",
+      "count",
+      "count"
+    ],
+    "context_length": 16,
+    "target_length": 4,
+    "parameter_count": 8,
+    "supported_product_axes": [
+      "sample",
+      "position"
+    ]
+  },
+  "distribution_guard": {
+    "method": "maximum_absolute_registry_zscore",
+    "max_abs_zscore": 8.0,
+    "effect": "warning_and_safe_auto_fallback"
+  },
+  "preprocessing": {
+    "method": "zscore_train_only",
+    "normalization_mean": [
+      -7.157038720863264,
+      -6.012488308590383,
+      0.3553130919649514,
+      1.622905783893483,
+      2.6628772744744085,
+      3.3290338371528168,
+      11.982043650793651,
+      20.01468253968254
+    ],
+    "normalization_std": [
+      0.6340736808421481,
+      13.358093634196047,
+      0.2104051419876069,
+      2.0225836066303966,
+      0.6403402990836353,
+      0.9657034427923238,
+      1.2834955548998856,
+      2.156534864476165
+    ],
+    "parameter_bounds": [
+      [
+        -9.0,
+        -5.0
+      ],
+      [
+        -20.0,
+        30.0
+      ],
+      [
+        0.01,
+        2.0
+      ],
+      [
+        0.0,
+        12.0
+      ],
+      [
+        1.0,
+        6.0
+      ],
+      [
+        0.1,
+        10.0
+      ],
+      [
+        4.0,
+        30.0
+      ],
+      [
+        4.0,
+        50.0
+      ]
+    ]
+  },
+  "entries": [
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-persistence",
+      "model_type": "persistence",
+      "model_family": "deterministic_baseline",
+      "deployment_status": "fallback_or_manual",
+      "manual_selection_allowed": true,
+      "checkpoint": null,
+      "checkpoint_sha256": null,
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": false,
+        "reason": "parameter_free_baseline"
+      },
+      "validation_evidence": {
+        "normalized_rmse": 0.15934106086917124,
+        "route_nrmse": {
+          "route-100": 0.1688422989986425,
+          "route-101": 0.1620411879252286,
+          "route-102": 0.1636099792876969,
+          "route-85": 0.15876478411267894,
+          "route-86": 0.16108983996243928,
+          "route-87": 0.15699858933647093,
+          "route-88": 0.16282043342266087,
+          "route-89": 0.16974464000872316,
+          "route-90": 0.1492025042436123,
+          "route-91": 0.15496311691368075,
+          "route-92": 0.14501578515056765,
+          "route-93": 0.16324691116067747,
+          "route-94": 0.15530096567613413,
+          "route-95": 0.16744211869148004,
+          "route-96": 0.14749634476256265,
+          "route-97": 0.15597433569590832,
+          "route-98": 0.16632065875341862,
+          "route-99": 0.1565103167436413
+        },
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-linear",
+      "model_type": "linear",
+      "model_family": "deterministic_baseline",
+      "deployment_status": "fallback_or_manual",
+      "manual_selection_allowed": true,
+      "checkpoint": null,
+      "checkpoint_sha256": null,
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": false,
+        "reason": "parameter_free_baseline"
+      },
+      "validation_evidence": {
+        "normalized_rmse": 0.1645852128244266,
+        "route_nrmse": {
+          "route-100": 0.16027823605023528,
+          "route-101": 0.16922795988886044,
+          "route-102": 0.17419293533912739,
+          "route-85": 0.16164726128262327,
+          "route-86": 0.17414909333340814,
+          "route-87": 0.16269651923623302,
+          "route-88": 0.15613005606186653,
+          "route-89": 0.16050427635220244,
+          "route-90": 0.1555095602608683,
+          "route-91": 0.16290787998187223,
+          "route-92": 0.1685611332807033,
+          "route-93": 0.15881797359540217,
+          "route-94": 0.16019423329643004,
+          "route-95": 0.1861707093295015,
+          "route-96": 0.15605100021742024,
+          "route-97": 0.16577957382576058,
+          "route-98": 0.17105892234804806,
+          "route-99": 0.15516726947101853
+        },
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-ar",
+      "model_type": "ar",
+      "model_family": "deterministic_baseline",
+      "deployment_status": "fallback_or_manual",
+      "manual_selection_allowed": true,
+      "checkpoint": null,
+      "checkpoint_sha256": null,
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": false,
+        "reason": "parameter_free_baseline"
+      },
+      "validation_evidence": {
+        "normalized_rmse": 0.18746211299911544,
+        "route_nrmse": {
+          "route-100": 0.19118635887562466,
+          "route-101": 0.19004498267262127,
+          "route-102": 0.17689356707278955,
+          "route-85": 0.18094190377149172,
+          "route-86": 0.1994447474313935,
+          "route-87": 0.19627497924011222,
+          "route-88": 0.19541075065987717,
+          "route-89": 0.20469025699531396,
+          "route-90": 0.1881072502599793,
+          "route-91": 0.1931758186650298,
+          "route-92": 0.17105588959913756,
+          "route-93": 0.18755492446582117,
+          "route-94": 0.17930621183017467,
+          "route-95": 0.204384258797393,
+          "route-96": 0.1657309150830375,
+          "route-97": 0.1830701721045454,
+          "route-98": 0.18063205834139906,
+          "route-99": 0.18110609079993947
+        },
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-kalman",
+      "model_type": "kalman",
+      "model_family": "deterministic_baseline",
+      "deployment_status": "system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": null,
+      "checkpoint_sha256": null,
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": false,
+        "reason": "parameter_free_baseline"
+      },
+      "validation_evidence": {
+        "normalized_rmse": 0.1568451655706215,
+        "route_nrmse": {
+          "route-100": 0.15600403785368963,
+          "route-101": 0.15977498243361807,
+          "route-102": 0.16429615559702063,
+          "route-85": 0.15438183306905817,
+          "route-86": 0.16506182021131208,
+          "route-87": 0.1544230721998842,
+          "route-88": 0.1513462419011461,
+          "route-89": 0.15667700926919023,
+          "route-90": 0.1473152860535135,
+          "route-91": 0.15573606265374387,
+          "route-92": 0.15723500919967767,
+          "route-93": 0.15217443847145617,
+          "route-94": 0.15331929699552924,
+          "route-95": 0.17437533579768283,
+          "route-96": 0.1494172346685046,
+          "route-97": 0.1566304835646772,
+          "route-98": 0.1627838137319685,
+          "route-99": 0.1498785840033378
+        },
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-gru",
+      "model_type": "gru",
+      "model_family": "official_pretrained_experimental",
+      "deployment_status": "official_experimental_not_system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": "extrapolation_gru.pt",
+      "checkpoint_sha256": "cf20991e3242cc96f3601c9a834f3ef2407678c66cf65b0dd0123d52bf818331",
+      "checkpoint_size_bytes": 27461,
+      "checkpoint_loader": "torch.load(weights_only=True)",
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": true,
+        "method": "output_head_only",
+        "automatic_candidate": true
+      },
+      "architecture": {
+        "model_type": "gru",
+        "task_type": "extrapolation",
+        "parameter_count": 8,
+        "context_length": 16,
+        "target_length": 4,
+        "training_config": {
+          "model_type": "gru",
+          "seed": 31402,
+          "hidden_size": 32,
+          "num_layers": 1,
+          "kernel_size": 3,
+          "tcn_channels": 32,
+          "dropout": 0.0,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "batch_size": 128,
+          "max_epochs": 60,
+          "patience": 8,
+          "min_delta": 1e-06,
+          "device": "cuda",
+          "deterministic": true,
+          "loss_weights": []
+        },
+        "parameter_count_total": 5088,
+        "interpolation_encoder": "not_applicable",
+        "causal_extrapolation": true
+      },
+      "training_dataset": {
+        "file_name": "step11abc_extrapolation_p8.h5",
+        "sha256": "bb370ebec7832d64c57a63a52ed44f15f9af37869c7f9bbad061291f812979e9",
+        "corpus_id": "chanaipulse-v3.1-corpus.1"
+      },
+      "validation_evidence": {
+        "normalized_rmse_mean": 0.1549968926700164,
+        "normalized_rmse_std": 0.001159588626144586,
+        "route_nrmse_mean": {
+          "route-100": 0.17609113814646624,
+          "route-101": 0.14945923789425716,
+          "route-102": 0.16482181060430737,
+          "route-85": 0.15312884789784698,
+          "route-86": 0.15570434577224232,
+          "route-87": 0.1560855078769483,
+          "route-88": 0.15570070398390667,
+          "route-89": 0.16939839900223438,
+          "route-90": 0.1472589310739639,
+          "route-91": 0.16546603477991328,
+          "route-92": 0.1369075002786947,
+          "route-93": 0.159117674980375,
+          "route-94": 0.1461730286618449,
+          "route-95": 0.15165790702350176,
+          "route-96": 0.13958764901214804,
+          "route-97": 0.14082497541099429,
+          "route-98": 0.1688115108276906,
+          "route-99": 0.1465104697594738
+        },
+        "qualification": {
+          "baseline_model_type": "kalman",
+          "relative_validation_nrmse_improvement": 0.011784060374961935,
+          "validation_route_win_rate": 0.5555555555555556,
+          "maximum_route_to_baseline_ratio": 1.128760130629539,
+          "seed_relative_std": 0.007481366924002241,
+          "passed_parameter_gate": false
+        },
+        "selected_seed": 31402,
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-lstm",
+      "model_type": "lstm",
+      "model_family": "official_pretrained_experimental",
+      "deployment_status": "official_experimental_not_system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": "extrapolation_lstm.pt",
+      "checkpoint_sha256": "6eddd282bdf93cc3f63d632e2e960df03a81006afb8b0f42d35d52ddac794e2c",
+      "checkpoint_size_bytes": 32849,
+      "checkpoint_loader": "torch.load(weights_only=True)",
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": true,
+        "method": "output_head_only",
+        "automatic_candidate": true
+      },
+      "architecture": {
+        "model_type": "lstm",
+        "task_type": "extrapolation",
+        "parameter_count": 8,
+        "context_length": 16,
+        "target_length": 4,
+        "training_config": {
+          "model_type": "lstm",
+          "seed": 31403,
+          "hidden_size": 32,
+          "num_layers": 1,
+          "kernel_size": 3,
+          "tcn_channels": 32,
+          "dropout": 0.0,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "batch_size": 128,
+          "max_epochs": 60,
+          "patience": 8,
+          "min_delta": 1e-06,
+          "device": "cuda",
+          "deterministic": true,
+          "loss_weights": []
+        },
+        "parameter_count_total": 6432,
+        "interpolation_encoder": "not_applicable",
+        "causal_extrapolation": true
+      },
+      "training_dataset": {
+        "file_name": "step11abc_extrapolation_p8.h5",
+        "sha256": "bb370ebec7832d64c57a63a52ed44f15f9af37869c7f9bbad061291f812979e9",
+        "corpus_id": "chanaipulse-v3.1-corpus.1"
+      },
+      "validation_evidence": {
+        "normalized_rmse_mean": 0.1495567222204623,
+        "normalized_rmse_std": 0.0003829954280426869,
+        "route_nrmse_mean": {
+          "route-100": 0.16963552410357086,
+          "route-101": 0.14128363314940431,
+          "route-102": 0.15774717533327587,
+          "route-85": 0.14496663122147463,
+          "route-86": 0.15037386793170335,
+          "route-87": 0.15093654963000713,
+          "route-88": 0.1538687613776416,
+          "route-89": 0.16558445938851288,
+          "route-90": 0.15906336527289128,
+          "route-91": 0.1574867175414009,
+          "route-92": 0.13370908318006758,
+          "route-93": 0.14975569559551846,
+          "route-94": 0.14043772472724883,
+          "route-95": 0.151405202737273,
+          "route-96": 0.12630973553076716,
+          "route-97": 0.13508541606166857,
+          "route-98": 0.15301187068284736,
+          "route-99": 0.14360469024901726
+        },
+        "qualification": {
+          "baseline_model_type": "kalman",
+          "relative_validation_nrmse_improvement": 0.04646903411809333,
+          "validation_route_win_rate": 0.7222222222222222,
+          "maximum_route_to_baseline_ratio": 1.0873790604232032,
+          "seed_relative_std": 0.0025608707008041506,
+          "passed_parameter_gate": false
+        },
+        "selected_seed": 31403,
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-tcn",
+      "model_type": "tcn",
+      "model_family": "official_pretrained_experimental",
+      "deployment_status": "official_experimental_not_system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": "extrapolation_tcn.pt",
+      "checkpoint_sha256": "388306bf348cc58f48fb5989a6073e4c767208aee042067807de7618c1f00a58",
+      "checkpoint_size_bytes": 81195,
+      "checkpoint_loader": "torch.load(weights_only=True)",
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": true,
+        "method": "output_head_only",
+        "automatic_candidate": true
+      },
+      "architecture": {
+        "model_type": "tcn",
+        "task_type": "extrapolation",
+        "parameter_count": 8,
+        "context_length": 16,
+        "target_length": 4,
+        "training_config": {
+          "model_type": "tcn",
+          "seed": 31401,
+          "hidden_size": 32,
+          "num_layers": 1,
+          "kernel_size": 3,
+          "tcn_channels": 32,
+          "dropout": 0.0,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "batch_size": 128,
+          "max_epochs": 30,
+          "patience": 5,
+          "min_delta": 1e-06,
+          "device": "cpu",
+          "deterministic": true,
+          "loss_weights": []
+        },
+        "parameter_count_total": 17664,
+        "interpolation_encoder": "not_applicable",
+        "causal_extrapolation": true
+      },
+      "training_dataset": {
+        "file_name": "step11abc_extrapolation_p8.h5",
+        "sha256": "bb370ebec7832d64c57a63a52ed44f15f9af37869c7f9bbad061291f812979e9",
+        "corpus_id": "chanaipulse-v3.1-corpus.1"
+      },
+      "validation_evidence": {
+        "normalized_rmse_mean": 0.14898973772593158,
+        "normalized_rmse_std": 0.0011795028874114037,
+        "route_nrmse_mean": {
+          "route-100": 0.15848676402273942,
+          "route-101": 0.149532117114943,
+          "route-102": 0.15714367738902751,
+          "route-85": 0.14726055319823594,
+          "route-86": 0.1497866768588224,
+          "route-87": 0.15124143934126336,
+          "route-88": 0.14705052917739428,
+          "route-89": 0.16603756737102812,
+          "route-90": 0.14673722002362802,
+          "route-91": 0.15069950741275748,
+          "route-92": 0.139939470774172,
+          "route-93": 0.14698494991302194,
+          "route-94": 0.14089545797925654,
+          "route-95": 0.16223309206304762,
+          "route-96": 0.13143925694298056,
+          "route-97": 0.1400143595210678,
+          "route-98": 0.15015437980042845,
+          "route-99": 0.1415031128924176
+        },
+        "qualification": {
+          "baseline_model_type": "kalman",
+          "relative_validation_nrmse_improvement": 0.05008396539422133,
+          "validation_route_win_rate": 0.8888888888888888,
+          "maximum_route_to_baseline_ratio": 1.0597442990870174,
+          "seed_relative_std": 0.007916672016572803,
+          "passed_parameter_gate": false
+        },
+        "selected_seed": 31401,
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-dlinear",
+      "model_type": "dlinear",
+      "model_family": "official_pretrained_experimental",
+      "deployment_status": "official_experimental_not_system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": "extrapolation_dlinear.pt",
+      "checkpoint_sha256": "3d444e6f8e3ffdeb7659bee908f2b75905505532e8db848a59ed6e7f5ede4a01",
+      "checkpoint_size_bytes": 7053,
+      "checkpoint_loader": "torch.load(weights_only=True)",
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": false,
+        "method": null,
+        "automatic_candidate": false
+      },
+      "architecture": {
+        "model_type": "dlinear",
+        "task_type": "extrapolation",
+        "parameter_count": 8,
+        "context_length": 16,
+        "target_length": 4,
+        "training_config": {
+          "model_type": "dlinear",
+          "seed": 31401,
+          "hidden_size": 32,
+          "num_layers": 1,
+          "kernel_size": 3,
+          "tcn_channels": 32,
+          "dropout": 0.0,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "batch_size": 128,
+          "max_epochs": 60,
+          "patience": 8,
+          "min_delta": 1e-06,
+          "device": "cuda",
+          "deterministic": true,
+          "loss_weights": []
+        },
+        "parameter_count_total": 136,
+        "interpolation_encoder": "not_applicable",
+        "causal_extrapolation": true
+      },
+      "training_dataset": {
+        "file_name": "step11abc_extrapolation_p8.h5",
+        "sha256": "bb370ebec7832d64c57a63a52ed44f15f9af37869c7f9bbad061291f812979e9",
+        "corpus_id": "chanaipulse-v3.1-corpus.1"
+      },
+      "validation_evidence": {
+        "normalized_rmse_mean": 0.1421283622781043,
+        "normalized_rmse_std": 4.1726213101874654e-05,
+        "route_nrmse_mean": {
+          "route-100": 0.14381912038118802,
+          "route-101": 0.1478178176412118,
+          "route-102": 0.15237052068304738,
+          "route-85": 0.14533782862822117,
+          "route-86": 0.14653172715811227,
+          "route-87": 0.13900098377937806,
+          "route-88": 0.1388867157401198,
+          "route-89": 0.14811140745265186,
+          "route-90": 0.13180360278246409,
+          "route-91": 0.13789922756997292,
+          "route-92": 0.1343876580532206,
+          "route-93": 0.14305731238617778,
+          "route-94": 0.13794255465690633,
+          "route-95": 0.15811550409522937,
+          "route-96": 0.12850979805439802,
+          "route-97": 0.14114349229765,
+          "route-98": 0.14495212888385592,
+          "route-99": 0.1353696672415913
+        },
+        "qualification": {
+          "baseline_model_type": "kalman",
+          "relative_validation_nrmse_improvement": 0.0938301364850852,
+          "validation_route_win_rate": 1.0,
+          "maximum_route_to_baseline_ratio": 0.9453295550094295,
+          "seed_relative_std": 0.00029358118557806545,
+          "passed_parameter_gate": false
+        },
+        "selected_seed": 31401,
+        "source_partition": "validation"
+      }
+    },
+    {
+      "model_id": "chanaipulse-v3.1.0-extrapolation-nlinear",
+      "model_type": "nlinear",
+      "model_family": "official_pretrained_experimental",
+      "deployment_status": "official_experimental_not_system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": "extrapolation_nlinear.pt",
+      "checkpoint_sha256": "57f3e3dbc5a601a200e752e25a9228e2a727068f1801328deb0e7e76d752b818",
+      "checkpoint_size_bytes": 5669,
+      "checkpoint_loader": "torch.load(weights_only=True)",
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "P8",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu",
+          "DS_sigma",
+          "KF_sigma",
+          "r_DS",
+          "LNS_ksi",
+          "num_clusters",
+          "num_rays"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB",
+          "log10_s_std",
+          "dB",
+          "dimensionless",
+          "dB",
+          "count",
+          "count"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 8,
+        "supported_product_axes": [
+          "sample",
+          "position"
+        ]
+      },
+      "adaptation": {
+        "supported": false,
+        "method": null,
+        "automatic_candidate": false
+      },
+      "architecture": {
+        "model_type": "nlinear",
+        "task_type": "extrapolation",
+        "parameter_count": 8,
+        "context_length": 16,
+        "target_length": 4,
+        "training_config": {
+          "model_type": "nlinear",
+          "seed": 31402,
+          "hidden_size": 32,
+          "num_layers": 1,
+          "kernel_size": 3,
+          "tcn_channels": 32,
+          "dropout": 0.0,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "batch_size": 128,
+          "max_epochs": 60,
+          "patience": 8,
+          "min_delta": 1e-06,
+          "device": "cuda",
+          "deterministic": true,
+          "loss_weights": []
+        },
+        "parameter_count_total": 68,
+        "interpolation_encoder": "not_applicable",
+        "causal_extrapolation": true
+      },
+      "training_dataset": {
+        "file_name": "step11abc_extrapolation_p8.h5",
+        "sha256": "bb370ebec7832d64c57a63a52ed44f15f9af37869c7f9bbad061291f812979e9",
+        "corpus_id": "chanaipulse-v3.1-corpus.1"
+      },
+      "validation_evidence": {
+        "normalized_rmse_mean": 0.145040070565118,
+        "normalized_rmse_std": 3.499607971667494e-05,
+        "route_nrmse_mean": {
+          "route-100": 0.14881743006090908,
+          "route-101": 0.1498895244483254,
+          "route-102": 0.15292420899340445,
+          "route-85": 0.1461861145506636,
+          "route-86": 0.15011382601785628,
+          "route-87": 0.14192266189355784,
+          "route-88": 0.14402962549711154,
+          "route-89": 0.1509227899897989,
+          "route-90": 0.13350554296796288,
+          "route-91": 0.13999104865872056,
+          "route-92": 0.13733585509937432,
+          "route-93": 0.14510866331087735,
+          "route-94": 0.14179412138687664,
+          "route-95": 0.1601438465967498,
+          "route-96": 0.1332347108798552,
+          "route-97": 0.1429019529047955,
+          "route-98": 0.149398120669464,
+          "route-99": 0.13967176593059438
+        },
+        "qualification": {
+          "baseline_model_type": "kalman",
+          "relative_validation_nrmse_improvement": 0.0752659156726645,
+          "validation_route_win_rate": 1.0,
+          "maximum_route_to_baseline_ratio": 0.9632733653378278,
+          "seed_relative_std": 0.0002412855949415917,
+          "passed_parameter_gate": false
+        },
+        "selected_seed": 31402,
+        "source_partition": "validation"
+      }
+    }
+  ],
+  "artifact_policy": {
+    "contains_private_measurements": false,
+    "contains_search_or_intermediate_checkpoints": false,
+    "binary_checkpoints_are_bound_by_sha256": true
+  }
+}

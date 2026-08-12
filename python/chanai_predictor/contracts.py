@@ -12,6 +12,7 @@ import numpy as np
 PREDICTOR_DATA_SCHEMA_VERSION = "v3.0-predictor-data-hdf5.1"
 MODEL_MANIFEST_SCHEMA_VERSION = "v3.0-predictor-model-manifest.1"
 REGISTRY_SCHEMA_VERSION = "v3.0-predictor-model-registry.1"
+REGISTRY_V2_SCHEMA_VERSION = "v3.1-predictor-model-registry.2"
 PREDICTION_SCHEMA_VERSION = "v3.0-predicted-channel-parameters.1"
 PREDICTION_REQUEST_SCHEMA_VERSION = "v3.0-predictor-request.1"
 ADAPTATION_SCHEMA_VERSION = "v3.0-predictor-adaptation-result.1"
@@ -20,8 +21,8 @@ SUPPORTED_TASKS = ("interpolation", "extrapolation")
 SUPPORTED_NEURAL_MODELS = ("gru", "lstm", "tcn")
 SUPPORTED_RESEARCH_NEURAL_MODELS = ("dlinear", "nlinear")
 SUPPORTED_TRAINABLE_MODELS = SUPPORTED_NEURAL_MODELS + SUPPORTED_RESEARCH_NEURAL_MODELS
-SUPPORTED_BASELINES = ("persistence", "linear")
-SUPPORTED_MODELS = SUPPORTED_BASELINES + SUPPORTED_NEURAL_MODELS
+SUPPORTED_BASELINES = ("persistence", "linear", "ar", "kalman")
+SUPPORTED_MODELS = SUPPORTED_BASELINES + SUPPORTED_TRAINABLE_MODELS
 SUPPORTED_SELECTION_MODES = ("auto", "manual")
 SUPPORTED_ADAPTATION_MODES = ("off", "auto", "force")
 

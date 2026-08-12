@@ -68,7 +68,9 @@ def adapt_prediction_head(
             strict=True,
         )
     }
-    overlap = sorted(_target_key_set(data, adaptation_indices) & forbidden)
+    used_for_adaptation = _target_key_set(data, adaptation_indices)
+    used_for_validation = _target_key_set(data, validation_indices)
+    overlap = sorted((used_for_adaptation | used_for_validation) & forbidden)
     if overlap:
         raise ValueError(
             "Adaptation data overlaps the actual prediction target region: "

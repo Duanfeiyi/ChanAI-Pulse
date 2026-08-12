@@ -12,6 +12,7 @@ import numpy as np
 from .adaptation import adapt_prediction_head
 from .contracts import (
     PREDICTION_SCHEMA_VERSION,
+    REGISTRY_V2_SCHEMA_VERSION,
     AdaptationPolicy,
     PredictionRequest,
     PredictorData,
@@ -32,6 +33,20 @@ def run_prediction(
     device: str = "auto",
 ) -> dict[str, Any]:
     registry_path, registry = load_registry(registry_path)
+    policy = adaptation_policy or AdaptationPolicy(mode="off")
+    if registry["schema_version"] == REGISTRY_V2_SCHEMA_VERSION:
+        from .service_v2 import run_prediction_v2
+
+        return run_prediction_v2(
+            data,
+            registry_path,
+            registry,
+            selection_mode=selection_mode,
+            requested_model=requested_model,
+            partition=partition,
+            adaptation_policy=policy,
+            device=device,
+        )
     entry = select_registry_entry(
         registry, data, selection_mode, requested_model=requested_model
     )
@@ -41,7 +56,6 @@ def run_prediction(
     actual_target_indices = np.asarray(data.target_parameter_sample_index)
     if actual_target_indices.shape[0] == data.inputs.shape[0]:
         actual_target_indices = actual_target_indices[indices]
-    policy = adaptation_policy or AdaptationPolicy(mode="off")
     policy_values = dict(policy.__dict__)
     target_groups = [
         data.example_group_ids[int(index)]
@@ -123,6 +137,20 @@ def run_prediction_request(
     """Run a product prediction request that contains no target ground truth."""
     request.validate()
     registry_path, registry = load_registry(registry_path)
+    policy = adaptation_policy or AdaptationPolicy(mode="off")
+    if registry["schema_version"] == REGISTRY_V2_SCHEMA_VERSION:
+        from .service_v2 import run_prediction_request_v2
+
+        return run_prediction_request_v2(
+            request,
+            registry_path,
+            registry,
+            selection_mode=selection_mode,
+            requested_model=requested_model,
+            adaptation_policy=policy,
+            adaptation_data=adaptation_data,
+            device=device,
+        )
     entry = select_registry_entry(
         registry, request, selection_mode, requested_model=requested_model
     )
@@ -136,7 +164,6 @@ def run_prediction_request(
     normalized_inputs = (
         request.input_parameters - mean.reshape(1, 1, -1)
     ) / std.reshape(1, 1, -1)
-    policy = adaptation_policy or AdaptationPolicy(mode="off")
     if adaptation_data is None:
         if policy.mode == "force":
             raise ValueError(
