@@ -10,7 +10,7 @@ addpath(genpath(fullfile(repoRoot, "core")));
 app = ChannelSimulator(Visible="off");
 cleanup = onCleanup(@() delete(app));
 assert(isvalid(app.UIFigure));
-assert(app.UIFigure.Name == "ChanAI Pulse v3.1.0-rc.1");
+assert(app.UIFigure.Name == "ChanAI Pulse v3.1.0");
 
 %% Four standard fixtures expose 1/3/6/9 standard plus optional heatmap.
 fixtureRoot = fullfile(repoRoot, "demo_data", "v3_standard_fixtures");

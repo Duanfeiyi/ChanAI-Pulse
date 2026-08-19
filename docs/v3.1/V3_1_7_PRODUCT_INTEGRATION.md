@@ -2,7 +2,7 @@
 
 ## 1. 状态与边界
 
-本工作包把 v3.1-5 的 ModelRegistry v2、官方 checkpoint 和 v3.1-6 的生成/Benchmark 边界接入正式 `ChannelSimulatorV3App`。候选版本为 `ChanAI Pulse v3.1.0-rc.1`，不是正式 Tag 或 Release；PR 合并、Tag 和 Release仍由项目负责人手动执行。
+本工作包把 v3.1-5 的 ModelRegistry v2、官方 checkpoint 和 v3.1-6 的生成/Benchmark 边界接入正式 `ChannelSimulatorV3App`。产品版本为 `ChanAI Pulse v3.1.0`；PR #75 已由项目负责人手动合并，Tag `v3.1.0` 和 GitHub Release 仍由项目负责人手动执行。
 
 v3.1 正式生成仍限样本/位置轴。Time/Frequency 完整端到端预测属于 v3.2。Full 6GPCM 核心未修改。
 
