@@ -10,7 +10,7 @@ addpath(genpath(fullfile(repoRoot, "core")));
 app = ChannelSimulator(Visible="off");
 cleanup = onCleanup(@() delete(app));
 assert(isvalid(app.UIFigure));
-assert(app.UIFigure.Name == "ChanAI Pulse v3.0");
+assert(app.UIFigure.Name == "ChanAI Pulse v3.1.0-rc.1");
 
 %% Four standard fixtures expose 1/3/6/9 standard plus optional heatmap.
 fixtureRoot = fullfile(repoRoot, "demo_data", "v3_standard_fixtures");
@@ -32,7 +32,9 @@ assert(app.UIFigure.Visible == "off", ...
     "Programmatic hidden loading must not steal focus or show the window.");
 externalFullRoot = fullfile(fileparts(repoRoot), ...
     "ChanAI-Pulse-v3-step11abc-assets", "full6gpcm", "source");
-if isfile(fullfile(externalFullRoot, "@channel_model", "channel_model.m"))
+bundledFullRoot = fullfile(repoRoot, "third_party", "full_6gpcm");
+if isfile(fullfile(externalFullRoot, "@channel_model", "channel_model.m")) || ...
+        isfile(fullfile(bundledFullRoot, "@channel_model", "channel_model.m"))
     assert(hasEnabledButton(app.UIFigure, ...
         "开始预测（自动：Full 6GPCM）"), ...
         "The 2x4x16 fixture should select the configurable Full public API.");

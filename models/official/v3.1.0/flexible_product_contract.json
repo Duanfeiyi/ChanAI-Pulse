@@ -1,0 +1,57 @@
+{
+  "schema_version": "v3.1-flexible-product-contract.1",
+  "parameter_bundle": "P8",
+  "supported_task_types": ["extrapolation", "interpolation"],
+  "public_length_contract": {
+    "known_length": "any_positive_length_consistent_with_uploaded_data",
+    "target_length": "any_positive_length",
+    "known_target_overlap_allowed": false,
+    "extrapolation_rule": "targets_after_all_known_indices",
+    "interpolation_rule": "each_target_run_has_known_samples_on_both_sides"
+  },
+  "native_flexible_models": [
+    "persistence",
+    "linear",
+    "quadratic",
+    "holt",
+    "harmonic",
+    "ar",
+    "kalman"
+  ],
+  "ordinary_selection": {
+    "mode": "per_parameter_uploaded_known_region_backtest",
+    "hybrid_allowed": true,
+    "observed_parameters": ["DS_mu", "KF_mu", "num_clusters"],
+    "target_truth_read": false
+  },
+  "legacy_neural_compatibility": {
+    "models": ["gru", "lstm", "tcn", "dlinear", "nlinear"],
+    "native_context_length": 16,
+    "native_target_length": 4,
+    "recurrent_history_policy": "gru_lstm_tcn_encoders_consume_all_known_rows_with_runtime_length_extension",
+    "linear_neural_history_policy": "dlinear_nlinear_keep_native_latest_16_rows",
+    "extrapolation": "autoregressive_rolling_blocks",
+    "interpolation": "bidirectional_autoregressive_rolling_and_distance_fusion",
+    "minimum_known_samples_per_required_side": 16,
+    "warning": "Predicted blocks re-enter later contexts; uncertainty can accumulate on long horizons."
+  },
+  "performance_policy": {
+    "known_region_backtest": "selection_and_warning",
+    "continuity_check": "warning_only",
+    "manual_model_performance_failure": "warning_and_run_without_silent_replacement",
+    "extreme_manual_regret_guard": {
+      "trigger_per_parameter_baseline_ratio": 4.0,
+      "minimum_requested_model_weight": 0.1,
+      "method": "transparent_blend_with_best_known_region_baseline",
+      "target_truth_read": false
+    },
+    "hard_rejection": [
+      "invalid_task_or_index_contract",
+      "insufficient_native_model_context",
+      "missing_runtime_or_checkpoint",
+      "non_finite_prediction",
+      "generator_failure"
+    ]
+  },
+  "scientific_boundary": "Legacy checkpoints were trained on generator P8 truth. No new variable-length neural checkpoint is claimed until real-observable-aligned variable-length training data pass an independent benchmark."
+}
