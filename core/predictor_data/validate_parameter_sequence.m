@@ -57,7 +57,8 @@ if numel(sequence.parameter_units) ~= parameterCount
     errors(end + 1, 1) = ...
         "parameter_units must have one value per parameter.";
 end
-allowedSources = ["generator_truth", "grid_fitted", "sa_fitted"];
+allowedSources = ["generator_truth", "grid_fitted", "sa_fitted", ...
+    "direct_channel_observed"];
 badSources = setdiff(unique(string(sequence.label_source)), allowedSources);
 if ~isempty(badSources)
     errors(end + 1, 1) = ...

@@ -32,4 +32,17 @@ extrapolation/extrapolation_{gru,lstm,tcn,dlinear,nlinear}.pt
 
 The package is intentionally small: it contains 10 selected checkpoints and two registries, not search checkpoints, training caches, private measurements or large experiment outputs.
 
+## v3.1-7 flexible product execution
+
+The public UI is no longer restricted to a 16-known/4-target task. The
+versioned [`flexible_product_contract.json`](flexible_product_contract.json)
+defines arbitrary valid public lengths, full-history classical trend models,
+per-parameter Hybrid selection, bidirectional interpolation, and warning-only
+performance diagnostics. The ten neural files above remain legacy native
+16-to-4 checkpoints. GRU/LSTM/TCN encoders can consume all available known rows
+through a clearly labelled runtime length extension; their four-point heads and
+the fixed-width DLinear/NLinear models use an explicitly recorded rolling
+compatibility layer for longer targets. They are not relabelled as newly trained
+variable-length weights.
+
 See [the v3.1-5 guide](../../../docs/v3.1/V3_1_5_MODEL_REGISTRY_AND_ADAPTATION.md) for commands and safety behavior.
