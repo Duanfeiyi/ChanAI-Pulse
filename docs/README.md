@@ -30,6 +30,7 @@ This index separates documentation that describes the current MATLAB implementat
 - [v3.1-5 official models, Registry v2 and safe adaptation](v3.1/V3_1_5_MODEL_REGISTRY_AND_ADAPTATION.md)
 - [v3.1-7 formal product integration and release-candidate checklist](v3.1/V3_1_7_PRODUCT_INTEGRATION.md)
 - [v3.1-7 pre-PR manual UI review](v3.1/V3_1_7_MANUAL_UI_REVIEW.md)
+- [v3.1.0 release notes](v3.1/V3_1_0_RELEASE_NOTES.md)
 - [Dataset policy](DATASET_POLICY.md)
 - [Dataset converter](../tools/dataset_converter/README.md)
 - [Benchmark plan](BENCHMARK_PLAN.md) — planned, not an implemented benchmark

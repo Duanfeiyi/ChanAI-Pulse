@@ -797,3 +797,4 @@ v3.1-3～v3.1-7 完成并发布后，再以 v3.1 的数据、实验和 Registry 
 - [v3.1-4 P8 模型公平训练与准入](v3.1/V3_1_4_MODEL_TRAINING.md)
 - [v3.1-5 官方模型、Registry v2 与安全微调](v3.1/V3_1_5_MODEL_REGISTRY_AND_ADAPTATION.md)
 - [v3.1-7 正式产品接入与候选发布检查](v3.1/V3_1_7_PRODUCT_INTEGRATION.md)
+- [v3.1.0 发布说明](v3.1/V3_1_0_RELEASE_NOTES.md)

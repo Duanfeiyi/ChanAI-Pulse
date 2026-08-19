@@ -19,7 +19,7 @@ setenv("CHANAI_STEP10_PYTHON", ...
 app = ChannelSimulator;
 ```
 
-预期：标题 `ChanAI Pulse v3.1.0-rc.1`；普通模式、中文；三个主页签齐全。未设置环境变量时，App 会检查项目 `.venv`、同级 v3.1 assets 环境，再检查能实际启动的系统 Python。
+预期：标题 `ChanAI Pulse v3.1.0`；普通模式、中文；三个主页签齐全。未设置环境变量时，App 会检查项目 `.venv`、同级 v3.1 assets 环境，再检查能实际启动的系统 Python。
 
 ## 2. A：普通模式自动 Hybrid（必测）
 
