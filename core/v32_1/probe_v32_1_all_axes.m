@@ -14,7 +14,7 @@ end
 
 hashBefore = hash_full_6gpcm_tree(engineRoot).aggregate_sha256;
 names2 = ["DS_mu", "KF_mu"];
-bounds2 = [-9.0, -5.0; -20, 30];
+bounds2 = [-9.0, -5.0; -30, 30];
 dataConfig = default_predictor_data_config();
 
 %% Time axis

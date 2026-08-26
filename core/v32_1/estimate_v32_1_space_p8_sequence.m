@@ -79,7 +79,7 @@ for sample = 1:nSample
     if ~isempty(logDelay)
         dsValue = bounded(median(logDelay), -9, -5);
     end
-    values(sample, :) = [dsValue, bounded(median(kFactorDb), -20, 30)];
+    values(sample, :) = [dsValue, bounded(median(kFactorDb), -30, 30)];
     clusterCounts(sample, 1) = round(bounded(median(significantCount), 4, 30));
 end
 
