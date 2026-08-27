@@ -1,0 +1,45 @@
+{
+  "schema_version": "v3.2-2c-frequency-capability.1",
+  "package_version": "v3.2.0-axes.1",
+  "created_utc": "2026-08-27T06:05:00Z",
+  "axis": "frequency",
+  "scope": "in_band",
+  "prediction_object": "ctf_complex_magnitude_and_phase",
+  "sequence_form": "per_tx_rx_link_64_subcarriers",
+  "recommended_method": "linear_interpolation",
+  "recommended_reason": "linear_interpolation beats IDW and all neural candidates on all three missing patterns; no neural model passed the v3.1 admission gate",
+  "missing_patterns": [
+    "uniform_half",
+    "random_half",
+    "block_8"
+  ],
+  "validation_evidence": {
+    "source_partition": "validation",
+    "linear_interpolation_complex_nmse": {
+      "uniform_half": 0.7627634107353825,
+      "random_half": 0.8420489947588341,
+      "block_8": 0.823282415063473
+    },
+    "idw_complex_nmse": {
+      "uniform_half": 0.8137054789707326,
+      "random_half": 0.9204621025948871,
+      "block_8": 1.250481889120872
+    },
+    "neural_best_complex_nmse": {
+      "uniform_half": 1.0275,
+      "random_half": 1.1807,
+      "block_8": 0.8549
+    }
+  },
+  "not_registered_in_parameter_registry": true,
+  "not_registered_reason": "Frequency prediction is waveform-level (CTF magnitude/phase), not a P8 parameter sequence; it is declared as a capability, not as a parameter-model registry entry",
+  "red_lines": {
+    "cross_band_scope": "experimental_only",
+    "ifft_is_not_prediction": "complete-CIR IFFT to CTF must not be presented as predicting missing subcarriers"
+  },
+  "source_evidence": {
+    "experiment_id": "v32_2b_frequency_study.1",
+    "baselines_file": "chanaipulse-v3.2-corpus.1/v32_2b_frequency_baselines.json",
+    "code_revision": "27ecf33"
+  }
+}

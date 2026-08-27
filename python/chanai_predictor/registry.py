@@ -177,11 +177,17 @@ def load_registry(path: str | Path) -> tuple[Path, dict[str, Any]]:
 
 
 def _validate_v2_registry(registry: dict[str, Any]) -> None:
-    if registry.get("parameter_bundle") != "P8":
-        raise ValueError("ModelRegistry v2 requires the frozen P8 parameter bundle.")
+    bundle = registry.get("parameter_bundle")
+    if bundle not in ("P8", "V3_2_DS_KF"):
+        raise ValueError(
+            "ModelRegistry v2 requires a known parameter bundle "
+            "(P8 or V3_2_DS_KF)."
+        )
     compatibility = registry.get("compatibility", {})
-    if compatibility.get("parameter_bundle") != "P8":
-        raise ValueError("ModelRegistry v2 compatibility must declare P8.")
+    if compatibility.get("parameter_bundle") not in ("P8", "V3_2_DS_KF"):
+        raise ValueError(
+            "ModelRegistry v2 compatibility must declare a known bundle."
+        )
     preprocessing = registry.get("preprocessing", {})
     parameter_count = compatibility.get("parameter_count")
     if not isinstance(parameter_count, int) or parameter_count < 1:
@@ -190,7 +196,9 @@ def _validate_v2_registry(registry: dict[str, Any]) -> None:
         len(preprocessing.get(name, [])) != parameter_count
         for name in ("normalization_mean", "normalization_std", "parameter_bounds")
     ):
-        raise ValueError("ModelRegistry v2 preprocessing does not match P8.")
+        raise ValueError(
+            "ModelRegistry v2 preprocessing does not match parameter count."
+        )
     entries = registry.get("entries")
     if not isinstance(entries, list) or not entries:
         raise ValueError("ModelRegistry v2 must contain model entries.")

@@ -1,0 +1,113 @@
+{
+  "schema_version": "v3.1-predictor-model-registry.2",
+  "package_version": "v3.2.0-axes.1",
+  "created_utc": "2026-08-27T06:01:08.450426+00:00",
+  "parameter_bundle": "V3_2_DS_KF",
+  "source_evidence": {
+    "experiment_id": "v32_2_time_space_study.1",
+    "study_schema_version": "v3.2-2-time-space-study.1",
+    "code_revision": "cfc5c3b",
+    "selection_partition": "validation",
+    "test_truth_used_for_selection": false
+  },
+  "selection_policy": {
+    "ordinary_user": "registry_recommendation",
+    "selected_model_type": "ar",
+    "selected_model_reason": "best_baseline_no_neural_candidate_passed_admission_gate",
+    "fallback_chain": [
+      "ar"
+    ],
+    "target_ground_truth_used_at_prediction_time": false
+  },
+  "compatibility": {
+    "task_type": "extrapolation",
+    "context_layout": "history_then_future",
+    "parameter_bundle": "V3_2_DS_KF",
+    "parameter_names": [
+      "DS_mu",
+      "KF_mu"
+    ],
+    "parameter_units": [
+      "log10_s",
+      "dB"
+    ],
+    "context_length": 16,
+    "target_length": 4,
+    "parameter_count": 2,
+    "supported_product_axes": [
+      "time"
+    ],
+    "axis": "time",
+    "coordinate_semantics": "seconds_slow_varying"
+  },
+  "preprocessing": {
+    "method": "zscore_train_only",
+    "normalization_mean": [
+      -7.173200751571375,
+      -10.615280298854023
+    ],
+    "normalization_std": [
+      0.5854307279902051,
+      10.173816316955273
+    ],
+    "parameter_bounds": [
+      [
+        -9.0,
+        -5.0
+      ],
+      [
+        -30.0,
+        30.0
+      ]
+    ]
+  },
+  "entries": [
+    {
+      "model_id": "chanaipulse-v3.2.0-time-ar",
+      "model_type": "ar",
+      "model_family": "deterministic_baseline",
+      "deployment_status": "system_recommended",
+      "manual_selection_allowed": true,
+      "checkpoint": null,
+      "checkpoint_sha256": null,
+      "compatibility": {
+        "task_type": "extrapolation",
+        "context_layout": "history_then_future",
+        "parameter_bundle": "V3_2_DS_KF",
+        "parameter_names": [
+          "DS_mu",
+          "KF_mu"
+        ],
+        "parameter_units": [
+          "log10_s",
+          "dB"
+        ],
+        "context_length": 16,
+        "target_length": 4,
+        "parameter_count": 2,
+        "supported_product_axes": [
+          "time"
+        ],
+        "axis": "time",
+        "coordinate_semantics": "seconds_slow_varying"
+      },
+      "adaptation": {
+        "supported": false,
+        "reason": "parameter_free_baseline"
+      },
+      "validation_evidence": {
+        "normalized_rmse": 0.01342418058926139,
+        "per_parameter_normalized_rmse": [
+          0.006470765101934767,
+          0.01784786956423055
+        ],
+        "source_partition": "validation"
+      }
+    }
+  ],
+  "artifact_policy": {
+    "contains_private_measurements": false,
+    "contains_search_or_intermediate_checkpoints": false,
+    "binary_checkpoints_are_bound_by_sha256": true
+  }
+}
