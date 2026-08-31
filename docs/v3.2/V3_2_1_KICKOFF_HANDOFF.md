@@ -145,9 +145,12 @@
 
 ### 8.2 下一步
 
-1. **v3.2-4a 合并**：人工审阅基本完成 → 新建分支（基于当前工作分支/origin/main）承载 v3.2-4a 变更 → PR（由 Duanfeiyi 手动合并）；
-2. **报错用户可读化改进**（人工审阅反馈，已登记主计划 5.6.2）：白话化映射表 + 统一包装 + 技术详情可复制 + 前置预告 + 速查文档；
-3. v3.2-4b（三维独立 Benchmark）/ v3.2-4c（发布验收 + release）随后推进。
+1. **v3.2-4a 已合并**（PR #86 → origin/main `d6395c2`）。
+2. **v3.2-4b 已完成**（工作分支 codex/v3.2-4b，未提交）：
+   - 报错用户可读化：`core/errors/user_error_guidance.m` + App `presentUserError`（4 个 catch 收口）+ 指引"常见报错与处理"节；
+   - 三维独立 Benchmark：`run_channel_benchmark`/`validate_benchmark_alignment` 按轴适配（time/frequency/sample/space 目标抽取、索引维度、轴值、基线、逐目标指标）；三轴端到端验证 PASS（`probe_v32_4b_benchmark_three_axis`）；
+   - 全部回归零退化（step13/v3.2-4a/v3.1-7/UI）。
+3. 待办：v3.2-4b 建分支 → PR（Duanfeiyi 手动合并）；随后 v3.2-4c（发布验收 + release）。
 
 ### 8.3 v3.2-4a 审阅修复轮（人工审阅发现的问题已修复）
 

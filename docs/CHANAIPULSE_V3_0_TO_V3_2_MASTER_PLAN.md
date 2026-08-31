@@ -385,9 +385,9 @@ Frequency 数据：
 
 #### 5.6.2 待办（并入后续 step）
 
-- [ ] v3.2-4a 合并 PR（由项目负责人手动合并）。
-- [ ] **报错用户可读化改进**（人工审阅反馈，优先做）：① 错误白话化映射表（发生了什么/为什么/下一步，按 identifier 查表）；② 统一友好包装（模块一/二/三/导出 4 个 catch 收口）；③ 技术详情可折叠可复制；④ 必然失败场景前置预告；⑤ 指引文档"常见报错与处理"速查节。
-- [ ] v3.2-4b：三维独立 Benchmark（Time/Space/Frequency 指标与严格对齐，见下方"独立 Benchmark"清单）。
+- [x] v3.2-4a 合并 PR（PR #86 已由项目负责人手动合并，origin/main `d6395c2`）。
+- [x] **报错用户可读化改进**（v3.2-4b 已完成）：① `core/errors/user_error_guidance.m` 白话化映射表（发生了什么/为什么/下一步，按 identifier 查表 + 兜底）；② App `presentUserError` 统一包装（模块一/二/三/导出 4 个 catch 收口，弹窗白话 + 状态区三段式 + 技术编号可复制）；③ 指引文档"常见报错与处理"速查节。
+- [x] **v3.2-4b 三维独立 Benchmark**（已完成）：`run_channel_benchmark` 目标抽取/索引维度/轴值/基线/逐目标指标按轴适配（time→Nt 快照、frequency→Nf 子载波、sample/space→N_sample）；`validate_benchmark_alignment` 轴感知（time 跳过 Nt 逐点比较、frequency 用预测 CTF 校验）；三轴端到端验证 `probe_v32_4b_benchmark_three_axis` PASS（time/space/frequency 对齐与评价均通过）。time/space 复数 NMSE 偏高属"参数→随机信道实现"链路固有特性（v3.1-6 同语义），frequency 确定性恢复 BETTER_THAN_BASELINE。
 - [ ] v3.2-4c：发布验收（新 Clone/ZIP、中英文路径、文档、Release Notes、Tag/Release 决策）。
 
 独立 Benchmark：

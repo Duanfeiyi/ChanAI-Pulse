@@ -846,6 +846,7 @@ classdef ChannelSimulatorV3App < handle
             catch exception
                 app.renderInputFailure(struct("errors", string(exception.message), ...
                     "warnings", strings(0, 1), "status", "FAIL"));
+                app.presentUserError(exception, "import");
                 app.finishProgress(false, string(exception.message));
             end
             app.setBusy(false, "");
@@ -1119,6 +1120,30 @@ classdef ChannelSimulatorV3App < handle
             app.setGlobalStatus("输入验证失败", "error");
         end
 
+        function presentUserError(app, exception, step)
+            % v3.2-4b: plain-language error presentation. Writes a
+            % what/why/next-step summary to the active module status area,
+            % opens a plain-language dialog, and keeps the raw technical
+            % identifier/message copyable for support.
+            guidance = user_error_guidance(exception, step);
+            area = app.errorStatusArea(step);
+            area.Value = [guidance.lines(:); ""; ...
+                "技术编号：" + guidance.technical];
+            uialert(app.UIFigure, ...
+                strjoin([guidance.lines(:); "技术编号：" + guidance.technical], newline), ...
+                guidance.title);
+            app.setGlobalStatus(guidance.title, "error");
+        end
+
+        function area = errorStatusArea(app, step)
+            switch step
+                case {"import", "calibration"}
+                    area = app.ModuleTwoStatusArea;
+                otherwise
+                    area = app.ModuleThreeStatusArea;
+            end
+        end
+
         function startWorkflow(app)
             app.TabGroup.SelectedTab = app.ModuleTwoTab;
             app.runCalibration();
@@ -1223,8 +1248,7 @@ classdef ChannelSimulatorV3App < handle
                     app.finishProgress(false, strjoin(string(app.CalibrationResult.errors(:)), newline));
                 end
             catch exception
-                app.ModuleTwoStatusArea.Value = ["标定失败："; string(exception.message)];
-                app.setGlobalStatus("模块二标定失败", "error");
+                app.presentUserError(exception, "calibration");
                 app.finishProgress(false, string(exception.message));
             end
             app.ModuleTwoCancelButton.Enable = "off";
@@ -1389,9 +1413,7 @@ classdef ChannelSimulatorV3App < handle
             catch exception
                 app.ExportButton.Enable = "off";
                 app.showWaitingParameterAxes("预测未完成");
-                app.ModuleThreeStatusArea.Value = [ ...
-                    "预测或生成失败。不会发布部分 CIR。"; string(exception.message)];
-                app.setGlobalStatus("模块三未生成结果", "error");
+                app.presentUserError(exception, "prediction");
                 app.finishProgress(false, string(exception.message));
             end
             app.setBusy(false, "");
@@ -2377,8 +2399,12 @@ classdef ChannelSimulatorV3App < handle
                 app.restoreWindowFocus();
                 return;
             end
-            files = export_prediction_result_bundle(app.PredictionResult, string(target));
-            uialert(app.UIFigure, "导出完成：" + newline + files.cir_hdf5, "导出完成");
+            try
+                files = export_prediction_result_bundle(app.PredictionResult, string(target));
+                uialert(app.UIFigure, "导出完成：" + newline + files.cir_hdf5, "导出完成");
+            catch exception
+                app.presentUserError(exception, "export");
+            end
             app.restoreWindowFocus();
         end
 
