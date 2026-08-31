@@ -98,16 +98,25 @@ end
 
 function options = taskAxisOptions(dataset, axisName)
 options = struct("axis_values", [], "axis_unit", "index");
+if axisName == "position"
+    axisName = "space";  % v3.2 compatibility alias
+end
 switch axisName
     case "sample"
         if isfield(dataset.axes, "sample_index")
             options.axis_values = dataset.axes.sample_index(:);
         end
-    case "position"
+    case "space"
         options.axis_unit = "m";
-        if isfield(dataset.axes, "sample_position_m") && ...
-                isvector(dataset.axes.sample_position_m)
-            options.axis_values = dataset.axes.sample_position_m(:);
+        if isfield(dataset.axes, "sample_position_m")
+            positions = dataset.axes.sample_position_m;
+            if isvector(positions)
+                options.axis_values = positions(:);
+            else
+                % N_sample-by-(1|2|3) route coordinates: use the
+                % along-track x component as the space axis value.
+                options.axis_values = positions(:, 1);
+            end
         end
     case "time"
         options.axis_unit = "s";

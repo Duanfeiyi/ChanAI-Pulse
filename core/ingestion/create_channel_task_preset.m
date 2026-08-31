@@ -16,10 +16,14 @@ axisName = lower(strtrim(axisName));
 axisLength = getAxisLength(dataset, axisName);
 if mode == "interpolation" && axisLength < 3
     error("create_channel_task_preset:AxisTooShort", ...
-        "Interpolation needs at least three values on the selected axis.");
+        "内插任务要求所选任务轴至少 3 个值，但当前任务轴 %s 的长度为 %d。" + ...
+        "请检查任务轴是否与文件匹配（例如 CTF 频谱文件应选“频率”轴）。", ...
+        axisName, axisLength);
 elseif mode == "extrapolation" && axisLength < 2
     error("create_channel_task_preset:AxisTooShort", ...
-        "Extrapolation needs at least two values on the selected axis.");
+        "外推任务要求所选任务轴至少 2 个值，但当前任务轴 %s 的长度为 %d。" + ...
+        "请检查任务轴是否与文件匹配。", ...
+        axisName, axisLength);
 elseif ~ismember(mode, ["interpolation", "extrapolation"])
     error("create_channel_task_preset:UnsupportedMode", ...
         "Mode must be interpolation or extrapolation.");
@@ -46,7 +50,7 @@ end
 
 function axisLength = getAxisLength(dataset, axisName)
 switch axisName
-    case {"sample", "position"}
+    case {"sample", "position", "space"}
         axisLength = dataset.dimensions.N_sample;
     case "time"
         axisLength = dataset.dimensions.Nt;
@@ -54,7 +58,7 @@ switch axisName
         axisLength = dataset.dimensions.Nf;
     otherwise
         error("create_channel_task_preset:UnsupportedAxis", ...
-            "Axis must be sample, position, time, or frequency.");
+            "Axis must be sample, position, space, time, or frequency.");
 end
 end
 
@@ -65,11 +69,16 @@ switch axisName
         if isfield(dataset.axes, "sample_index")
             taskOptions.axis_values = dataset.axes.sample_index(:);
         end
-    case "position"
+    case {"position", "space"}
         taskOptions.axis_unit = "m";
-        if isfield(dataset.axes, "sample_position_m") && ...
-                isvector(dataset.axes.sample_position_m)
-            taskOptions.axis_values = dataset.axes.sample_position_m(:);
+        if isfield(dataset.axes, "sample_position_m")
+            positions = dataset.axes.sample_position_m;
+            if isvector(positions)
+                taskOptions.axis_values = positions(:);
+            else
+                % N_sample-by-(1|2|3) route coordinates: along-track x.
+                taskOptions.axis_values = positions(:, 1);
+            end
         end
     case "time"
         taskOptions.axis_unit = "s";

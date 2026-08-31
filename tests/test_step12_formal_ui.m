@@ -12,6 +12,29 @@ cleanup = onCleanup(@() delete(app));
 assert(isvalid(app.UIFigure));
 assert(app.UIFigure.Name == "ChanAI Pulse v3.1.0");
 
+%% v3.2-4a three-axis UI controls are present and consistent.
+axisDropdown = findDropdown(app.UIFigure, "space");
+missingPattern = findDropdown(app.UIFigure, "uniform_half");
+assert(~isempty(axisDropdown), "Task-axis dropdown not found.");
+assert(~isempty(missingPattern), "Missing-pattern dropdown not found.");
+assert(isequal(string(axisDropdown.ItemsData), ...
+    ["sample", "space", "time", "frequency"]));
+assert(isequal(string(axisDropdown.Items), ...
+    ["样本", "空间", "时间", "频率"]));
+assert(isequal(string(missingPattern.ItemsData), ...
+    ["uniform_half", "random_half", "block_8"]));
+assert(string(missingPattern.Enable) == "off", ...
+    "Missing pattern applies only to the Frequency axis.");
+% Simulate the user selecting the Frequency axis: invoke the registered
+% ValueChangedFcn explicitly (uifigure does not auto-dispatch callbacks on
+% programmatic value changes in headless runs).
+axisDropdown.Value = "frequency";
+feval(axisDropdown.ValueChangedFcn, axisDropdown, struct());
+assert(string(missingPattern.Enable) == "on");
+axisDropdown.Value = "sample";
+feval(axisDropdown.ValueChangedFcn, axisDropdown, struct());
+assert(string(missingPattern.Enable) == "off");
+
 %% Four standard fixtures expose 1/3/6/9 standard plus optional heatmap.
 fixtureRoot = fullfile(repoRoot, "demo_data", "v3_standard_fixtures");
 fixtureNames = [ ...
@@ -103,4 +126,15 @@ function tf = hasEnabledButton(figureHandle, expectedText)
 buttons = findall(figureHandle, "Type", "uibutton");
 matches = buttons(string({buttons.Text}) == expectedText);
 tf = numel(matches) == 1 && string(matches.Enable) == "on";
+end
+
+function dropdown = findDropdown(figureHandle, dataMember)
+dropdown = [];
+allDropdowns = findall(figureHandle, "Type", "uidropdown");
+for index = 1:numel(allDropdowns)
+    if any(string(allDropdowns(index).ItemsData) == dataMember)
+        dropdown = allDropdowns(index);
+        return;
+    end
+end
 end

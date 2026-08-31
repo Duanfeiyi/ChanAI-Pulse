@@ -32,6 +32,7 @@ classdef ChannelSimulatorV3App < handle
         TaskAxisDropDown matlab.ui.control.DropDown
         TaskPresetDropDown matlab.ui.control.DropDown
         CoordinateDropDown matlab.ui.control.DropDown
+        MissingPatternDropDown matlab.ui.control.DropDown
         KnownRangeField matlab.ui.control.EditField
         TargetRangeField matlab.ui.control.EditField
         TaskPreviewLabel matlab.ui.control.TextArea
@@ -335,9 +336,9 @@ classdef ChannelSimulatorV3App < handle
             controls = uipanel(layout, "Title", "数据导入与任务设置", ...
                 "FontWeight", "bold", "BackgroundColor", "white", ...
                 "BorderColor", border);
-            grid = uigridlayout(controls, [17, 1], ...
+            grid = uigridlayout(controls, [19, 1], ...
                 "RowHeight", {31, 31, 42, 22, 30, 30, 30, 22, 30, 22, 30, ...
-                22, 30, 50, 76, 38, 38}, ...
+                22, 30, 22, 30, 92, 62, 38, 38}, ...
                 "Padding", [12, 10, 12, 10], "RowSpacing", 5);
             uibutton(grid, "push", "Text", "浏览信道文件…", ...
                 "ButtonPushedFcn", @(~, ~) app.browseFile());
@@ -354,8 +355,8 @@ classdef ChannelSimulatorV3App < handle
                 "Value", "extrapolation", ...
                 "ValueChangedFcn", @(~, ~) app.updateTaskPreview());
             app.TaskAxisDropDown = uidropdown(grid, ...
-                "Items", ["样本", "位置", "时间", "频率"], ...
-                "ItemsData", ["sample", "position", "time", "frequency"], ...
+                "Items", ["样本", "空间", "时间", "频率"], ...
+                "ItemsData", ["sample", "space", "time", "frequency"], ...
                 "Value", "sample", ...
                 "ValueChangedFcn", @(~, ~) app.updateTaskPreview());
             app.TaskPresetDropDown = uidropdown(grid, ...
@@ -367,6 +368,12 @@ classdef ChannelSimulatorV3App < handle
                 "Items", ["原始样本编号（推荐）", "MATLAB 数组位置（高级）"], ...
                 "ItemsData", ["original_sample", "matlab_index"], ...
                 "Value", "original_sample", ...
+                "ValueChangedFcn", @(~, ~) app.updateTaskPreview());
+            uilabel(grid, "Text", "缺失子载波模式（仅频率轴）");
+            app.MissingPatternDropDown = uidropdown(grid, ...
+                "Items", ["均匀隔1挖1（缺50%）", "随机50%", "成块8"], ...
+                "ItemsData", ["uniform_half", "random_half", "block_8"], ...
+                "Value", "uniform_half", "Enable", "off", ...
                 "ValueChangedFcn", @(~, ~) app.updateTaskPreview());
             uilabel(grid, "Text", "已知区（例：0:30,40:60）");
             app.KnownRangeField = uieditfield(grid, "text", ...
@@ -726,11 +733,11 @@ classdef ChannelSimulatorV3App < handle
         end
 
         function updateTaskPreview(app)
-            if app.TaskAxisDropDown.Value == "position"
+            if app.TaskAxisDropDown.Value == "space"
                 app.CoordinateDropDown.Items = [ ...
-                    "原始位置坐标（推荐）", "MATLAB 数组位置（高级）"];
+                    "原始空间坐标（推荐）", "MATLAB 数组位置（高级）"];
                 app.CoordinateDropDown.ItemsData = ...
-                    ["original_position", "matlab_index"];
+                    ["original_space", "matlab_index"];
             elseif app.TaskAxisDropDown.Value == "time"
                 app.CoordinateDropDown.Items = [ ...
                     "原始时间坐标（推荐）", "MATLAB 数组位置（高级）"];
@@ -746,6 +753,14 @@ classdef ChannelSimulatorV3App < handle
                     "原始样本编号（推荐）", "MATLAB 数组位置（高级）"];
                 app.CoordinateDropDown.ItemsData = ...
                     ["original_sample", "matlab_index"];
+            end
+            % v3.2-4a: missing-subcarrier pattern only applies to Frequency.
+            if isprop(app, "MissingPatternDropDown")
+                if app.TaskAxisDropDown.Value == "frequency"
+                    app.MissingPatternDropDown.Enable = "on";
+                else
+                    app.MissingPatternDropDown.Enable = "off";
+                end
             end
             if app.CoordinateDropDown.Value ~= "matlab_index"
                 app.CoordinateDropDown.Value = app.CoordinateDropDown.ItemsData(1);
@@ -792,6 +807,19 @@ classdef ChannelSimulatorV3App < handle
                     app.renderInputFailure(app.ImportResult.validation);
                     app.finishProgress(false, strjoin( ...
                         string(app.ImportResult.validation.errors(:)), newline));
+                    app.setBusy(false, "");
+                    app.restoreWindowFocus();
+                    return;
+                end
+                % v3.2-4a: guide the task axis when the file domain does not
+                % match the selected axis (a common user mistake that used
+                % to surface as an opaque "axis too short" error).
+                axisMismatch = app.axisDomainMismatchMessage();
+                if strlength(axisMismatch) > 0
+                    app.renderInputFailure(struct( ...
+                        "errors", string(axisMismatch), ...
+                        "warnings", strings(0, 1), "status", "FAIL"));
+                    app.finishProgress(false, axisMismatch);
                     app.setBusy(false, "");
                     app.restoreWindowFocus();
                     return;
@@ -855,9 +883,15 @@ classdef ChannelSimulatorV3App < handle
             else
                 dataset = app.ImportResult.dataset;
             end
-            if app.TaskAxisDropDown.Value == "position" && ...
+            if app.TaskAxisDropDown.Value == "space" && ...
                     isfield(dataset.axes, "sample_position_m")
-                values = double(dataset.axes.sample_position_m(:));
+                positions = dataset.axes.sample_position_m;
+                if isvector(positions)
+                    values = double(positions(:));
+                else
+                    % N_sample-by-(1|2|3) route coordinates: along-track x.
+                    values = double(positions(:, 1));
+                end
             elseif app.TaskAxisDropDown.Value == "time" && ...
                     isfield(dataset.axes, "time_s")
                 values = double(dataset.axes.time_s(:));
@@ -982,19 +1016,46 @@ classdef ChannelSimulatorV3App < handle
             codes(double(task.known_indices)) = 1;
             codes(double(task.target_indices)) = 2;
             cla(app.TaskRangeAxes);
-            imagesc(app.TaskRangeAxes, 1:sampleCount, 1, codes);
+            % A two-row band keeps the known/target color strip visible even
+            % when the axes height is modest.
+            imagesc(app.TaskRangeAxes, 1:sampleCount, 1:2, [codes; codes]);
             colormap(app.TaskRangeAxes, [0.82, 0.84, 0.87; ...
                 0.22, 0.67, 0.38; 0.95, 0.55, 0.16]);
             clim(app.TaskRangeAxes, [0, 2]);
+            app.TaskRangeAxes.YLim = [0.5, 2.5];
             app.TaskRangeAxes.YTick = [];
             app.TaskRangeAxes.Box = "on";
             app.TaskRangeAxes.XLim = [0.5, sampleCount + 0.5];
+            tickCount = min(5, sampleCount);
             tickPositions = unique(round(linspace(1, sampleCount, ...
-                min(5, sampleCount))));
+                tickCount)));
             axisValues = double(task.axis_values(:));
             app.TaskRangeAxes.XTick = tickPositions;
-            app.TaskRangeAxes.XTickLabel = ...
-                compose("%g", axisValues(tickPositions));
+            % Compact per-unit tick labels keep the axis readable for large
+            % values (e.g. Hz) instead of overlapping scientific notation.
+            tickValues = axisValues(tickPositions);
+            if isfield(task, "axis_unit") && ...
+                    string(task.axis_unit) == "Hz"
+                tickLabels = strings(numel(tickValues), 1);
+                for labelIndex = 1:numel(tickValues)
+                    value = tickValues(labelIndex);
+                    if abs(value) >= 1e9
+                        tickLabels(labelIndex) = ...
+                            sprintf("%.3f G", value / 1e9);
+                    elseif abs(value) >= 1e6
+                        tickLabels(labelIndex) = ...
+                            sprintf("%.3f M", value / 1e6);
+                    elseif abs(value) >= 1e3
+                        tickLabels(labelIndex) = ...
+                            sprintf("%.3f k", value / 1e3);
+                    else
+                        tickLabels(labelIndex) = sprintf("%.3g", value);
+                    end
+                end
+            else
+                tickLabels = compose("%.3g", tickValues);
+            end
+            app.TaskRangeAxes.XTickLabel = tickLabels;
             xlabel(app.TaskRangeAxes, app.tr(string(task.axis) + ...
                 "（绿色：已知，橙色：目标，灰色：未使用）"));
             title(app.TaskRangeAxes, app.tr(sprintf( ...
@@ -1123,7 +1184,14 @@ classdef ChannelSimulatorV3App < handle
                 end
                 options = struct("progress_callback", @app.calibrationProgress, ...
                     "cancel_check", @() app.CancellationRequested);
-                if string(app.InputAnalysis.classification) == ...
+                if app.currentAxisName() == "frequency"
+                    % v3.2-4a: Frequency prediction is deterministic in-band
+                    % recovery (linear interpolation); it never consumes
+                    % generator-parameter calibration, and the hole-y known
+                    % subcarrier grid cannot build a wideband PDP fit target.
+                    % Skip the optimizer and record the honest reason.
+                    app.CalibrationResult = create_frequency_axis_calibration();
+                elseif string(app.InputAnalysis.classification) == ...
                         "narrowband_static_siso"
                     app.CalibrationResult = ...
                         create_capability_default_calibration( ...
@@ -1198,12 +1266,15 @@ classdef ChannelSimulatorV3App < handle
                     "缺少标定结果");
                 return;
             end
-            if string(app.ImportResult.task.axis) ~= "sample" && ...
-                    string(app.ImportResult.task.axis) ~= "position"
-                uialert(app.UIFigure, ...
-                    "当前正式生成链路只支持沿样本或位置轴生成目标 CIR。时间/频率轴的导入与特性分析已支持，但端到端预测生成将在后续迭代接入。", ...
-                    "当前任务轴尚未接入生成链路");
-                return;
+            switch string(app.ImportResult.task.axis)
+                case {"sample", "position", "space", "time", "frequency"}
+                    % 已接入生成链路：sample 走 v3.1-7 链路；
+                    % space/time/frequency 走 v3.2 统一三轴预测入口。
+                otherwise
+                    uialert(app.UIFigure, ...
+                        "当前任务轴尚未接入生成链路：" + string(app.ImportResult.task.axis), ...
+                        "当前任务轴尚未接入生成链路");
+                    return;
             end
 
             app.CancellationRequested = false;
@@ -1238,18 +1309,38 @@ classdef ChannelSimulatorV3App < handle
                 prediction = app.createProductParameterPrediction(backend);
                 prediction.selection.generator_backend = selection;
                 app.ParameterPrediction = prediction;
-                generationConfig = app.buildPredictionGenerationConfig(backend);
-                generationConfig.generator_overrides.backend_options = struct( ...
-                    "output_profile", app.generatorOutputProfile());
-                if backend == "full_6gpcm"
-                    generationConfig.generator_overrides.backend_options.full_interface = ...
-                        selection.selected_adapter_variant;
+                if app.currentAxisName() == "frequency"
+                    % v3.2-4a: Frequency generation is deterministic in-band
+                    % CTF recovery (linear interpolation of known subcarriers;
+                    % Full 6GPCM is not involved). Run the dedicated service.
+                    generationConfig = struct("mode", "formal");
+                    serviceResult = run_v32_frequency_generation( ...
+                        app.ImportResult.dataset, prediction, struct( ...
+                        "progress_callback", @app.predictionProgress, ...
+                        "cancel_check", @() app.CancellationRequested));
+                    targetCount = numel(prediction.target_parameter_sample_index);
+                    backendLine = "后端：无（频率确定性恢复，不调用 Full 6GPCM）";
+                else
+                    generationConfig = app.buildPredictionGenerationConfig(backend);
+                    generationConfig.generator_overrides.backend_options = struct( ...
+                        "output_profile", app.generatorOutputProfile());
+                    if backend == "full_6gpcm"
+                        generationConfig.generator_overrides.backend_options.full_interface = ...
+                            selection.selected_adapter_variant;
+                        if ismember(app.currentAxisName(), ["time", "space"])
+                            % v3.2-3a/3b probes used 8 m/s track speed.
+                            generationConfig.generator_overrides.backend_options.full_track_speed_mps = 8.0;
+                        end
+                    end
+                    request = create_prediction_generation_request( ...
+                        prediction, generationConfig);
+                    serviceResult = run_prediction_generation(request, struct( ...
+                        "progress_callback", @app.predictionProgress, ...
+                        "cancel_check", @() app.CancellationRequested));
+                    targetCount = double(request.target_count);
+                    backendLine = "后端：" + backend + ...
+                        "（" + generationConfig.mode + "）";
                 end
-                request = create_prediction_generation_request( ...
-                    prediction, generationConfig);
-                serviceResult = run_prediction_generation(request, struct( ...
-                    "progress_callback", @app.predictionProgress, ...
-                    "cancel_check", @() app.CancellationRequested));
                 if ~serviceResult.success
                     error("ChannelSimulatorV3App:PredictionGenerationFailed", ...
                         "%s", strjoin(string(serviceResult.errors(:)), newline));
@@ -1284,8 +1375,8 @@ classdef ChannelSimulatorV3App < handle
                     "模型来源：" + app.modelSelectionBasis(prediction); ...
                     "适配：" + app.adaptationSummary(prediction); ...
                     "设备：" + app.deviceSummary(prediction); ...
-                    "后端：" + backend + "（" + generationConfig.mode + "）"; ...
-                    "生成目标数：" + string(request.target_count); ...
+                    backendLine; ...
+                    "生成目标数：" + string(targetCount); ...
                     "可导出：CIR / CTF / Prediction Manifest"; ...
                     warningLines; ...
                     "说明：本页展示已知区回测，不把目标真值当作已知精度。"];
@@ -1318,12 +1409,26 @@ classdef ChannelSimulatorV3App < handle
                 config.mode = "preview";
             end
             config.engine_root = app.fullEngineRoot();
-            config.task_axis = string(app.ImportResult.task.axis);
+            % Task layer uses "space"; the generation layer (request
+            % validator) only accepts "position" — map once here.
+            if string(app.ImportResult.task.axis) == "space"
+                config.task_axis = "position";
+            else
+                config.task_axis = string(app.ImportResult.task.axis);
+            end
             config.target_axis_values = app.targetAxisValues();
             dimensions = app.ImportResult.dataset.dimensions;
             config.dimensions.Tx = dimensions.Tx;
             config.dimensions.Rx = dimensions.Rx;
-            config.dimensions.Nt = dimensions.Nt;
+            if ismember(app.currentAxisName(), ["time", "space"])
+                % v3.2-3a/3b chain semantics: each target is one static
+                % snapshot at its target time/position, so Nt=1 per target
+                % call. The target axis values (time_s / position) are
+                % carried in target_axis_values.
+                config.dimensions.Nt = 1;
+            else
+                config.dimensions.Nt = dimensions.Nt;
+            end
             config.dimensions.Npath = dimensions.Npath;
             if backend ~= "full_6gpcm" || ...
                     (~isempty(fieldnames(app.BackendSelection)) && ...
@@ -1347,6 +1452,44 @@ classdef ChannelSimulatorV3App < handle
                     app.ModelModeDropDown.Value == "manual"
                 selectionMode = "manual";
                 requestedModel = string(app.ManualModelDropDown.Value);
+            end
+            if app.currentAxisName() ~= "sample"
+                % v3.2-4a: unified three-axis prediction entry for
+                % time/space/frequency. All 12 registered models run on all
+                % three axes: classical models in MATLAB; neural models
+                % (gru/lstm/tcn/dlinear/nlinear) via Python online-fit
+                % (experimental, no axis-sequence checkpoint). Automatic
+                % mode keeps the studied recommendations / structure hybrid.
+                if selectionMode == "manual" && ...
+                        ismember(requestedModel, ["gru", "lstm", ...
+                        "tcn", "dlinear", "nlinear"])
+                    % Neural online-fit needs the Python runtime.
+                    predictorConfig = struct( ...
+                        "selection_mode", selectionMode, ...
+                        "requested_model", requestedModel, ...
+                        "adaptation_mode", "off", ...
+                        "device", "cpu", ...
+                        "fit_progress_callback", @app.p8ExtractionProgress, ...
+                        "cancel_check", @() app.CancellationRequested, ...
+                        "python_executable", app.resolvePredictorPython());
+                else
+                    predictorConfig = struct( ...
+                        "selection_mode", selectionMode, ...
+                        "requested_model", requestedModel, ...
+                        "adaptation_mode", "off", ...
+                        "device", "cpu", ...
+                        "fit_progress_callback", @app.p8ExtractionProgress, ...
+                        "cancel_check", @() app.CancellationRequested);
+                end
+                try
+                    prediction = run_v32_axis_prediction( ...
+                        app.ImportResult.dataset, app.CalibrationResult, ...
+                        app.ImportResult.task, backend, predictorConfig);
+                catch exception
+                    error("ChannelSimulatorV3App:V32PredictionFailed", ...
+                        "%s", string(exception.message));
+                end
+                return;
             end
             predictorConfig = struct( ...
                 "selection_mode", selectionMode, ...
@@ -1450,10 +1593,52 @@ classdef ChannelSimulatorV3App < handle
         end
 
         function value = registryRecommendation(app)
-            if app.taskType() == "extrapolation"
-                value = "kalman";
-            else
-                value = "persistence";
+            % v3.2-4a: recommend per task axis. time/space/frequency use the
+            % v3.2-2 studied methods; sample keeps the v3.1-7 policy.
+            switch app.currentAxisName()
+                case "time"
+                    value = "ar";
+                case "space"
+                    value = "persistence";
+                case "frequency"
+                    % v3.2-4a 1A: structure-based hybrid (contiguous block ->
+                    % delay-domain OMP sparse; otherwise complex linear).
+                    value = "structure_hybrid";
+                otherwise
+                    if app.taskType() == "extrapolation"
+                        value = "kalman";
+                    else
+                        value = "persistence";
+                    end
+            end
+        end
+
+        function value = currentAxisName(app)
+            value = "sample";
+            if isfield(app.ImportResult, "task") && ...
+                    isfield(app.ImportResult.task, "axis")
+                value = string(app.ImportResult.task.axis);
+            end
+            if value == "position"
+                value = "space";  % v3.2 compatibility alias
+            end
+        end
+
+        function message = axisDomainMismatchMessage(app)
+            % v3.2-4a: give actionable guidance when the selected task axis
+            % is impossible for the imported file domain. CTF + non-frequency
+            % is intentionally NOT blocked (legacy sample-axis CTF flows).
+            message = "";
+            if isempty(fieldnames(app.ImportResult)) || ...
+                    ~isfield(app.ImportResult, "dataset") || ...
+                    isempty(fieldnames(app.ImportResult.dataset))
+                return;
+            end
+            domain = lower(string(app.ImportResult.dataset.domain));
+            axis = app.currentAxisName();
+            if domain == "cir" && axis == "frequency"
+                message = "该文件是 CIR 时域信道（无频率子载波轴）。" + ...
+                    "“频率”任务轴需要 CTF 频谱文件；请将任务轴改为“样本”“时间”或“空间”后重新加载。";
             end
         end
 
@@ -1468,6 +1653,11 @@ classdef ChannelSimulatorV3App < handle
         function lines = modelResultSummary(app, prediction)
             selected = app.selectedModelName(prediction);
             recommendation = app.registryRecommendation();
+            if ismember(app.currentAxisName(), ["time", "space", "frequency"])
+                lines = app.v32ModelResultSummary(prediction, ...
+                    selected, recommendation);
+                return;
+            end
             safety = app.predictionSafetySummary(prediction);
             lines = [ ...
                 "正式预测已完成：" + selected; ...
@@ -1493,6 +1683,51 @@ classdef ChannelSimulatorV3App < handle
                 "目标区域 Ground Truth：未读取"; ...
                 "输出：预测 CIR、可选 CTF、特性图和可审计 Manifest"; ...
                 app.predictionWarningLines(prediction)];
+        end
+
+        function lines = v32ModelResultSummary(app, prediction, selected, recommendation)
+            axis = app.currentAxisName();
+            knownCount = 0;
+            if isfield(prediction, "known_context_parameter_sample_index")
+                knownCount = numel( ...
+                    prediction.known_context_parameter_sample_index);
+            end
+            targetCount = 0;
+            if isfield(prediction, "target_parameter_sample_index")
+                targetCount = numel(prediction.target_parameter_sample_index);
+            end
+            lines = [ ...
+                "正式预测已完成：" + selected; ...
+                "Registry 冻结推荐：" + recommendation; ...
+                "逐参数模型：" + app.parameterModelSummary(prediction); ...
+                "预测对象：" + app.v32PredictionObject(axis); ...
+                "已知区观测点：" + string(knownCount) + ...
+                    "（仅使用已知区，未读取目标区真值）"; ...
+                "目标区预测点数：" + string(targetCount); ...
+                "选择依据：" + app.modelSelectionBasis(prediction); ...
+                "适配结果：" + app.adaptationSummary(prediction); ...
+                "目标区域 Ground Truth：未读取"; ...
+                "输出：" + app.v32OutputDescription(axis); ...
+                app.predictionWarningLines(prediction)];
+        end
+
+        function value = v32PredictionObject(~, axis)
+            switch axis
+                case "time"
+                    value = "沿时间轴的目标 DS_mu/KF_mu（AR(4) 外推，num_clusters 冻结）";
+                case "space"
+                    value = "沿空间轴的目标 DS_mu/KF_mu（Persistence 外推，num_clusters 冻结）";
+                otherwise
+                    value = "缺失带内子载波的 CTF 幅度/相位（结构分流恢复：连续块→延迟域稀疏，其余→线性插值）";
+            end
+        end
+
+        function value = v32OutputDescription(~, axis)
+            if axis == "frequency"
+                value = "恢复 CTF、确定性 IFFT 导出的 CIR、特性图和可审计 Manifest";
+            else
+                value = "预测 CIR（Full 6GPCM 公共 API）、可选 CTF 和特性图";
+            end
         end
 
         function lines = predictionWarningLines(app, prediction)
@@ -1974,10 +2209,14 @@ classdef ChannelSimulatorV3App < handle
         function label = calibrationSourceLabel(app)
             label = "known 区 Grid/SA 标定";
             if ~isempty(fieldnames(app.CalibrationResult)) && ...
-                    isfield(app.CalibrationResult, "selected_strategy") && ...
-                    string(app.CalibrationResult.selected_strategy) == ...
-                    "capability_defaults"
-                label = "窄带不可辨识参数：版本化默认值";
+                    isfield(app.CalibrationResult, "selected_strategy")
+                if string(app.CalibrationResult.selected_strategy) == ...
+                        "capability_defaults"
+                    label = "窄带不可辨识参数：版本化默认值";
+                elseif string(app.CalibrationResult.selected_strategy) == ...
+                        "frequency_deterministic_recovery"
+                    label = "频率轴确定性恢复：不依赖标定（版本化默认值）";
+                end
             end
         end
 
@@ -2358,12 +2597,26 @@ classdef ChannelSimulatorV3App < handle
                 knownValues = zeros(0, numel(names));
                 knownX = zeros(0, 1);
             end
-            app.renderOneParameter(app.DelayParameterAxes, ...
-                names, knownValues, values, "DS_mu", knownX, targetX, ...
-                "log10(s)", app.parameterModelName(prediction, "DS_mu"));
-            app.renderOneParameter(app.KFactorParameterAxes, ...
-                names, knownValues, values, "KF_mu", knownX, targetX, ...
-                "dB", app.parameterModelName(prediction, "KF_mu"));
+            if app.currentAxisName() == "frequency"
+                % v3.2-4a: Frequency predicts the CTF magnitude/phase at the
+                % missing in-band subcarriers; reuse the two module-three
+                % parameter axes with the frequency axis in Hz.
+                app.renderOneParameter(app.DelayParameterAxes, ...
+                    names, knownValues, values, "magnitude", ...
+                    knownX, targetX, "线性幅度", ...
+                    app.parameterModelName(prediction, "magnitude"));
+                app.renderOneParameter(app.KFactorParameterAxes, ...
+                    names, knownValues, values, "phase", ...
+                    knownX, targetX, "rad", ...
+                    app.parameterModelName(prediction, "phase"));
+            else
+                app.renderOneParameter(app.DelayParameterAxes, ...
+                    names, knownValues, values, "DS_mu", knownX, targetX, ...
+                    "log10(s)", app.parameterModelName(prediction, "DS_mu"));
+                app.renderOneParameter(app.KFactorParameterAxes, ...
+                    names, knownValues, values, "KF_mu", knownX, targetX, ...
+                    "dB", app.parameterModelName(prediction, "KF_mu"));
+            end
         end
 
         function value = parameterModelName(app, prediction, parameterName)
