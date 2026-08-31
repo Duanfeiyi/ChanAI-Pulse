@@ -1127,11 +1127,13 @@ classdef ChannelSimulatorV3App < handle
             % identifier/message copyable for support.
             guidance = user_error_guidance(exception, step);
             area = app.errorStatusArea(step);
-            area.Value = [guidance.lines(:); ""; ...
-                "技术编号：" + guidance.technical];
-            uialert(app.UIFigure, ...
-                strjoin([guidance.lines(:); "技术编号：" + guidance.technical], newline), ...
-                guidance.title);
+            lines = guidance.lines(:);
+            if ~any(contains(lines, "技术详情")) && ...
+                    ~any(contains(lines, "技术编号"))
+                lines(end + 1, 1) = "技术编号：" + guidance.technical; %#ok<AGROW>
+            end
+            area.Value = lines;
+            uialert(app.UIFigure, strjoin(lines, newline), guidance.title);
             app.setGlobalStatus(guidance.title, "error");
         end
 
