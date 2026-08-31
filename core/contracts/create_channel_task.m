@@ -18,9 +18,13 @@ if ~ismember(mode, ["interpolation", "extrapolation"])
     error("create_channel_task:UnsupportedMode", ...
         "Mode must be 'interpolation' or 'extrapolation'.");
 end
-if ~ismember(axisName, ["sample", "position", "time", "frequency"])
+if ~ismember(axisName, ["sample", "space", "position", "time", "frequency"])
     error("create_channel_task:UnsupportedAxis", ...
-        "Axis must be sample, position, time, or frequency.");
+        "Axis must be sample, space, position, time, or frequency.");
+end
+% v3.2: "position" is a compatibility alias for the unified "space" axis.
+if axisName == "position"
+    axisName = "space";
 end
 
 task = struct();

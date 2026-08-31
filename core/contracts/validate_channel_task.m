@@ -27,13 +27,16 @@ end
 
 mode = lower(string(task.mode));
 axisName = lower(string(task.axis));
+if axisName == "position"
+    axisName = "space";  % v3.2 compatibility alias
+end
 if ~ismember(mode, ["interpolation", "extrapolation"])
     report = addError(report, ...
         "Task mode must be interpolation or extrapolation.");
 end
-if ~ismember(axisName, ["sample", "position", "time", "frequency"])
+if ~ismember(axisName, ["sample", "space", "time", "frequency"])
     report = addError(report, ...
-        "Task axis must be sample, position, time, or frequency.");
+        "Task axis must be sample, space, time, or frequency.");
 end
 if ~isempty(report.errors)
     report = finalize(report);
@@ -94,11 +97,11 @@ if axisName == "frequency" && dataset.dimensions.Nf <= 1
 elseif axisName == "time" && dataset.dimensions.Nt <= 1
     report = addError(report, ...
         "Time interpolation/extrapolation requires Nt > 1.");
-elseif axisName == "position" && ...
+elseif axisName == "space" && ...
         ~isfield(dataset.axes, "sample_position_m") && ...
         (~isfield(task, "axis_values") || isempty(task.axis_values))
     report = addError(report, ...
-        "Position task requires sample_position_m or task.axis_values.");
+        "Space task requires sample_position_m or task.axis_values.");
 end
 
 report = finalize(report);
@@ -110,7 +113,7 @@ if isfield(task, "axis_values") && ~isempty(task.axis_values)
     return;
 end
 switch axisName
-    case {"sample", "position"}
+    case {"sample", "space", "position"}
         axisLength = dataset.dimensions.N_sample;
     case "time"
         axisLength = dataset.dimensions.Nt;

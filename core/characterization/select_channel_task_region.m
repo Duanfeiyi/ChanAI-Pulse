@@ -40,7 +40,7 @@ info.axis = axisName;
 info.indices = indices(:);
 
 switch axisName
-    case {"sample", "position"}
+    case {"sample", "position", "space"}
         info.original_length = dataset.dimensions.N_sample;
         selected = subsetDatasetDimension(selected, 5, indices);
         selected.dimensions.N_sample = numel(indices);

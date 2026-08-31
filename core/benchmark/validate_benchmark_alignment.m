@@ -90,9 +90,9 @@ if isfield(predicted.axes, "sample_index") && ...
     errors(end + 1, 1) = ...
         "predicted_cir.h5 sample_index does not match declared target order.";
 end
-if ~ismember(lower(string(task.axis)), ["sample", "position"])
+if ~ismember(lower(string(task.axis)), ["sample", "position", "space"])
     errors(end + 1, 1) = ...
-        "Step 13 v3.0 benchmark currently requires a sample/position task axis.";
+        "Step 13 v3.0 benchmark currently requires a sample/position/space task axis.";
 end
 if isfield(context, "original_dimensions")
     expected = context.original_dimensions;

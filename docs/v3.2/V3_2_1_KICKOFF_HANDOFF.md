@@ -120,3 +120,62 @@
 3. 生成数据 Manifest 冻结，v3.2-1 收尾。
 
 **已无未决决策**——所有参数（16→4、Time Nt=96/100ms/8m/s、Time 2 字段、Nf=64、3 档缺失、84/18/18、探路规模、脚本位置、资产目录）均已由用户确认。
+
+---
+
+## 8. v3.2-4a 进度快照（三轴 UI 集成，工作分支 `codex/v3.2-4a`，未提交）
+
+> 上一快照以来：v3.2-0 合同（PR #77）、v3.2-1 数据（PR #78/#79）、v3.2-2 模型研究（PR #80/#81）、注册表（PR #82）、v3.2-3 端到端（PR #83）均已合并；origin/main HEAD `315fb0f`。
+
+### 8.1 已完成（本地已验证，未提交）
+
+- **统一预测入口** `core/v32_1/run_v32_axis_prediction.m`：按 task.axis 分派——sample→v3.1-7；time→AR(4) 外推 DS/KF；space→Persistence 外推 DS/KF；frequency→线性插值恢复 CTF 幅度/相位（不调 Full 6GPCM）。全部带泄漏守卫（不读目标区）。
+- **已知区 DS/KF 提取** `core/v32_1/estimate_known_region_ds_kf.m`：按位置轴/时间轴判别索引维度，DS 界 [-9,-5]、KF 界 [-30,30]。
+- **频率恢复服务** `core/v32_1/run_v32_frequency_generation.m` + `recover_inband_ctf_spectrum.m` + `ifft_ctf_to_cir.m`：确定性恢复 → CTF 数据集 → IFFT CIR → 特性引擎 → canonical prediction result（镜像 run_prediction_generation 契约）。
+- **App 接线** `app/ChannelSimulatorV3App.m`：
+  - 任务轴四项 样本/空间/时间/频率（position→space 兼容别名，任务层用 space，生成层映射回 position——生成请求校验器只认 position）；
+  - 频率轴"缺失子载波模式"下拉（uniform_half/random_half/block_8，仅频率轴启用）；
+  - `registryRecommendation` 按轴（time→ar / space→persistence / frequency→linear_interpolation / sample→v3.1 策略）；
+  - `createProductParameterPrediction` 三轴分派；`runPredictionGeneration` 频率分支；time/space 每目标 Nt=1 + full_track_speed_mps=8.0（v3.2-3a/3b 语义）；
+  - 模块三参数轴渲染频率 magnitude/phase；v3.2 专属摘要；翻译表补充。
+- **轴别名修复**：`select_channel_task_region`、`create_channel_task_preset`、`validate_benchmark_alignment` 均接受 space；`import_channel_dataset`/App 的空间位置轴按沿轨 x（N×3 取第 1 列）取值。
+- **审计更新**：`audit_platform_compatibility` 的 `time_frequency_target_generation_supported=true`（v3.2-4a 起成立）。
+- **测试**：`tests/run_v32_4_regression.m`（三轴核心链路，含泄漏篡改校验）、`tests/probe_v32_4_app_import.m`（无头三轴导入）、`test_step12_formal_ui.m`/`test_step12extra_usability_and_audit.m` 更新。**全部 PASS，v3.1-7 全量回归零退化。**
+- **审阅指引**：`docs/v3.2/V3_2_4_UI_MANUAL_REVIEW_GUIDE.md`（人工审阅清单与勾选表）。
+
+### 8.2 下一步
+
+1. **v3.2-4a 合并**：人工审阅基本完成 → 新建分支（基于当前工作分支/origin/main）承载 v3.2-4a 变更 → PR（由 Duanfeiyi 手动合并）；
+2. **报错用户可读化改进**（人工审阅反馈，已登记主计划 5.6.2）：白话化映射表 + 统一包装 + 技术详情可复制 + 前置预告 + 速查文档；
+3. v3.2-4b（三维独立 Benchmark）/ v3.2-4c（发布验收 + release）随后推进。
+
+### 8.3 v3.2-4a 审阅修复轮（人工审阅发现的问题已修复）
+
+1. **图1（频率导入报错不友好）**：`create_channel_task_preset` 的轴长不足错误现在带轴名与长度并给出引导（"CTF 频谱文件应选频率轴"）；App `loadAndAnalyze` 增加 CIR 文件+频率轴 的域↔轴匹配引导（CTF+非频率不拦截，保留 v3.1-7 遗留流程）。
+2. **图2（空间轴只有 3 图）**：探针文件元数据富化（`export_v32_4_probe_import_files` 现在写入 frequency_count=64、subcarrier_spacing_hz=120e3、tx_array/rx_array ULA 几何，且强制重生成）。空间轴模块一现为 **6 标准 + 1 附加**（频率自相关经派生 CTF、角度两图经 ULA 波束空间）。诚实降级：时间轴单路线（N_sample=1）6 图（3 个 CDF 不可用）；频率模块一已知区洞状网格 2 图；频率模块三恢复 CIR 4 图（CDF 单谱降级）。
+3. **图3（三轴手动选模型被拒）**：新增 `core/v32_1/v32_axis_manual_forecast.m`（MATLAB 经典模型族 persistence/linear/quadratic/holt/harmonic/ar/kalman，逐模型与 Python `flexible_forecast.py` 数值一致 ≤3.5e-14）。时间/空间轴高级模式手动选择经典模型可直接运行；神经模型（gru/lstm/tcn/dlinear/nlinear）给出明确不可用原因；频率轴手动给出明确说明（恢复为确定性线性插值）。
+4. **图4（频率轴模块二标定失败）**：根因 = 频率轴已知区是洞状非均匀子载波网格，Step-8 优化器构建 PDP 拟合目标（CTF→CIR 需均匀网格）必然失败（`build_channel_fit_target:MissingPdp`）。修复 = 频率轴跳过参数优化，新增 `core/v32_1/create_frequency_axis_calibration.m` 占位标定（success=true，策略=frequency_deterministic_recovery，如实标注"不依赖标定"），模块二快速通过 → 模块三恢复。对恢复精度零影响（恢复本就不读标定）。无头端到端验证 `prediction_success=1, selected_model=linear_interpolation`。
+5. 新增回归覆盖：手动经典模型 7 个、神经模型拒绝、三轴模块一图数断言、频率轴端到端。全部 PASS，v3.1-7 零退化。
+
+### 8.4 v3.2-4a 频率精度提升（方案 A：结构分流 hybrid，已实现并评估）
+
+- **背景**：v3.2-2b 发布的频率基线（mag/phase 线性插值）complex NMSE 0.76–0.84；产品复数插值已将其降至 uniform 0.18 / random 0.37（block 仍 0.80）。1A 延迟域稀疏恢复（OMP）在 block_8 0.59、random 0.25 更优，但 uniform_half 因隔点采样混叠退化到 1.06。
+- **方案 A（采纳）**：`core/v32_1/recover_inband_ctf_hybrid.m` 按**目标索引最大连续段 ≥4** 无泄漏分流——block 型走 `recover_inband_ctf_delay_sparse.m`（延迟域 OMP，support=8），其余走复数线性。选择器只看缺口形状，不读真值。
+- **产品级全语料评估**（`core/v32_1/probe_v32_4_frequency_hybrid_eval.m`，用上线同款 MATLAB 函数跑 2880 序列）：
+  - block_8：hybrid 0.592 vs linear 0.796 → **+25.6%**，胜出率 72.8%
+  - random_half：0.255 vs 0.374 → **+32.0%**，胜出率 75.1%
+  - uniform_half：0.169 vs 0.169 → 0%（保持最优，不劣化）
+  - 整体（3 模式等权）≈ 0.339 vs 0.446 → **+24%**
+  - 报告：`chanaipulse-v3.2-corpus.1/v32_4a_frequency_hybrid_eval.json`（Git 外）
+- **准入说明**：block/random 满足 ≥10% 改善与 ≥60% 胜出；uniform 保持最优不劣化（设计使然，非退步）。**已由 Duanfeiyi 确认按整体口径验收**（3 模式等权整体改善约 +24%，达标）。
+- **Manifest 如实记录**：selection.selected_model / model.model_type / engine.id = 实际方法；recovery_dispatch = structure_hybrid_1a_contiguous_block_ge_4。
+
+### 8.5 v3.2-4a 三轴 × 12 模型全接入（高级模式手动选择）
+
+- 需求：高级模式三轴**每个实验方法都能接入运行**（好坏不论）。
+- 实现：
+  - 经典 7 模型（persistence/linear/quadratic/holt/harmonic/ar/kalman）：MATLAB（`v32_axis_manual_forecast.m`），时间/空间=DS/KF 序列外推；频率=沿频率轴对 [Re, Im] 序列预测（`run_v32_axis_prediction.recoverWithModel`）。
+  - 神经 5 模型（gru/lstm/tcn/dlinear/nlinear）：Python 在线拟合外推（`python/chanai_predictor/v32_4_axis_neural.py` + `core/v32_1/v32_axis_neural_forecast.m`），在已知区序列上现场拟合小模型后滚动外推，无预训练 checkpoint；**实验性质**，Manifest `execution_contract` 含 `online_fit`、provenance 标 `manual_experimental_override`。
+  - App：取消神经/频率手动拒绝，神经模型自动解析 Python 运行时（`resolvePredictorPython`，仅在选神经模型时要求）。
+- 自动模式不变：时间=AR、空间=Persistence、频率=structure_hybrid。
+- 验证：回归测试覆盖 12 模型 × 三轴可运行断言，全部 PASS，v3.1-7 零退化。
