@@ -26,9 +26,18 @@ end
 task = bundle.result.benchmark_context.task;
 target = double(task.target_indices(:));
 known = double(task.known_indices(:));
-[referenceAll, prediction, representation] = ...
-    comparableRepresentations(original, bundle, config);
-reference = referenceAll(:, :, :, :, target);
+axisName = lower(string(task.axis));
+if axisName == "position"
+    axisName = "space";
+end
+[allReference, prediction, representation] = ...
+    comparableRepresentations(original, bundle, task, config);
+reference = extractTargetRepresentation(allReference, task);
+if axisName == "frequency"
+    % The predicted CTF carries the full spectrum; keep only the target
+    % subcarriers so reference and prediction share the target shape.
+    prediction = extractTargetRepresentation(prediction, task);
+end
 if ~isequal(size5(reference), size5(prediction))
     error("run_channel_benchmark:RepresentationShapeMismatch", ...
         "Aligned reference and prediction representations have different shapes.");
@@ -36,31 +45,31 @@ end
 config.internal_frequency_hz = representation.frequency_hz;
 axisValues = resolveTaskAxis(original, task);
 baselineClock = tic;
-baselinePersistence = baselineRepresentation(referenceAll, axisValues, ...
-    known, target, "persistence");
+baselinePersistence = baselineRepresentation(allReference, axisValues, ...
+    known, target, "persistence", axisName);
 persistenceBuildRuntime = toc(baselineClock);
 baselineClock = tic;
-baselineLinear = baselineRepresentation(referenceAll, axisValues, ...
-    known, target, "linear");
+baselineLinear = baselineRepresentation(allReference, axisValues, ...
+    known, target, "linear", axisName);
 linearBuildRuntime = toc(baselineClock);
 
 metricClock = tic;
 metricsPrediction = computeMetrics(reference, prediction, ...
-    original, bundle.cir, target, config);
+    original, bundle.cir, target, config, axisName);
 metricsPrediction.evaluation_runtime_s = toc(metricClock);
 metricsPrediction.generation_runtime_s = predictionRuntime(bundle.generator_manifest);
 metricClock = tic;
 metricsPersistence = computeMetrics(reference, baselinePersistence, ...
-    original, struct(), target, config);
+    original, struct(), target, config, axisName);
 metricsPersistence.evaluation_runtime_s = persistenceBuildRuntime + toc(metricClock);
 metricsPersistence.generation_runtime_s = NaN;
 metricClock = tic;
 metricsLinear = computeMetrics(reference, baselineLinear, ...
-    original, struct(), target, config);
+    original, struct(), target, config, axisName);
 metricsLinear.evaluation_runtime_s = linearBuildRuntime + toc(metricClock);
 metricsLinear.generation_runtime_s = NaN;
 perTarget = perTargetMetrics(reference, prediction, ...
-    baselinePersistence, baselineLinear, target, axisValues);
+    baselinePersistence, baselineLinear, target, axisValues, axisName);
 perLink = perLinkMetrics(reference, prediction, ...
     baselinePersistence, baselineLinear);
 
@@ -97,7 +106,7 @@ if logical(config.export_report)
 end
 end
 
-function [allReference, prediction, info] = comparableRepresentations(original, bundle, config)
+function [allReference, prediction, info] = comparableRepresentations(original, bundle, task, config)
 if original.domain == "ctf" && ~isempty(fieldnames(bundle.ctf))
     referenceFrequency = double(original.axes.frequency_hz(:));
     predictedFrequency = double(bundle.ctf.axes.frequency_hz(:));
@@ -120,6 +129,32 @@ end
 info = struct("domain", source, "frequency_hz", frequencyHz, ...
     "shape", size5(prediction), ...
     "explanation", "Both channels are compared on one common complex frequency grid.");
+end
+
+function reference = extractTargetRepresentation(allReference, task)
+% v3.2-4b: extract the TARGET region along the task axis so time/frequency/
+% sample/space tasks compare the exact predicted targets against truth.
+target = double(task.target_indices(:));
+axisName = lower(string(task.axis));
+if axisName == "position"
+    axisName = "space";
+end
+switch axisName
+    case "time"
+        % Targets are snapshots (dim 4); predicted CIR carries one snapshot
+        % per target sample (dim 5); align both to [.., 1, T].
+        reference = allReference(:, :, :, target, 1);
+        reference = reshape(reference, ...
+            [size(reference, 1), size(reference, 2), ...
+            size(reference, 3), 1, numel(target)]);
+    case "frequency"
+        % Targets are subcarriers (dim 3); keep the frequency dimension.
+        reference = reshape(allReference(:, :, target, 1, 1), ...
+            [size(allReference, 1), size(allReference, 2), numel(target), 1, 1]);
+    otherwise
+        % sample/space: targets are samples (dim 5).
+        reference = allReference(:, :, :, :, target);
+end
 end
 
 function frequencyHz = comparisonFrequencyAxis(original, predicted, config)
@@ -167,20 +202,40 @@ H = cir_to_ctf(coefficient, dataset.cir.delay_s, frequencyHz);
 end
 
 function axisValues = resolveTaskAxis(original, task)
-axisValues = (1:original.dimensions.N_sample).';
+% v3.2-4b: axis-aware coordinate values for baseline construction.
 axisName = lower(string(task.axis));
-if axisName == "position" && isfield(original.axes, "sample_position_m")
-    position = double(original.axes.sample_position_m);
-    if size(position, 2) == 1
-        axisValues = position(:);
-    else
-        axisValues = [0; cumsum(vecnorm(diff(position, 1, 1), 2, 2))];
-    end
-elseif isfield(task, "axis_values") && ...
-        numel(task.axis_values) == original.dimensions.N_sample
-    axisValues = double(task.axis_values(:));
-elseif isfield(original.axes, "sample_index")
-    axisValues = double(original.axes.sample_index(:));
+if axisName == "position"
+    axisName = "space";
+end
+switch axisName
+    case "time"
+        axisValues = taskAxisValues(task, original.dimensions.Nt);
+        if isempty(axisValues) && isfield(original.axes, "time_s")
+            axisValues = double(original.axes.time_s(:));
+        end
+    case "frequency"
+        axisValues = taskAxisValues(task, original.dimensions.Nf);
+        if isempty(axisValues) && isfield(original.axes, "frequency_hz")
+            axisValues = double(original.axes.frequency_hz(:));
+        end
+    case "space"
+        axisValues = taskAxisValues(task, original.dimensions.N_sample);
+        if isempty(axisValues) && isfield(original.axes, "sample_position_m")
+            position = double(original.axes.sample_position_m);
+            if size(position, 2) == 1
+                axisValues = position(:);
+            else
+                axisValues = [0; cumsum(vecnorm(diff(position, 1, 1), 2, 2))];
+            end
+        end
+    otherwise
+        axisValues = taskAxisValues(task, original.dimensions.N_sample);
+        if isempty(axisValues) && isfield(original.axes, "sample_index")
+            axisValues = double(original.axes.sample_index(:));
+        end
+end
+if isempty(axisValues)
+    axisValues = (1:original.dimensions.N_sample).';
 end
 if any(~isfinite(axisValues)) || numel(unique(axisValues)) ~= numel(axisValues)
     error("run_channel_benchmark:InvalidTaskAxis", ...
@@ -188,9 +243,39 @@ if any(~isfinite(axisValues)) || numel(unique(axisValues)) ~= numel(axisValues)
 end
 end
 
-function estimate = baselineRepresentation(allReference, x, known, target, method)
+function values = taskAxisValues(task, expectedLength)
+values = [];
+if isfield(task, "axis_values") && ...
+        numel(task.axis_values) == expectedLength
+    values = double(task.axis_values(:));
+end
+end
+
+function estimate = baselineRepresentation(allReference, x, known, target, method, axisName)
+% Builds a persistence/linear baseline from the FULL reference along the
+% task axis, then returns an estimate on the TARGET positions with the same
+% layout as extractTargetRepresentation.
 shape = size5(allReference);
-matrix = reshape(allReference, [], shape(5));
+switch axisName
+    case "frequency"
+        matrix = reshape(allReference, shape(1) * shape(2), shape(3));
+        result = baselineMatrix(matrix, x, known, target, method);
+        estimate = reshape(result, ...
+            [shape(1), shape(2), numel(target), 1, 1]);
+    case "time"
+        matrix = reshape(allReference, [], shape(4));
+        result = baselineMatrix(matrix, x, known, target, method);
+        estimate = reshape(result, ...
+            [shape(1), shape(2), shape(3), 1, numel(target)]);
+    otherwise
+        matrix = reshape(allReference, [], shape(5));
+        result = baselineMatrix(matrix, x, known, target, method);
+        estimate = reshape(result, ...
+            [shape(1), shape(2), shape(3), shape(4), numel(target)]);
+end
+end
+
+function estimate = baselineMatrix(matrix, x, known, target, method)
 estimate = complex(zeros(size(matrix, 1), numel(target)));
 if method == "persistence"
     for index = 1:numel(target)
@@ -202,10 +287,9 @@ else
     knownMatrix = matrix(:, known(order)).';
     estimate = interp1(knownX, knownMatrix, x(target), "linear", "extrap").';
 end
-estimate = reshape(estimate, [shape(1:4), numel(target)]);
 end
 
-function metrics = computeMetrics(reference, estimate, original, predictedCir, target, config)
+function metrics = computeMetrics(reference, estimate, original, predictedCir, target, config, axisName)
 delta = estimate - reference;
 referencePower = sum(abs(reference(:)).^2);
 metrics = struct();
@@ -220,9 +304,12 @@ metrics.phase_mae_rad = mean(abs(phaseDelta), "omitnan");
 metrics.complex_correlation = abs(sum(conj(reference(:)) .* estimate(:))) / ...
     max(sqrt(sum(abs(reference(:)).^2) * sum(abs(estimate(:)).^2)), eps);
 capabilities = infer_channel_capabilities(original);
+% v3.2-4b: on a Frequency task the compared region is the missing
+% subcarriers only, which has no uniform grid, so PDP/spatial/time
+% capability metrics are not meaningful there and stay NaN.
 metrics.pdp_nrmse = NaN;
 metrics.rms_delay_spread_abs_error_s = NaN;
-if capabilities.pdp
+if capabilities.pdp && axisName ~= "frequency"
     [referencePdp, delayS] = pdpFromCtf(reference, config.internal_frequency_hz);
     [estimatePdp, ~] = pdpFromCtf(estimate, config.internal_frequency_hz);
     metrics.pdp_nrmse = norm(estimatePdp - referencePdp) / ...
@@ -231,11 +318,11 @@ if capabilities.pdp
         weightedSpread(delayS, estimatePdp) - weightedSpread(delayS, referencePdp));
 end
 metrics.spatial_correlation_nrmse = NaN;
-if capabilities.spatial_correlation
+if capabilities.spatial_correlation && axisName ~= "frequency"
     metrics.spatial_correlation_nrmse = spatialCorrelationError(reference, estimate);
 end
 metrics.time_autocorrelation_nrmse = NaN;
-if capabilities.time_autocorrelation
+if capabilities.time_autocorrelation && axisName ~= "frequency"
     metrics.time_autocorrelation_nrmse = timeCorrelationError(reference, estimate);
 end
 metrics.doppler_spectrum_nrmse = NaN;
@@ -250,20 +337,36 @@ if capabilities.angular_power_spectrum && ...
 end
 end
 
-function rows = perTargetMetrics(reference, estimate, persistence, linear, target, x)
+function rows = perTargetMetrics(reference, estimate, persistence, linear, target, x, axisName)
 rows = repmat(struct("target_index", 0, "axis_value", 0, ...
     "prediction_complex_nmse", 0, "persistence_complex_nmse", 0, ...
     "linear_complex_nmse", 0, "prediction_correlation", 0), numel(target), 1);
 for index = 1:numel(target)
-    ref = reference(:, :, :, :, index);
-    a = computeBasic(ref, estimate(:, :, :, :, index));
-    b = computeBasic(ref, persistence(:, :, :, :, index));
-    c = computeBasic(ref, linear(:, :, :, :, index));
+    [ref, est, per, lin] = targetSlice( ...
+        reference, estimate, persistence, linear, index, axisName);
+    a = computeBasic(ref, est);
+    b = computeBasic(ref, per);
+    c = computeBasic(ref, lin);
     rows(index) = struct("target_index", target(index), ...
         "axis_value", x(target(index)), "prediction_complex_nmse", a.nmse, ...
         "persistence_complex_nmse", b.nmse, ...
         "linear_complex_nmse", c.nmse, ...
         "prediction_correlation", a.correlation);
+end
+end
+
+function [ref, est, per, lin] = targetSlice( ...
+        reference, estimate, persistence, linear, index, axisName)
+if axisName == "frequency"
+    ref = reference(:, :, index, 1, 1);
+    est = estimate(:, :, index, 1, 1);
+    per = persistence(:, :, index, 1, 1);
+    lin = linear(:, :, index, 1, 1);
+else
+    ref = reference(:, :, :, :, index);
+    est = estimate(:, :, :, :, index);
+    per = persistence(:, :, :, :, index);
+    lin = linear(:, :, :, :, index);
 end
 end
 

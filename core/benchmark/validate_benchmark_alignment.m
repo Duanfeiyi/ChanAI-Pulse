@@ -26,12 +26,24 @@ if ~isempty(errors)
     return;
 end
 predicted = bundle.cir;
-for name = ["Tx", "Rx", "Nt"]
+taskAxis = lower(string(task.axis));
+if taskAxis == "position"
+    taskAxis = "space";
+end
+for name = ["Tx", "Rx"]
     if original.dimensions.(name) ~= predicted.dimensions.(name)
         errors(end + 1, 1) = sprintf( ...
             "%s mismatch: original=%d, predicted=%d.", name, ...
             original.dimensions.(name), predicted.dimensions.(name)); %#ok<AGROW>
     end
+end
+if taskAxis ~= "time" && ...
+        original.dimensions.Nt ~= predicted.dimensions.Nt
+    % On a Time task, Nt is the task axis: the original route has many
+    % snapshots while each predicted target carries one snapshot.
+    errors(end + 1, 1) = sprintf( ...
+        "Nt mismatch: original=%d, predicted=%d.", ...
+        original.dimensions.Nt, predicted.dimensions.Nt);
 end
 if original.domain == "ctf" && ~isempty(fieldnames(bundle.ctf)) && ...
         original.dimensions.Nf ~= bundle.ctf.dimensions.Nf
@@ -54,15 +66,28 @@ if isempty(known) || isempty(target)
     alignment = finishAlignment(errors, warnings, task);
     return;
 end
-if any(target < 1 | target > original.dimensions.N_sample) || ...
-        any(known < 1 | known > original.dimensions.N_sample)
-    errors(end + 1, 1) = ...
-        "Known/target indices exceed the original data sample dimension.";
+axisName = lower(string(task.axis));
+if axisName == "position"
+    axisName = "space";
+end
+switch axisName
+    case {"time"}
+        axisLength = original.dimensions.Nt;
+    case {"frequency"}
+        axisLength = original.dimensions.Nf;
+    otherwise
+        axisLength = original.dimensions.N_sample;
+end
+if any(target < 1 | target > axisLength) || ...
+        any(known < 1 | known > axisLength)
+    errors(end + 1, 1) = sprintf( ...
+        "Known/target indices exceed the original %s-axis length (%d).", ...
+        axisName, axisLength);
 end
 if ~isempty(intersect(known, target))
     errors(end + 1, 1) = "Known and target regions overlap.";
 end
-if predicted.dimensions.N_sample ~= numel(target)
+if axisName ~= "frequency" && predicted.dimensions.N_sample ~= numel(target)
     errors(end + 1, 1) = sprintf( ...
         "Predicted target count=%d but task declares %d targets.", ...
         predicted.dimensions.N_sample, numel(target));
@@ -85,14 +110,20 @@ if isfield(task, "axis_values") && ...
             "Prediction target-axis coordinates differ from the declared task.";
     end
 end
-if isfield(predicted.axes, "sample_index") && ...
+if axisName ~= "frequency" && isfield(predicted.axes, "sample_index") && ...
         ~isequal(double(predicted.axes.sample_index(:)), target)
     errors(end + 1, 1) = ...
         "predicted_cir.h5 sample_index does not match declared target order.";
 end
-if ~ismember(lower(string(task.axis)), ["sample", "position", "space"])
+if axisName == "frequency" && ...
+        isempty(fieldnames(bundle.ctf))
     errors(end + 1, 1) = ...
-        "Step 13 v3.0 benchmark currently requires a sample/position/space task axis.";
+        "Frequency-axis benchmark requires a predicted CTF dataset.";
+end
+if ~ismember(lower(string(task.axis)), ...
+        ["sample", "position", "space", "time", "frequency"])
+    errors(end + 1, 1) = ...
+        "Step 13 v3.0 benchmark requires a sample/position/space/time/frequency task axis.";
 end
 if isfield(context, "original_dimensions")
     expected = context.original_dimensions;
